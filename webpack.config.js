@@ -19,8 +19,14 @@ const MODULE_CONFIG = {
   rules: [
     {
       test: /(\.jsx|\.js)$/,
-      loader: 'babel-loader',
-      exclude: /(node_modules|bower_components)/
+      exclude: /(node_modules|bower_components)/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env'],
+          plugins: ['@babel/plugin-transform-runtime']
+        }
+      }
     }
   ]
 };
@@ -51,13 +57,11 @@ if (env === 'min') {
 const config = [
   {
     // Front-end module
-    entry: {
-      deriver: __dirname + '/src/index.js',
-    },
+    entry: __dirname + '/src/index.js',
     output: {
       path: __dirname + '/dist',
       filename: `tls.${min}js`,
-      library: 'fxaTls',
+      library: 'tls',
       libraryTarget: 'umd',
       umdNamedDefine: true
     },
