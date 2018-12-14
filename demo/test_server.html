@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>fxa-pairing-tls demo server</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <h2>fxa-pairing-tls demo server</h2>
+  <div id="show-code-ui">
+    <p>Enter this code to chat: <span id="code-value">...</span></p>
+  </div>
+  <div id="chat-ui">
+    <textarea id="chat-history"></textarea>
+    <input type="text" id="chat-input" />
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="../dist/tls.js"></script>
+  <script src="./tlschannel.js"></script>
+  <script>
+      $(async () => {
+          $("#chat-history").val("")
+          const channel = await InsecureTLSChannel.create()
+          $("#code-value").text(channel.channelId)
+          channel.onReceive = msg => {
+            $("#chat-history").val($("#chat-history").val() + "\nthem>> " + msg)
+          }
+          $("#chat-input").on("keypress", (evt) => {
+            if (evt.keyCode !== 13) { return }
+            let msg = $("#chat-input").val()
+            $("#chat-input").val("")
+            $("#chat-history").val($("#chat-history").val() + "\nme>>>> " + msg)
+            channel.send(msg)
+          });
+      })
+  </script>
+</body>
+
+</html>
