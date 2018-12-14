@@ -2,22 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+'use strict'
 
-class Exchange {
-  /**
-   * @constructor
-   */
-  constructor() {
-    this.state = null;
-  }
-
-  thing() {
-    console.log('2');
-    return 1;
-  }
-
-}
-
-module.exports = {
-  Exchange: Exchange,
-};
+//
+// Low-level crypto primitives.
+//
+// We haven't actually implemented any of the crypto yet,
+// but when we do, this is the file where we'll define the basics.
+//

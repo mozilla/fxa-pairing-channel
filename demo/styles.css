@@ -1,0 +1,13 @@
+body {
+    font-size: large;
+  }
+  h2 {
+    margin: 2em;
+  }
+  #chat-history {
+    width: 90%;
+    height: 15em;
+  }
+  #chat-input {
+    width: 90%;
+  }
