@@ -21,20 +21,20 @@ const bannerPlugin = new webpack.BannerPlugin({
 const MODULE_CONFIG = {
   rules: [
     {
-      test: /(\.jsx|\.js)$/,
       exclude: /(node_modules|bower_components)/,
+      test: /(\.jsx|\.js)$/,
       use: {
         loader: 'babel-loader',
         options: {
+          plugins: ['@babel/plugin-transform-runtime'],
           presets: ['@babel/preset-env'],
-          plugins: ['@babel/plugin-transform-runtime']
         }
       }
     }
   ]
 };
 
-let PLUGINS = [];
+const PLUGINS = [];
 const FIREFOX_PLUGINS = [];
 
 // Adds a banner to the generated source
@@ -52,15 +52,18 @@ const config = [
   {
     // Front-end module
     entry: __dirname + '/src/index.js',
+    module: MODULE_CONFIG,
     output: {
-      path: __dirname + '/dist',
-      filename: `tls.${min}js`,
-      library: 'tls',
+      filename: `fxaPairingTLS.${min}js`,
+      library: 'fxaPairingTLS',
       libraryTarget: 'umd',
+      path: __dirname + '/dist',
       umdNamedDefine: true
     },
-    module: MODULE_CONFIG,
-    plugins: PLUGINS
+    plugins: PLUGINS,
+    optimization: {
+      minimize: false,
+    },
   },
   {
     // Firefox module

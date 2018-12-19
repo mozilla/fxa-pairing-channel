@@ -18,24 +18,24 @@
   </div>
 
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-  <script src="../dist/tls.js"></script>
+  <script src="../dist/fxaPairingTLS.js"></script>
   <script src="./tlschannel.js"></script>
   <script>
-      $(async () => {
-          $("#chat-history").val("")
-          const channel = await InsecureTLSChannel.create()
-          $("#code-value").text(channel.channelId)
-          channel.onReceive = msg => {
-            $("#chat-history").val($("#chat-history").val() + "\nthem>> " + msg)
-          }
-          $("#chat-input").on("keypress", (evt) => {
-            if (evt.keyCode !== 13) { return }
-            let msg = $("#chat-input").val()
-            $("#chat-input").val("")
-            $("#chat-history").val($("#chat-history").val() + "\nme>>>> " + msg)
-            channel.send(msg)
-          });
-      })
+    $(async () => {
+      $("#chat-history").val("");
+      const channel = await InsecurePairingChannel.create();
+      $("#code-value").text(channel.code);
+      channel.onReceive = msg => {
+        $("#chat-history").val($("#chat-history").val() + "\nthem>> " + msg);
+      }
+      $("#chat-input").on("keypress", (evt) => {
+        if (evt.keyCode !== 13) { return; }
+        let msg = $("#chat-input").val();
+        $("#chat-input").val("");
+        $("#chat-history").val($("#chat-history").val() + "\nme>>>> " + msg);
+        channel.send(msg)
+      });
+    })
   </script>
 </body>
 
