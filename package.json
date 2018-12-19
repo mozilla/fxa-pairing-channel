@@ -6,9 +6,9 @@
   "scripts": {
     "build": "webpack --env=build",
     "dev": "webpack --progress --colors --watch --env dev",
-    "test": "webpack && karma start test/karma.conf.js --single-run",
+    "test": "eslint src test demo && webpack && karma start test/karma.conf.js --single-run",
     "test-dev": "webpack && karma start test/karma.conf.js",
-    "lint": "eslint src test"
+    "lint": "eslint src test demo"
   },
   "repository": {
     "type": "git",
