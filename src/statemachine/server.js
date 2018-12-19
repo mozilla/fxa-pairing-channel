@@ -27,13 +27,14 @@ import {
 // to check the implementation against the diagrams in the RFC.
 
 export class ServerState_START extends State {
-    async initialize() {
-        // Nothing to initialize, just wait for ClientHello message.
-    }
-    async recv() {
-        await this.conn._getIncomingMessage(ClientHello, this.conn.pskID)
-        await this.conn._transition(ServerState_RECVD_CH)
-        return this.conn._state.maybeRecv()
+    async recvHandshakeMessage(type, record) {
+        switch (type) {
+            case ClientHello.TYPE_TAG:
+                await ClientHello.read(record, this.conn.pskID)
+                await this.conn._transition(ServerState_RECVD_CH);
+            default:
+                assert(false, 'unexpected handshake message type');
+        }
     }
 }
 
@@ -46,9 +47,9 @@ class ServerState_RECVD_CH extends State {
 
 class ServerState_NEGOTIATED extends State {
     async initialize() {
-        await this.conn._addOutgoingMessage(ServerHello, this.conn.pskID)
-        await this.conn._addOutgoingMessage(Finished)
-        await this.conn._flushOutgoingRecords()
+        await this.conn._writeHandshakeMessage(ServerHello, this.conn.pskID)
+        await this.conn._writeHandshakeMessage(Finished)
+        await this.conn._flushOutgoingRecord()
         await this.conn._transition(ServerState_WAIT_FLIGHT2)
     }
 }
@@ -62,9 +63,13 @@ class ServerState_WAIT_FLIGHT2 extends State {
 }
 
 class ServerState_WAIT_FINISHED extends State {
-    async recv() {
-        await this.conn._getIncomingMessage(Finished)
-        await this.conn._transition(State_CONNECTED)
-        return this.conn._state.maybeRecv()
+    async recvHandshakeMessage(type, record) {
+        switch (type) {
+            case Finished.TYPE_TAG:
+                await Finished.read(record)
+                await this.conn._transition(State_CONNECTED)
+            default:
+                assert(false, 'unexpected handshake message type');
+        }
     }
 }

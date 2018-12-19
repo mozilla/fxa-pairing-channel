@@ -10,6 +10,7 @@ import {
     ServerHello,
     Finished
 } from '../messages.js'
+import { assert } from '../utils.js';
 
 
 // These states implement (part of) the client state-machine from
@@ -28,36 +29,45 @@ import {
 
 export class ClientState_START extends State {
     async initialize() {
-        await this.conn._addOutgoingMessage(ClientHello, this.conn.pskID)
-        await this.conn._flushOutgoingRecords()
+        await this.conn._writeHandshakeMessage(ClientHello, this.conn.pskID)
+        await this.conn._flushOutgoingRecord()
         await this.conn._transition(ClientState_WAIT_SH)
     }
 }
 
 class ClientState_WAIT_SH extends State {
-    async recv() {
-        await this.conn._getIncomingMessage(ServerHello, this.conn.pskID)
-        await this.conn._transition(ClientState_WAIT_EE)
-        return this.conn._state.maybeRecv()
+    async recvHandshakeMessage(type, record) {
+        switch (type) {
+            case ServerHello.TYPE_TAG:
+                await ServerHello.read(record, this.conn.pskID);
+                await this.conn._transition(ClientState_WAIT_EE);
+                break;
+            default:
+                assert(false, 'unexpected handshake message type');
+        }
     }
 }
 
 class ClientState_WAIT_EE extends State {
-    async recv() {
+    async initialize() {
         // There are no EncryptedExtensions in the subset of TLS we plan to use.
-        // It's T.B.D. whether the server might send some and we have to skip over them.
-        await this.conn._transition(ClientState_WAIT_FINISHED)
-        return this.conn._state.maybeRecv()
+        // Transition directly to WAIT_FINISHED, which will error out if the server
+        // attempts to send any.
+        await this.conn._transition(ClientState_WAIT_FINISHED);
     }
 }
 
 class ClientState_WAIT_FINISHED extends State {
-    async recv() {
-        await this.conn._getIncomingMessage(Finished)
-        await this.conn._addOutgoingMessage(Finished)
-        await this.conn._flushOutgoingRecords()
-        // The handshake is complete!
-        await this.conn._transition(State_CONNECTED)
-        return this.conn._state.maybeRecv()
+    async recvHandshakeMessage(type, record) {
+        switch (type) {
+            case Finished.TYPE_TAG:
+                await Finished.read(record);
+                await this.conn._writeHandshakeMessage(Finished);
+                await this.conn._flushOutgoingRecord();
+                await this.conn._transition(State_CONNECTED);
+                break;
+            default:
+                assert(false, 'unexpected handshake message type');
+        }
     }
 }

@@ -21,7 +21,6 @@
 import { assert } from '../utils.js';
 import { ApplicationData } from '../messages.js';
 
-
 export class State {
 
     constructor(conn) {
@@ -32,26 +31,22 @@ export class State {
         // By default, nothing to do when entering the state.
     }
 
-    async send() {
+    async sendApplicationData() {
         // By default, assume we're not ready to send yet
-        // and just queue the data for a future state.
+        // and just let the data queue up for a future state.
+        // XXX TODO: should this block until it's successfuly sent?
     }
 
-    async recv() {
-        // By default, we just accumulate received data in the
-        // incoming_buffer until a future state is ready to consume it.
-        return null
+    async recvApplicationData() {
+        assert(false, 'not ready to receive application data')
     }
 
-    async maybeRecv() {
-        if (this.conn._hasIncomingMessage()) {
-            return await this.recv()
-        }
-        return null
+    async recvHandshakeMessage() {
+        assert(false, 'not expecting to receive a handhake message')
     }
 
     async close() {
-        assert(false, 'not implemented')
+        assert(false, 'close() not implemented yet')
     }
 
 }
@@ -63,10 +58,13 @@ export class State_UNINITIALIZED extends State {
     async initialize() {
         assert(false, 'uninitialized state')
     }
-    async send() {
+    async sendApplicationData() {
         assert(false, 'uninitialized state')
     }
-    async recv() {
+    async recvApplicationData(record) {
+        assert(false, 'uninitialized state')
+    }
+    async recvHandshakeMessage(type, record) {
         assert(false, 'uninitialized state')
     }
     async close() {
@@ -82,13 +80,13 @@ export class State_ERROR extends State {
     async initialize(err) {
         this.error = err
     }
-    async send() {
+    async sendApplicationData() {
         throw this.error
     }
-    async recv() {
+    async recvApplicationData(record) {
         throw this.error
     }
-    async maybeRecv() {
+    async recvHandshakeMessage(type, record) {
         throw this.error
     }
     async close() {
@@ -102,18 +100,19 @@ export class State_ERROR extends State {
 
 export class State_CONNECTED extends State {
     async initialize() {
-        await this.send()
+        await this.sendApplicationData()
     }
-    async send() {
+    async sendApplicationData() {
         // We can now send any application data that was
         // submitted before the handshake was complete.
-        while (this.conn._pendingSendData.length > 0) {
-            const data = this.conn._pendingSendData.shift()
-            await this.conn._addOutgoingMessage(ApplicationData, data)
-            await this.conn._flushOutgoingRecords()
+        while (this.conn._pendingApplicationData.length > 0) {
+            const data = this.conn._pendingApplicationData.shift()
+            await this.conn._writeApplicationData(data)
+            await this.conn._flushOutoingRecord()
         }
     }
-    async recv() {
-        return await this.conn._getIncomingMessage(ApplicationData)
+    async recvApplicationData(record) {
+        // Application data has no framing, just return the entire buffer.
+        return record.slice(0);
     }
 }

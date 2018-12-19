@@ -4,9 +4,10 @@
 
 'use strict'
 
+// TLS1.3 Key Schedule.
 //
-// Low-level crypto primitives.
-//
-// We haven't actually implemented any of the crypto yet,
-// but when we do, this is the file where we'll define the basics.
+// In this file we will implement the "key schedule" from
+// https://tools.ietf.org/html/rfc8446#section-7.1, which
+// defines how to calculate various keys as the handshake
+// state progreses.
 //

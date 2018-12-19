@@ -42,6 +42,7 @@
 // in which side is expected to send vs receieve during the protocol handshake.
 
 import {
+    assert,
     assertIsBytes,
     bytesToHex,
     hexToBytes,
@@ -53,7 +54,12 @@ import { State_UNINITIALIZED, State_ERROR } from './statemachine/index.js';
 import { ClientState_START } from './statemachine/client.js';
 import { ServerState_START } from './statemachine/server.js';
 
-import { OutgoingRecordBuffer, IncomingRecordBuffer } from './recordlayer.js'
+import {
+    RecordSender,
+    RecordReceiver,
+    RECORD_TYPE,
+    EMPTY_RECORD_READER
+ } from './recordlayer/index.js'
 
 // !!!!!!!
 // !!
@@ -69,14 +75,14 @@ import { OutgoingRecordBuffer, IncomingRecordBuffer } from './recordlayer.js'
 
 class InsecureConnection {
     constructor(psk, pskID, sendCallback) {
-        this.psk = assertIsBytes(psk)
-        this.pskID = assertIsBytes(pskID)
-        this.sendCallback = sendCallback
-        this._state = new State_UNINITIALIZED(this)
-        this._pendingSendData = []
-        this._incomingRecords = new IncomingRecordBuffer()
-        this._outgoingRecords = new OutgoingRecordBuffer()
-        this._lastPromise = Promise.resolve()
+        this.psk = assertIsBytes(psk);
+        this.pskID = assertIsBytes(pskID);
+        this.sendCallback = sendCallback;
+        this._state = new State_UNINITIALIZED(this);
+        this._pendingApplicationData = [];
+        this._recordSender = new RecordSender();
+        this._recordReceiver = new RecordReceiver();
+        this._lastPromise = Promise.resolve();
     }
 
     // Subclasses will override this with some async initialization logic.
@@ -90,16 +96,16 @@ class InsecureConnection {
     async send(data) {
         assertIsBytes(data)
         await this._serialize(async () => {
-            this._pendingSendData.push(data)
-            await this._state.send()
+            this._pendingApplicationData.push(data)
+            await this._state.sendApplicationData()
         })
     }
 
     async recv(data) {
         assertIsBytes(data)
         return await this._serialize(async () => {
-            this._incomingRecords.append(data)
-            return await this._state.recv()
+            const [type, buf] = this._recordReceiver.recv(data);
+            return await this._dispatchIncomingRecord(type, buf);
         })
     }
 
@@ -132,30 +138,56 @@ class InsecureConnection {
     // ensuring that the new state is properly initialized.
 
     async _transition(State, ...args) {
-        this._state = new State(this)
-        await this._state.initialize(...args)
+        this._state = new State(this);
+        await this._state.initialize(...args);
     }
 
-    // These are some helpers for reading/writing different types of
-    // structured message from the underlying byte arrays.
+    // These are helpers to allow the state to add data to the next outgoing record.
 
-    async _addOutgoingMessage(typeCls, ...args) {
-        await typeCls.write(this._outgoingRecords, ...args)
+    async _writeApplicationData(bytes) {
+        await this._recordSender.withBufferWriter(RECORD_TYPE.APPLICATION_DATA, async buf => {
+            await buf.writeBytes(bytes)
+        });
     }
 
-    async _flushOutgoingRecords() {
-        await this.sendCallback(this._outgoingRecords.finalize())
-        this._outgoingRecords = new OutgoingRecordBuffer()
+    async _writeHandshakeMessage(typeCls, ...args) {
+        await this._recordSender.withBufferWriter(RECORD_TYPE.HANDSHAKE, async buf => {
+            buf.writeUint8(typeCls.TYPE_TAG);
+            await buf.writeWithLengthPrefix24(async buf => {
+                await typeCls.write(buf, ...args)
+            });
+        });
     }
 
-    _hasIncomingMessage() {
-        return this._incomingRecords.hasMoreBytes()
+    async _flushOutgoingRecord() {
+        const record = await this._recordSender.flush();
+        await this.sendCallback(record);
     }
 
-    async _getIncomingMessage(typeCls, ...args) {
-        return await typeCls.read(this._incomingRecords, ...args)
-    }
+    // This is a helper for handling incoming records.
 
+    async _dispatchIncomingRecord(type, buf) {
+        switch (type) {
+            case RECORD_TYPE.ALERT:
+                // XXX TODO: implement alert records for communicating errors.
+                throw new Error('received TLS alert record, aborting!');
+            case RECORD_TYPE.APPLICATION_DATA:
+                return await this._state.recvApplicationData(buf);
+            case RECORD_TYPE.HANDSHAKE:
+                // Each handshake record may contain multiple handshake messages.
+                // For simplicity, we assume that handshake messages will not be
+                // fragmented across multiple records.  They shouldn't need to be
+                // for the tiny subset of TLS that we're using.
+                do {
+                    const msgType = buf.readUint8();
+                    const msgLength = buf.readUint24();
+                    await this._state.recvHandshakeMessage(msgType, buf.clamp(msgLength))
+                } while (buf.hasMoreBytes());
+                return null;
+            default:
+                assert(false, 'unexpected record type');
+        }
+    }
 }
 
 
