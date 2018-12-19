@@ -1,0 +1,7 @@
+parserOptions:
+  sourceType: script
+env:
+  node: true
+globals:
+  assert: true
+  fxaPairingTLS: true
