@@ -6,11 +6,10 @@ module.exports = function (config) {
       mocha: {
         // change Karma's debug.html to the mocha web reporter
         reporter: 'html',
-
         // require specific files after Mocha is initialized
         require: [
           require.resolve('../node_modules/chai/chai.js'),
-          require.resolve('../dist/tls.js'),
+          require.resolve('../dist/fxaPairingTLS.js'),
         ],
       }
     },
