@@ -1,8 +1,9 @@
 /* global __dirname, require, module*/
 
 const env = require('yargs').argv.env;
-const webpack = require('webpack');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+
+require('webpack');
 
 const MODULE_CONFIG = {
   rules: [

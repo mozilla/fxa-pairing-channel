@@ -1,12 +1,7 @@
 // karma.conf.js
 module.exports = function (config) {
   config.set({
-    frameworks: ['mocha', 'chai'],
-    files: [
-      '**/*.js'
-    ],
     browsers: ['Firefox'],
-    nocache: true,
     client: {
       mocha: {
         // change Karma's debug.html to the mocha web reporter
@@ -18,6 +13,11 @@ module.exports = function (config) {
           require.resolve('../dist/tls/tls.js'),
         ],
       }
-    }
+    },
+    files: [
+      '**/*.js'
+    ],
+    frameworks: ['mocha', 'chai'],
+    nocache: true,
   });
 };
