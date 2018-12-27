@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:8.14.1-stretch-browsers
+        env:
+          - DISPLAY=:99
+    steps:
+      - checkout
+      - run:
+          command: |
+            sudo apt-get install -y python-setuptools python2.7-dev build-essential xvfb
+            sudo easy_install pip
+            sudo pip install mozdownload mozinstall
+            mozdownload --version 58.0 --destination firefox.tar.bz2
+            mozinstall firefox.tar.bz2
+      - run:
+          shell: /bin/bash --login
+          command: |
+            sudo npm install -g npm@6
+            npm install
+            DISPLAY=:99 FIREFOX_BIN=./firefox/firefox-bin npm test
+
+      - run: npm run lint
+workflows:
+  version: 2
+
+  build-test-push:
+    jobs:
+      - build
