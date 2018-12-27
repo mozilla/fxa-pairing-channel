@@ -10,7 +10,7 @@ module.exports = function (config) {
         // require specific files after Mocha is initialized
         require: [
           require.resolve('../node_modules/chai/chai.js'),
-          require.resolve('../dist/tls/tls.js'),
+          require.resolve('../dist/tls.js'),
         ],
       }
     },
