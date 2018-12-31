@@ -124,7 +124,8 @@ function assert(cond, msg) {
 }
 
 function assertIsBytes(value, msg = 'value must be a Uint8Array') {
-  assert(value instanceof Uint8Array, msg);
+  // XXX: Disabled until Gecko problems are resolved
+  //assert(value instanceof Uint8Array, msg);
   return value;
 }
 

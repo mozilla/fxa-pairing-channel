@@ -1243,7 +1243,8 @@ function assert(cond, msg) {
 }
 function assertIsBytes(value) {
   var msg = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'value must be a Uint8Array';
-  assert(value instanceof Uint8Array, msg);
+  // XXX: Disabled until Gecko problems are resolved
+  //assert(value instanceof Uint8Array, msg);
   return value;
 }
 function bytesToHex(bytes) {
