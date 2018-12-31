@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:1b01a6c3e196077e4f02, Chunkhash:b45ecf6247beb2e73376.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:76a8330bd78482d30e84, Chunkhash:4d3d80e978bf723008fa.
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -1243,7 +1243,8 @@ function assert(cond, msg) {
 }
 function assertIsBytes(value) {
   var msg = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'value must be a Uint8Array';
-  assert(value instanceof Uint8Array, msg);
+  // XXX: Disabled until Gecko problems are resolved
+  //assert(value instanceof Uint8Array, msg);
   return value;
 }
 function bytesToHex(bytes) {
