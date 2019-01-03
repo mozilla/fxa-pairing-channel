@@ -1,21 +1,14 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
+/*!
+ * 
+ * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-'use strict';
-
-var window = {};
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define("fxaPairingTLS", [], factory);
-	else if(typeof exports === 'object')
-		exports["fxaPairingTLS"] = factory();
-	else
-		root["fxaPairingTLS"] = factory();
-})(window, function() {
-return /******/ (function(modules) { // webpackBootstrap
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * 
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:f0f1cc6087a9fa69c0ea, Chunkhash:e63e7abdfb1b7b7df39c.
+ * 
+ */
+module.exports =
+/******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -132,7 +125,3 @@ module.exports = {
 
 /***/ })
 /******/ ]);
-});
-this.FxAccountsTlsSubset = window.fxaPairingTLS;
-
-const EXPORTED_SYMBOLS = ["FxAccountsTlsSubset"];
