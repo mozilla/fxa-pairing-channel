@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:76a8330bd78482d30e84, Chunkhash:4d3d80e978bf723008fa.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:532ad3fc3d5204404eec, Chunkhash:7c9ff41f2d372b6787ca.
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -100,14 +100,14 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 18);
+/******/ 	return __webpack_require__(__webpack_require__.s = 21);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(16);
+module.exports = __webpack_require__(11);
 
 
 /***/ }),
@@ -203,9 +203,9 @@ module.exports = _getPrototypeOf;
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _typeof = __webpack_require__(9);
+var _typeof = __webpack_require__(13);
 
-var assertThisInitialized = __webpack_require__(10);
+var assertThisInitialized = __webpack_require__(14);
 
 function _possibleConstructorReturn(self, call) {
   if (call && (_typeof(call) === "object" || typeof call === "function")) {
@@ -221,7 +221,7 @@ module.exports = _possibleConstructorReturn;
 /* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var setPrototypeOf = __webpack_require__(12);
+var setPrototypeOf = __webpack_require__(7);
 
 function _inherits(subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
@@ -242,11 +242,26 @@ module.exports = _inherits;
 
 /***/ }),
 /* 7 */
+/***/ (function(module, exports) {
+
+function _setPrototypeOf(o, p) {
+  module.exports = _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+module.exports = _setPrototypeOf;
+
+/***/ }),
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var getPrototypeOf = __webpack_require__(4);
 
-var superPropBase = __webpack_require__(11);
+var superPropBase = __webpack_require__(17);
 
 function _get(target, property, receiver) {
   if (typeof Reflect !== "undefined" && Reflect.get) {
@@ -271,14 +286,62 @@ function _get(target, property, receiver) {
 module.exports = _get;
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var arrayWithHoles = __webpack_require__(13);
+var getPrototypeOf = __webpack_require__(4);
 
-var iterableToArrayLimit = __webpack_require__(14);
+var setPrototypeOf = __webpack_require__(7);
 
-var nonIterableRest = __webpack_require__(15);
+var isNativeFunction = __webpack_require__(15);
+
+var construct = __webpack_require__(16);
+
+function _wrapNativeSuper(Class) {
+  var _cache = typeof Map === "function" ? new Map() : undefined;
+
+  module.exports = _wrapNativeSuper = function _wrapNativeSuper(Class) {
+    if (Class === null || !isNativeFunction(Class)) return Class;
+
+    if (typeof Class !== "function") {
+      throw new TypeError("Super expression must either be null or a function");
+    }
+
+    if (typeof _cache !== "undefined") {
+      if (_cache.has(Class)) return _cache.get(Class);
+
+      _cache.set(Class, Wrapper);
+    }
+
+    function Wrapper() {
+      return construct(Class, arguments, getPrototypeOf(this).constructor);
+    }
+
+    Wrapper.prototype = Object.create(Class.prototype, {
+      constructor: {
+        value: Wrapper,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+    return setPrototypeOf(Wrapper, Class);
+  };
+
+  return _wrapNativeSuper(Class);
+}
+
+module.exports = _wrapNativeSuper;
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var arrayWithHoles = __webpack_require__(18);
+
+var iterableToArrayLimit = __webpack_require__(19);
+
+var nonIterableRest = __webpack_require__(20);
 
 function _slicedToArray(arr, i) {
   return arrayWithHoles(arr) || iterableToArrayLimit(arr, i) || nonIterableRest();
@@ -287,127 +350,7 @@ function _slicedToArray(arr, i) {
 module.exports = _slicedToArray;
 
 /***/ }),
-/* 9 */
-/***/ (function(module, exports) {
-
-function _typeof2(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof2 = function _typeof2(obj) { return typeof obj; }; } else { _typeof2 = function _typeof2(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof2(obj); }
-
-function _typeof(obj) {
-  if (typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol") {
-    module.exports = _typeof = function _typeof(obj) {
-      return _typeof2(obj);
-    };
-  } else {
-    module.exports = _typeof = function _typeof(obj) {
-      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : _typeof2(obj);
-    };
-  }
-
-  return _typeof(obj);
-}
-
-module.exports = _typeof;
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports) {
-
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return self;
-}
-
-module.exports = _assertThisInitialized;
-
-/***/ }),
 /* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var getPrototypeOf = __webpack_require__(4);
-
-function _superPropBase(object, property) {
-  while (!Object.prototype.hasOwnProperty.call(object, property)) {
-    object = getPrototypeOf(object);
-    if (object === null) break;
-  }
-
-  return object;
-}
-
-module.exports = _superPropBase;
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports) {
-
-function _setPrototypeOf(o, p) {
-  module.exports = _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  };
-
-  return _setPrototypeOf(o, p);
-}
-
-module.exports = _setPrototypeOf;
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports) {
-
-function _arrayWithHoles(arr) {
-  if (Array.isArray(arr)) return arr;
-}
-
-module.exports = _arrayWithHoles;
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports) {
-
-function _iterableToArrayLimit(arr, i) {
-  var _arr = [];
-  var _n = true;
-  var _d = false;
-  var _e = undefined;
-
-  try {
-    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
-      _arr.push(_s.value);
-
-      if (i && _arr.length === i) break;
-    }
-  } catch (err) {
-    _d = true;
-    _e = err;
-  } finally {
-    try {
-      if (!_n && _i["return"] != null) _i["return"]();
-    } finally {
-      if (_d) throw _e;
-    }
-  }
-
-  return _arr;
-}
-
-module.exports = _iterableToArrayLimit;
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports) {
-
-function _nonIterableRest() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance");
-}
-
-module.exports = _nonIterableRest;
-
-/***/ }),
-/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -434,7 +377,7 @@ var oldRuntime = hadRuntime && g.regeneratorRuntime;
 // Force reevalutation of runtime.js.
 g.regeneratorRuntime = undefined;
 
-module.exports = __webpack_require__(17);
+module.exports = __webpack_require__(12);
 
 if (hadRuntime) {
   // Restore the original runtime.
@@ -450,7 +393,7 @@ if (hadRuntime) {
 
 
 /***/ }),
-/* 17 */
+/* 12 */
 /***/ (function(module, exports) {
 
 /**
@@ -1177,31 +1120,164 @@ if (hadRuntime) {
 
 
 /***/ }),
+/* 13 */
+/***/ (function(module, exports) {
+
+function _typeof2(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof2 = function _typeof2(obj) { return typeof obj; }; } else { _typeof2 = function _typeof2(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof2(obj); }
+
+function _typeof(obj) {
+  if (typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol") {
+    module.exports = _typeof = function _typeof(obj) {
+      return _typeof2(obj);
+    };
+  } else {
+    module.exports = _typeof = function _typeof(obj) {
+      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : _typeof2(obj);
+    };
+  }
+
+  return _typeof(obj);
+}
+
+module.exports = _typeof;
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports) {
+
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+
+module.exports = _assertThisInitialized;
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports) {
+
+function _isNativeFunction(fn) {
+  return Function.toString.call(fn).indexOf("[native code]") !== -1;
+}
+
+module.exports = _isNativeFunction;
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var setPrototypeOf = __webpack_require__(7);
+
+function isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function _construct(Parent, args, Class) {
+  if (isNativeReflectConstruct()) {
+    module.exports = _construct = Reflect.construct;
+  } else {
+    module.exports = _construct = function _construct(Parent, args, Class) {
+      var a = [null];
+      a.push.apply(a, args);
+      var Constructor = Function.bind.apply(Parent, a);
+      var instance = new Constructor();
+      if (Class) setPrototypeOf(instance, Class.prototype);
+      return instance;
+    };
+  }
+
+  return _construct.apply(null, arguments);
+}
+
+module.exports = _construct;
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var getPrototypeOf = __webpack_require__(4);
+
+function _superPropBase(object, property) {
+  while (!Object.prototype.hasOwnProperty.call(object, property)) {
+    object = getPrototypeOf(object);
+    if (object === null) break;
+  }
+
+  return object;
+}
+
+module.exports = _superPropBase;
+
+/***/ }),
 /* 18 */
+/***/ (function(module, exports) {
+
+function _arrayWithHoles(arr) {
+  if (Array.isArray(arr)) return arr;
+}
+
+module.exports = _arrayWithHoles;
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports) {
+
+function _iterableToArrayLimit(arr, i) {
+  var _arr = [];
+  var _n = true;
+  var _d = false;
+  var _e = undefined;
+
+  try {
+    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+      _arr.push(_s.value);
+
+      if (i && _arr.length === i) break;
+    }
+  } catch (err) {
+    _d = true;
+    _e = err;
+  } finally {
+    try {
+      if (!_n && _i["return"] != null) _i["return"]();
+    } finally {
+      if (_d) throw _e;
+    }
+  }
+
+  return _arr;
+}
+
+module.exports = _iterableToArrayLimit;
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports) {
+
+function _nonIterableRest() {
+  throw new TypeError("Invalid attempt to destructure non-iterable instance");
+}
+
+module.exports = _nonIterableRest;
+
+/***/ }),
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js
-var possibleConstructorReturn = __webpack_require__(5);
-var possibleConstructorReturn_default = /*#__PURE__*/__webpack_require__.n(possibleConstructorReturn);
-
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/getPrototypeOf.js
-var getPrototypeOf = __webpack_require__(4);
-var getPrototypeOf_default = /*#__PURE__*/__webpack_require__.n(getPrototypeOf);
-
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/get.js
-var get = __webpack_require__(7);
-var get_default = /*#__PURE__*/__webpack_require__.n(get);
-
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/inherits.js
-var inherits = __webpack_require__(6);
-var inherits_default = /*#__PURE__*/__webpack_require__.n(inherits);
-
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/slicedToArray.js
-var slicedToArray = __webpack_require__(8);
-var slicedToArray_default = /*#__PURE__*/__webpack_require__.n(slicedToArray);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/regenerator/index.js
 var regenerator = __webpack_require__(0);
@@ -1218,6 +1294,30 @@ var classCallCheck_default = /*#__PURE__*/__webpack_require__.n(classCallCheck);
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/createClass.js
 var createClass = __webpack_require__(3);
 var createClass_default = /*#__PURE__*/__webpack_require__.n(createClass);
+
+// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js
+var possibleConstructorReturn = __webpack_require__(5);
+var possibleConstructorReturn_default = /*#__PURE__*/__webpack_require__.n(possibleConstructorReturn);
+
+// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/getPrototypeOf.js
+var getPrototypeOf = __webpack_require__(4);
+var getPrototypeOf_default = /*#__PURE__*/__webpack_require__.n(getPrototypeOf);
+
+// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/inherits.js
+var inherits = __webpack_require__(6);
+var inherits_default = /*#__PURE__*/__webpack_require__.n(inherits);
+
+// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/wrapNativeSuper.js
+var wrapNativeSuper = __webpack_require__(9);
+var wrapNativeSuper_default = /*#__PURE__*/__webpack_require__.n(wrapNativeSuper);
+
+// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/get.js
+var get = __webpack_require__(8);
+var get_default = /*#__PURE__*/__webpack_require__.n(get);
+
+// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/slicedToArray.js
+var slicedToArray = __webpack_require__(10);
+var slicedToArray_default = /*#__PURE__*/__webpack_require__.n(slicedToArray);
 
 // CONCATENATED MODULE: ./src/utils.js
 /* This Source Code Form is subject to the terms of the Mozilla Public
@@ -1748,14 +1848,14 @@ function _AEADDecrypt() {
   return _AEADDecrypt.apply(this, arguments);
 }
 
-function getRandomBytes(_x11) {
+function getRandomBytes(_x11, _x12) {
   return _getRandomBytes.apply(this, arguments);
 }
 
 function _getRandomBytes() {
   _getRandomBytes = asyncToGenerator_default()(
   /*#__PURE__*/
-  regenerator_default.a.mark(function _callee3(size) {
+  regenerator_default.a.mark(function _callee3(crypto, size) {
     var bytes;
     return regenerator_default.a.wrap(function _callee3$(_context3) {
       while (1) {
@@ -3727,13 +3827,7 @@ function () {
 
   return RecordSender;
 }();
-// CONCATENATED MODULE: ./src/index.js
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "InsecureClientConnection", function() { return src_InsecureClientConnection; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "InsecureServerConnection", function() { return src_InsecureServerConnection; });
-/* concated harmony reexport bytesToHex */__webpack_require__.d(__webpack_exports__, "bytesToHex", function() { return bytesToHex; });
-/* concated harmony reexport hexToBytes */__webpack_require__.d(__webpack_exports__, "hexToBytes", function() { return hexToBytes; });
-/* concated harmony reexport bytesToUtf8 */__webpack_require__.d(__webpack_exports__, "bytesToUtf8", function() { return bytesToUtf8; });
-/* concated harmony reexport utf8ToBytes */__webpack_require__.d(__webpack_exports__, "utf8ToBytes", function() { return utf8ToBytes; });
+// CONCATENATED MODULE: ./src/tlsconnection.js
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -3799,7 +3893,7 @@ function () {
 // Using an implementation with proper crypto should feel identical to using
 // this mock version, except it won't have "Insecure" in the class name...
 
-var src_InsecureConnection =
+var tlsconnection_InsecureConnection =
 /*#__PURE__*/
 function () {
   function InsecureConnection(psk, pskId, sendCallback, randomSalt) {
@@ -4289,7 +4383,7 @@ function () {
                 }
 
                 _context15.next = 4;
-                return getRandomBytes(32);
+                return getRandomBytes(crypto, 32);
 
               case 4:
                 _context15.t0 = _context15.sent;
@@ -4322,7 +4416,7 @@ function () {
   return InsecureConnection;
 }();
 
-var src_InsecureClientConnection =
+var tlsconnection_InsecureClientConnection =
 /*#__PURE__*/
 function (_InsecureConnection) {
   inherits_default()(InsecureClientConnection, _InsecureConnection);
@@ -4372,8 +4466,8 @@ function (_InsecureConnection) {
   }]);
 
   return InsecureClientConnection;
-}(src_InsecureConnection);
-var src_InsecureServerConnection =
+}(tlsconnection_InsecureConnection);
+var tlsconnection_InsecureServerConnection =
 /*#__PURE__*/
 function (_InsecureConnection2) {
   inherits_default()(InsecureServerConnection, _InsecureConnection2);
@@ -4423,9 +4517,314 @@ function (_InsecureConnection2) {
   }]);
 
   return InsecureServerConnection;
-}(src_InsecureConnection); // Re-export helpful utilities for calling code to use.
+}(tlsconnection_InsecureConnection);
+// CONCATENATED MODULE: ./src/index.js
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "InsecurePairingChannel", function() { return src_InsecurePairingChannel; });
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ // A wrapper that combines a WebSocket to the channelserver
+// with a TLS Connection for encryption.
 
 
+
+
+
+
+
+
+
+
+
+var utf8Encoder = new TextEncoder();
+var utf8Decoder = new TextDecoder();
+var src_InsecurePairingChannel =
+/*#__PURE__*/
+function (_EventTarget) {
+  inherits_default()(InsecurePairingChannel, _EventTarget);
+
+  function InsecurePairingChannel(channelId, channelKey, socket, tlsConnection) {
+    var _this;
+
+    classCallCheck_default()(this, InsecurePairingChannel);
+
+    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(InsecurePairingChannel).call(this));
+    _this._channelId = channelId;
+    _this._channelKey = channelKey;
+    _this._socket = socket;
+    _this._tlsConnection = tlsConnection;
+
+    _this._setupListeners();
+
+    return _this;
+  }
+  /**
+   * Create a new pairing channel.
+   *
+   * @returns Promise<InsecurePairingChannel>
+   */
+
+
+  createClass_default()(InsecurePairingChannel, [{
+    key: "_setupListeners",
+    value: function _setupListeners() {
+      var _this2 = this;
+
+      this._socket.addEventListener('message',
+      /*#__PURE__*/
+      function () {
+        var _ref = asyncToGenerator_default()(
+        /*#__PURE__*/
+        regenerator_default.a.mark(function _callee(event) {
+          var channelServerEnvelope, payload, data;
+          return regenerator_default.a.wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  _context.prev = 0;
+                  channelServerEnvelope = JSON.parse(event.data);
+                  _context.next = 4;
+                  return _this2._tlsConnection.recv(hexToBytes(channelServerEnvelope.message));
+
+                case 4:
+                  payload = _context.sent;
+
+                  if (payload !== null) {
+                    data = JSON.parse(utf8Decoder.decode(payload));
+
+                    _this2.dispatchEvent(new CustomEvent('message', {
+                      detail: {
+                        data: data,
+                        sender: channelServerEnvelope.sender
+                      }
+                    }));
+                  }
+
+                  _context.next = 11;
+                  break;
+
+                case 8:
+                  _context.prev = 8;
+                  _context.t0 = _context["catch"](0);
+
+                  _this2.dispatchEvent(new CustomEvent('error', {
+                    detail: {
+                      error: _context.t0
+                    }
+                  }));
+
+                case 11:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee, this, [[0, 8]]);
+        }));
+
+        return function (_x) {
+          return _ref.apply(this, arguments);
+        };
+      }()); // Relay the other events.
+
+
+      this._socket.addEventListener('error', this.dispatchEvent);
+
+      this._socket.addEventListener('close', this.dispatchEvent);
+    }
+    /**
+     * @param {Object} data
+     */
+
+  }, {
+    key: "send",
+    value: function () {
+      var _send = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee2(data) {
+        var payload;
+        return regenerator_default.a.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                payload = utf8Encoder.encode(JSON.stringify(data));
+                _context2.next = 3;
+                return this._tlsConnection.send(payload);
+
+              case 3:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function send(_x2) {
+        return _send.apply(this, arguments);
+      }
+
+      return send;
+    }()
+  }, {
+    key: "close",
+    value: function () {
+      var _close = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee3() {
+        return regenerator_default.a.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.next = 2;
+                return this._tlsConnection.close();
+
+              case 2:
+                this._tlsConnection = null;
+                this.socket.close();
+
+              case 4:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function close() {
+        return _close.apply(this, arguments);
+      }
+
+      return close;
+    }()
+  }, {
+    key: "closed",
+    get: function get() {
+      return this._socket.readyState === 3;
+    }
+  }, {
+    key: "channelId",
+    get: function get() {
+      return this._channelId;
+    }
+  }, {
+    key: "channelKey",
+    get: function get() {
+      return this._channelKey;
+    }
+  }], [{
+    key: "create",
+    value: function create(channelServerURI) {
+      var wsURI = new URL('/v1/ws/', channelServerURI).href;
+      var channelKey = crypto.getRandomValues(new Uint8Array(32));
+      return this._makePairingChannel(wsURI, tlsconnection_InsecureServerConnection, channelKey);
+    }
+    /**
+     * Connect to an existing pairing channel.
+     *
+     * @returns Promise<InsecurePairingChannel>
+     */
+
+  }, {
+    key: "connect",
+    value: function connect(channelServerURI, channelId, channelKey) {
+      var wsURI = new URL("/v1/ws/".concat(channelId), channelServerURI).href;
+      return this._makePairingChannel(wsURI, tlsconnection_InsecureClientConnection, channelKey);
+    }
+  }, {
+    key: "_makePairingChannel",
+    value: function _makePairingChannel(wsUri, TlsConnection, psk) {
+      var _this3 = this;
+
+      var socket = new WebSocket(wsUri);
+      return new Promise(function (resolve, reject) {
+        // eslint-disable-next-line prefer-const
+        var stopListening;
+
+        var onConnectionError =
+        /*#__PURE__*/
+        function () {
+          var _ref2 = asyncToGenerator_default()(
+          /*#__PURE__*/
+          regenerator_default.a.mark(function _callee4() {
+            return regenerator_default.a.wrap(function _callee4$(_context4) {
+              while (1) {
+                switch (_context4.prev = _context4.next) {
+                  case 0:
+                    stopListening();
+                    reject(new Error('Error while creating the pairing channel'));
+
+                  case 2:
+                  case "end":
+                    return _context4.stop();
+                }
+              }
+            }, _callee4, this);
+          }));
+
+          return function onConnectionError() {
+            return _ref2.apply(this, arguments);
+          };
+        }();
+
+        var onFirstMessage =
+        /*#__PURE__*/
+        function () {
+          var _ref3 = asyncToGenerator_default()(
+          /*#__PURE__*/
+          regenerator_default.a.mark(function _callee5(event) {
+            var _JSON$parse, channelId, pskId, tlsConnection, instance;
+
+            return regenerator_default.a.wrap(function _callee5$(_context5) {
+              while (1) {
+                switch (_context5.prev = _context5.next) {
+                  case 0:
+                    stopListening();
+                    _context5.prev = 1;
+                    _JSON$parse = JSON.parse(event.data), channelId = _JSON$parse.channelid;
+                    pskId = utf8ToBytes(channelId);
+                    _context5.next = 6;
+                    return TlsConnection.create(psk, pskId, function (data) {
+                      // To send data over the websocket, it needs to be encoded as a safe string.
+                      socket.send(bytesToHex(data));
+                    });
+
+                  case 6:
+                    tlsConnection = _context5.sent;
+                    instance = new _this3(channelId, psk, socket, tlsConnection);
+                    resolve(instance);
+                    _context5.next = 14;
+                    break;
+
+                  case 11:
+                    _context5.prev = 11;
+                    _context5.t0 = _context5["catch"](1);
+                    reject(_context5.t0);
+
+                  case 14:
+                  case "end":
+                    return _context5.stop();
+                }
+              }
+            }, _callee5, this, [[1, 11]]);
+          }));
+
+          return function onFirstMessage(_x3) {
+            return _ref3.apply(this, arguments);
+          };
+        }();
+
+        stopListening = function stopListening() {
+          socket.removeEventListener('error', onConnectionError);
+          socket.removeEventListener('message', onFirstMessage);
+        };
+
+        socket.addEventListener('error', onConnectionError);
+        socket.addEventListener('message', onFirstMessage);
+      });
+    }
+  }]);
+
+  return InsecurePairingChannel;
+}(wrapNativeSuper_default()(EventTarget));
 
 /***/ })
 /******/ ]);
