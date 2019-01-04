@@ -20,28 +20,45 @@
 
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
   <script src="../dist/fxaPairingTLS.js"></script>
-  <script src="./tlschannel.js"></script>
   <script>
     $(() => {
+      const {InsecurePairingChannel} = fxaPairingTLS;
+      const CHANNEL_SERVER = 'wss://dev.channelserver.nonprod.cloudops.mozgcp.net';
       $("#code-value").val("")
       $("#chat-history").val("")
       $("#code-value").on("keypress", async evt => {
         if (evt.keyCode !== 13) { return }
-        const channel = await InsecurePairingChannel.connect($("#code-value").val())
-        channel.onReceive = msg => {
+        const [channelId, pskHex] = $("#code-value").val().split("#");
+        const psk = hexToBytes(pskHex);
+        const channel = await InsecurePairingChannel.connect(CHANNEL_SERVER, channelId, psk);
+        channel.addEventListener("message", event => {
+          const {msg} = event.detail.data;
           $("#chat-history").val($("#chat-history").val() + "\nthem>> " + msg)
-        }
+        });
         $("#chat-input").on("keypress", (evt) => {
           if (evt.keyCode !== 13) { return }
           let msg = $("#chat-input").val()
           $("#chat-input").val("")
           $("#chat-history").val($("#chat-history").val() + "\nme>>>> " + msg)
-          channel.send(msg)
+          channel.send({msg});
         });
         $("#enter-code-ui").hide();
         $("#chat-ui").show();
       })
     })
+    function hexToBytes(hexstr) {
+      return new Uint8Array(Array.prototype.map.call(hexstr, (c, n) => {
+        if (n % 2 === 1) {
+          return hexstr[n - 1] + c;
+        } else {
+          return '';
+        }
+      }).filter(s => {
+        return !! s;
+      }).map(s => {
+        return parseInt(s, 16);
+      }));
+    }
   </script>
 </body>
 
