@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:2d24ef643fc5561bc942, Chunkhash:bdb5e70d861078b07585.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:fc9e9b93c35195f5ab10, Chunkhash:430be1ddbfd45160f666.
  * 
  */
 module.exports =
@@ -1427,13 +1427,7 @@ class recordlayer_RecordSender {
   }
 }
 
-// CONCATENATED MODULE: ./src/index.js
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "InsecureClientConnection", function() { return src_InsecureClientConnection; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "InsecureServerConnection", function() { return src_InsecureServerConnection; });
-/* concated harmony reexport bytesToHex */__webpack_require__.d(__webpack_exports__, "bytesToHex", function() { return bytesToHex; });
-/* concated harmony reexport hexToBytes */__webpack_require__.d(__webpack_exports__, "hexToBytes", function() { return hexToBytes; });
-/* concated harmony reexport bytesToUtf8 */__webpack_require__.d(__webpack_exports__, "bytesToUtf8", function() { return bytesToUtf8; });
-/* concated harmony reexport utf8ToBytes */__webpack_require__.d(__webpack_exports__, "utf8ToBytes", function() { return utf8ToBytes; });
+// CONCATENATED MODULE: ./src/tlsconnection.js
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -1499,7 +1493,7 @@ class recordlayer_RecordSender {
 // Using an implementation with proper crypto should feel identical to using
 // this mock version, except it won't have "Insecure" in the class name...
 
-class src_InsecureConnection {
+class tlsconnection_InsecureConnection {
   constructor(psk, pskId, sendCallback, randomSalt) {
     this.psk = assertIsBytes(psk);
     this.pskId = assertIsBytes(pskId);
@@ -1625,7 +1619,7 @@ class src_InsecureConnection {
 }
 
 
-class src_InsecureClientConnection extends src_InsecureConnection {
+class tlsconnection_InsecureClientConnection extends tlsconnection_InsecureConnection {
   static async create(psk, pskId, sendCallback) {
     const instance = await super.create(psk, pskId, sendCallback);
     await instance._transition(states_CLIENT_START);
@@ -1634,7 +1628,7 @@ class src_InsecureClientConnection extends src_InsecureConnection {
 }
 
 
-class src_InsecureServerConnection extends src_InsecureConnection {
+class tlsconnection_InsecureServerConnection extends tlsconnection_InsecureConnection {
   static async create(psk, pskId, sendCallback) {
     const instance = await super.create(psk, pskId, sendCallback);
     await instance._transition(states_SERVER_START);
@@ -1642,9 +1636,167 @@ class src_InsecureServerConnection extends src_InsecureConnection {
   }
 }
 
+// CONCATENATED MODULE: ./src/index.js
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "InsecurePairingChannel", function() { return src_InsecurePairingChannel; });
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// Re-export helpful utilities for calling code to use.
 
+
+// A wrapper that combines a WebSocket to the channelserver
+// with a TLS Connection for encryption.
+
+
+
+
+
+// Copy pasta from https://developer.mozilla.org/en-US/docs/Web/API/EventTarget.
+var EventTarget = function() {
+  this.listeners = {};
+};
+
+EventTarget.prototype.listeners = null;
+EventTarget.prototype.addEventListener = function(type, callback) {
+  if (!(type in this.listeners)) {
+    this.listeners[type] = [];
+  }
+  this.listeners[type].push(callback);
+};
+
+EventTarget.prototype.removeEventListener = function(type, callback) {
+  if (!(type in this.listeners)) {
+    return;
+  }
+  var stack = this.listeners[type];
+  for (var i = 0, l = stack.length; i < l; i++) {
+    if (stack[i] === callback) {
+      stack.splice(i, 1);
+      return;
+    }
+  }
+};
+
+EventTarget.prototype.dispatchEvent = function(event) {
+  if (!(event.type in this.listeners)) {
+    return true;
+  }
+  var stack = this.listeners[event.type].slice();
+
+  for (var i = 0, l = stack.length; i < l; i++) {
+    stack[i].call(this, event);
+  }
+  return !event.defaultPrevented;
+};
+
+class src_InsecurePairingChannel extends EventTarget {
+  constructor(channelId, channelKey, socket, tlsConnection) {
+    super();
+    this._channelId = channelId;
+    this._channelKey = channelKey;
+    this._socket = socket;
+    this._tlsConnection = tlsConnection;
+    this._setupListeners();
+  }
+
+  /**
+   * Create a new pairing channel.
+   *
+   * @returns Promise<InsecurePairingChannel>
+   */
+  static create(channelServerURI, {WebSocket} = window) {
+    const channelKey = crypto.getRandomValues(new Uint8Array(32));
+    return this._makePairingChannel(WebSocket, channelServerURI, tlsconnection_InsecureServerConnection, channelKey);
+  }
+
+  /**
+   * Connect to an existing pairing channel.
+   *
+   * `channelServerURI` must be the full URI and therefore should contain the channel ID.
+   * @returns Promise<InsecurePairingChannel>
+   */
+  static connect(channelServerURI, channelKey, {WebSocket} = window) {
+    return this._makePairingChannel(WebSocket, channelServerURI, tlsconnection_InsecureClientConnection, channelKey);
+  }
+
+  static _makePairingChannel(WebSocket, wsUri, TlsConnection, psk) {
+    const socket = new WebSocket(wsUri);
+    return new Promise((resolve, reject) => {
+      const stopListening = () => {
+        socket.removeEventListener("error", onConnectionError);
+        socket.removeEventListener("message", onFirstMessage);
+      };
+      const onConnectionError = async () => {
+        stopListening();
+        reject(new Error("Error while creating the pairing channel"));
+      };
+      const onFirstMessage = async event => {
+        stopListening();
+        try {
+          const {channelid: channelId} = JSON.parse(event.data);
+          const pskId = utf8ToBytes(channelId);
+          const tlsConnection = await TlsConnection.create(psk, pskId, data => {
+            // To send data over the websocket, it needs to be encoded as a safe string.
+            socket.send(bytesToHex(data));
+          });
+          const instance = new this(channelId, psk, socket, tlsConnection);
+          resolve(instance);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      socket.addEventListener("error", onConnectionError);
+      socket.addEventListener("message", onFirstMessage);
+    });
+  }
+
+  _setupListeners() {
+    this._socket.addEventListener("message", async event => {
+      let {message: payload, sender} = JSON.parse(event.data);
+      payload = await this._tlsConnection.recv(hexToBytes(payload));
+      if (payload !== null) {
+        const {message, data} = JSON.parse(bytesToUtf8(payload));
+        // Assume the application wants to deal with strings,
+        // not Uint8Array buffers as returned by the TLS layer.
+        this.dispatchEvent({
+          type: "message",
+          sender,
+          message,
+          data,
+        });
+      }
+    });
+    // Relay the other events.
+    this._socket.addEventListener("error", this.dispatchEvent);
+    this._socket.addEventListener("close", this.dispatchEvent);
+  }
+
+  send(message, data = {}) {
+    const envelope = JSON.stringify({
+      message,
+      data,
+    });
+    this._tlsConnection.send(utf8ToBytes(envelope));
+  }
+
+  async close() {
+    await this._tlsConnection.close();
+    this._tlsConnection = null;
+    this.socket.close();
+  }
+
+  get closed() {
+    return this._socket.readyState == 3;
+  }
+
+  get channelId() {
+    return this._channelId;
+  }
+
+  get channelKey() {
+    return this._channelKey;
+  }
+}
 
 
 /***/ })
