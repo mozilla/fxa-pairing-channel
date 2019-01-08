@@ -40,7 +40,7 @@ export async function AEADDecrypt(key, iv, seqNum, ciphertext, additionalData) {
   return plaintext;
 }
 
-export async function getRandomBytes(size) {
+export async function getRandomBytes(crypto, size) {
   const bytes = new Uint8Array(size);
   crypto.getRandomValues(bytes);
   return bytes;

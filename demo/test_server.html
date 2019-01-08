@@ -19,23 +19,35 @@
 
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
   <script src="../dist/fxaPairingTLS.js"></script>
-  <script src="./tlschannel.js"></script>
   <script>
     $(async () => {
+      // TODO: do we want to export InsecurePairingChannel directly?
+      const {InsecurePairingChannel} = fxaPairingTLS;
+      const CHANNEL_SERVER = 'wss://dev.channelserver.nonprod.cloudops.mozgcp.net';
       $("#chat-history").val("");
-      const channel = await InsecurePairingChannel.create();
-      $("#code-value").text(channel.code);
-      channel.onReceive = msg => {
+      const channel = await InsecurePairingChannel.create(CHANNEL_SERVER);
+      $("#code-value").text(`${channel.channelId}#${bytesToHex(channel.channelKey)}`);
+      channel.addEventListener("message", event => {
+        const {msg} = event.detail.data;
         $("#chat-history").val($("#chat-history").val() + "\nthem>> " + msg);
-      }
+      });
       $("#chat-input").on("keypress", (evt) => {
         if (evt.keyCode !== 13) { return; }
         let msg = $("#chat-input").val();
         $("#chat-input").val("");
         $("#chat-history").val($("#chat-history").val() + "\nme>>>> " + msg);
-        channel.send(msg)
+        channel.send({msg});
       });
     })
+    function bytesToHex(bytes) {
+      return Array.prototype.map.call(bytes, byte => {
+        let s = byte.toString(16);
+        if (s.length === 1) {
+          s = '0' + s;
+        }
+        return s;
+      }).join('');
+    }
   </script>
 </body>
 
