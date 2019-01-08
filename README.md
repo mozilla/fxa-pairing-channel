@@ -1,2 +1,2 @@
-# fxa-pairing-tls [![CircleCI](https://circleci.com/gh/mozilla/fxa-pairing-tls/tree/master.svg?style=svg)](https://circleci.com/gh/mozilla/fxa-pairing-tls/tree/master)
+# fxa-pairing-channel [![CircleCI](https://circleci.com/gh/mozilla/fxa-pairing-channel/tree/master.svg?style=svg)](https://circleci.com/gh/mozilla/fxa-pairing-channel/tree/master)
 FxA Pairing TLS dot js
