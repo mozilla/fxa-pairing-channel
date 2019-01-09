@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * 
  * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:e77e8658c4e6d2474bda, Chunkhash:1f8293afa34ea1765ce7.
->>>>>>> Expose a pairing channel API
+>>>>>>> Done not assert on close()
  * 
  */
 module.exports =
@@ -950,7 +950,7 @@ class states_State {
   }
 
   async close() {
-    assert(false, 'close() not implemented yet');
+    console.warn('close() not implemented yet');
   }
 
 }

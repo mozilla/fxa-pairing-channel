@@ -5,6 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * 
  * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:1b01a6c3e196077e4f02, Chunkhash:b45ecf6247beb2e73376.
+>>>>>>> Done not assert on close()
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -2468,7 +2469,7 @@ function () {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                assert(false, 'close() not implemented yet');
+                console.warn('close() not implemented yet');
 
               case 1:
               case "end":
