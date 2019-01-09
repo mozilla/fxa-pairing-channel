@@ -123,7 +123,7 @@ export class InsecurePairingChannel extends EventTarget {
   async close() {
     await this._tlsConnection.close();
     this._tlsConnection = null;
-    this.socket.close();
+    this._socket.close();
   }
 
   get closed() {

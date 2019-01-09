@@ -4,8 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:e77e8658c4e6d2474bda, Chunkhash:1f8293afa34ea1765ce7.
->>>>>>> Done not assert on close()
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:f14c2aadb8e586d8c6c7, Chunkhash:68c3e0644aed038b39bf.
  * 
  */
 module.exports =
@@ -1757,7 +1756,7 @@ class src_InsecurePairingChannel extends EventTarget {
   async close() {
     await this._tlsConnection.close();
     this._tlsConnection = null;
-    this.socket.close();
+    this._socket.close();
   }
 
   get closed() {
