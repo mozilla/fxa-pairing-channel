@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:f0f1cc6087a9fa69c0ea, Chunkhash:e63e7abdfb1b7b7df39c.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:f0f1cc6087a9fa69c0ea, Chunkhash:e63e7abdfb1b7b7df39c.
  * 
  */
 module.exports =
