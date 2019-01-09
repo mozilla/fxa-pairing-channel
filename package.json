@@ -1,5 +1,5 @@
 {
-  "name": "fxa-pairing-tls",
+  "name": "fxa-pairing-channel",
   "version": "1.0.0",
   "description": "TLS for FxA Pairing",
   "main": "index.js",
