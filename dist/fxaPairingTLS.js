@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:532ad3fc3d5204404eec, Chunkhash:7c9ff41f2d372b6787ca.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:25584862130d6fe693ef, Chunkhash:05f88d571306df14ed78.
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -2468,7 +2468,7 @@ function () {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                assert(false, 'close() not implemented yet');
+                console.warn('close() not implemented yet');
 
               case 1:
               case "end":
