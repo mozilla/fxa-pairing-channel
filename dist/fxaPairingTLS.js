@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:25584862130d6fe693ef, Chunkhash:05f88d571306df14ed78.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:ab7f3a6c35b153f3797b, Chunkhash:386dab9e0c492235970e.
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -4679,7 +4679,8 @@ function (_EventTarget) {
 
               case 2:
                 this._tlsConnection = null;
-                this.socket.close();
+
+                this._socket.close();
 
               case 4:
               case "end":
