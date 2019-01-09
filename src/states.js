@@ -59,7 +59,7 @@ class State {
   }
 
   async close() {
-    assert(false, 'close() not implemented yet');
+    console.warn('close() not implemented yet');
   }
 
 }

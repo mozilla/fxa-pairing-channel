@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:e3841292a30f0ee10946, Chunkhash:bcd34c7f9e2cccc4a46f.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:452a2e7f9c05a5de30ae, Chunkhash:3c7e4f8f8ccfd537bbc7.
  * 
  */
 module.exports =
@@ -949,7 +949,7 @@ class states_State {
   }
 
   async close() {
-    assert(false, 'close() not implemented yet');
+    console.warn('close() not implemented yet');
   }
 
 }
