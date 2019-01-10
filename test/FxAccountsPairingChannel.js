@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-describe('fxaPairingTLS', () => {
+describe('FxAccountsPairingChannel', () => {
   const CHANNEL_SERVER = 'wss://dev.channelserver.nonprod.cloudops.mozgcp.net';
 
   describe('a Client and Server connected together', () => {
@@ -12,7 +12,7 @@ describe('fxaPairingTLS', () => {
       // into a single state-machine that doesn't have any deadlocks.
       const CLIENT_RECV = [];
       const SERVER_RECV = [];
-      const server = await fxaPairingTLS.InsecurePairingChannel.create(CHANNEL_SERVER);
+      const server = await FxAccountsPairingChannel.InsecurePairingChannel.create(CHANNEL_SERVER);
       const messageReceived = new Promise(res => {
         server.addEventListener('message', ({detail: {data}}) => {
           SERVER_RECV.push(data.msg);
@@ -20,7 +20,7 @@ describe('fxaPairingTLS', () => {
         });
       });
       const {channelId, channelKey} = server;
-      const client = await fxaPairingTLS.InsecurePairingChannel.connect(CHANNEL_SERVER, channelId, channelKey);
+      const client = await FxAccountsPairingChannel.InsecurePairingChannel.connect(CHANNEL_SERVER, channelId, channelKey);
       client.addEventListener('message', ({detail: {data}}) => {
         CLIENT_RECV.push(data.msg);
       });
@@ -37,7 +37,7 @@ describe('fxaPairingTLS', () => {
     it('should fail to complete the handshake if they have a different PSK', async () => {
       // const SERVER_ERR = [];
       // const SERVER_RECV = [];
-      // const server = await fxaPairingTLS.InsecurePairingChannel.create(CHANNEL_SERVER);
+      // const server = await FxAccountsPairingChannel.InsecurePairingChannel.create(CHANNEL_SERVER);
       // server.addEventListener('message', ({detail: {payload}}) => {
       //   SERVER_RECV.push(new TextDecoder().decode(payload));
       // });
@@ -49,7 +49,7 @@ describe('fxaPairingTLS', () => {
       // });
       // const {channelId} = server;
       // const wrongPsk = new Uint8Array(crypto.getRandomValues(new Uint8Array(server.channelKey.length)));
-      // const client = await fxaPairingTLS.InsecurePairingChannel.connect(CHANNEL_SERVER, channelId, wrongPsk);
+      // const client = await FxAccountsPairingChannel.InsecurePairingChannel.connect(CHANNEL_SERVER, channelId, wrongPsk);
 
       // await client.send(new TextEncoder().encode('Hi test message!'));
 

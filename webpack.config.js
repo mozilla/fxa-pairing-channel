@@ -67,7 +67,8 @@ const babelLibraryConfig = {
   ...libraryConfig,
   output: {
     ...outputConfig,
-    filename: `${LIBRARY_NAME}.babel.js`
+    filename: `${LIBRARY_NAME}.babel.umd.js`,
+    libraryTarget: 'umd'
   },
   module: MODULE_CONFIG,
 };
