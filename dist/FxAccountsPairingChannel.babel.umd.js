@@ -4,18 +4,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:ab7f3a6c35b153f3797b, Chunkhash:386dab9e0c492235970e.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:e8581504039e650561d5, Chunkhash:f9eeaefee1877add3ca7.
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define("fxaPairingTLS", [], factory);
+		define("FxAccountsPairingChannel", [], factory);
 	else if(typeof exports === 'object')
-		exports["fxaPairingTLS"] = factory();
+		exports["FxAccountsPairingChannel"] = factory();
 	else
-		root["fxaPairingTLS"] = factory();
+		root["FxAccountsPairingChannel"] = factory();
 })(window, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
