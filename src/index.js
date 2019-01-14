@@ -20,6 +20,8 @@ import {
 
 const utf8Encoder = new TextEncoder();
 const utf8Decoder = new TextDecoder();
+const CLOSE_FLUSH_BUFFER_INTERVAL_MS = 200;
+const CLOSE_FLUSH_BUFFER_MAX_TRIES = 5;
 
 export class InsecurePairingChannel extends EventTarget {
   constructor(channelId, channelKey, socket, tlsConnection) {
@@ -123,7 +125,19 @@ export class InsecurePairingChannel extends EventTarget {
   async close() {
     await this._tlsConnection.close();
     this._tlsConnection = null;
-    this._socket.close();
+    try {
+      // Ensure all queued bytes have been sent before closing the connection.
+      let tries = 0;
+      while (this._socket.bufferedAmount > 0) {
+        if (++tries > CLOSE_FLUSH_BUFFER_MAX_TRIES) {
+          throw new Error('Could not flush the outgoing buffer in time.');
+        }
+        await new Promise(res => setTimeout(res, CLOSE_FLUSH_BUFFER_INTERVAL_MS));
+      }
+    } finally {
+      this._socket.close();
+      this._socket = null;
+    }
   }
 
   get closed() {

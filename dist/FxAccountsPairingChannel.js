@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:12b32ad00499b7253052, Chunkhash:68c3e0644aed038b39bf.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:e44d4d5b65434d3ceab3, Chunkhash:3d20192f7b03e0786bc0.
  * 
  */
 module.exports =
@@ -1653,6 +1653,8 @@ class tlsconnection_InsecureServerConnection extends tlsconnection_InsecureConne
 
 const utf8Encoder = new TextEncoder();
 const utf8Decoder = new TextDecoder();
+const CLOSE_FLUSH_BUFFER_INTERVAL_MS = 200;
+const CLOSE_FLUSH_BUFFER_MAX_TRIES = 5;
 
 class src_InsecurePairingChannel extends EventTarget {
   constructor(channelId, channelKey, socket, tlsConnection) {
@@ -1756,7 +1758,19 @@ class src_InsecurePairingChannel extends EventTarget {
   async close() {
     await this._tlsConnection.close();
     this._tlsConnection = null;
-    this._socket.close();
+    try {
+      // Ensure all queued bytes have been sent before closing the connection.
+      let tries = 0;
+      while (this._socket.bufferedAmount > 0) {
+        if (++tries > CLOSE_FLUSH_BUFFER_MAX_TRIES) {
+          throw new Error('Could not flush the outgoing buffer in time.');
+        }
+        await new Promise(res => setTimeout(res, CLOSE_FLUSH_BUFFER_INTERVAL_MS));
+      }
+    } finally {
+      this._socket.close();
+      this._socket = null;
+    }
   }
 
   get closed() {
