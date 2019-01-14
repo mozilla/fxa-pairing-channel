@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:e8581504039e650561d5, Chunkhash:f9eeaefee1877add3ca7.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:07de17d33eed526d51c2, Chunkhash:8dd042c2521a0395e10f.
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -4538,6 +4538,8 @@ function (_InsecureConnection2) {
 
 var utf8Encoder = new TextEncoder();
 var utf8Decoder = new TextDecoder();
+var CLOSE_FLUSH_BUFFER_INTERVAL_MS = 200;
+var CLOSE_FLUSH_BUFFER_MAX_TRIES = 5;
 var src_InsecurePairingChannel =
 /*#__PURE__*/
 function (_EventTarget) {
@@ -4670,6 +4672,7 @@ function (_EventTarget) {
       var _close = asyncToGenerator_default()(
       /*#__PURE__*/
       regenerator_default.a.mark(function _callee3() {
+        var tries;
         return regenerator_default.a.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -4679,15 +4682,47 @@ function (_EventTarget) {
 
               case 2:
                 this._tlsConnection = null;
+                _context3.prev = 3;
+                // Ensure all queued bytes have been sent before closing the connection.
+                tries = 0;
+
+              case 5:
+                if (!(this._socket.bufferedAmount > 0)) {
+                  _context3.next = 12;
+                  break;
+                }
+
+                if (!(++tries > CLOSE_FLUSH_BUFFER_MAX_TRIES)) {
+                  _context3.next = 8;
+                  break;
+                }
+
+                throw new Error('Could not flush the outgoing buffer in time.');
+
+              case 8:
+                _context3.next = 10;
+                return new Promise(function (res) {
+                  return setTimeout(res, CLOSE_FLUSH_BUFFER_INTERVAL_MS);
+                });
+
+              case 10:
+                _context3.next = 5;
+                break;
+
+              case 12:
+                _context3.prev = 12;
 
                 this._socket.close();
 
-              case 4:
+                this._socket = null;
+                return _context3.finish(12);
+
+              case 16:
               case "end":
                 return _context3.stop();
             }
           }
-        }, _callee3, this);
+        }, _callee3, this, [[3,, 12, 16]]);
       }));
 
       function close() {
