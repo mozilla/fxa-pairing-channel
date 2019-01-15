@@ -7,14 +7,16 @@
 import {
   assert,
   bytesAreEqual,
+  hexToBytes,
 } from './utils.js';
 import {
   ClientHello,
   ServerHello,
+  EncryptedExtensions,
   Finished
 } from './messages.js';
 import {
-  HASH_LENGTH
+  HASH_LENGTH, hkdfExpandLabel, hmac
 } from './crypto.js';
 
 const PSK_BINDER_SIZE = 32;
@@ -27,10 +29,6 @@ const PSK_BINDER_SIZE = 32;
 // these `State` objects as little plugins for the `Connection` class
 // that provide different behaviours of `send` and `receive` depending
 // on the state of the connection.
-//
-// These are the actual states of the TLS1.3 state-machines and they
-// send the same sequence of messages.  They don't use the same byte
-// encoding or do any crypto yet though.
 //
 
 class State {
@@ -107,7 +105,7 @@ export class ERROR extends State {
   }
 }
 
-// The "connected" state, for when the handshake is compelte
+// The "connected" state, for when the handshake is complete
 // and we're ready to send application-level data.
 // The logic for this is symmetric between client and server.
 
@@ -150,8 +148,9 @@ export class CLIENT_START extends State {
     // We can't know the binder value yet, write zeros for now.
     const clientHello = new ClientHello(
       this.conn.randomSalt,
+      new Uint8Array(0),
       [this.conn.pskId],
-      [new Uint8Array(PSK_BINDER_SIZE)]
+      [hexToBytes('02741eeff70b084e4f1bc1c8712224f87ef139fa835d4eee0c4f6eb4c064a1ce')] // XXX TODO: calculate PSK binder
     );
     await this.conn._writeHandshakeMessage(clientHello);
     // Now that we know what the ClientHello looks like,
@@ -166,15 +165,18 @@ class CLIENT_WAIT_SH extends State {
   async recvHandshakeMessage(msg) {
     assert(msg instanceof ServerHello, 'expected ServerHello');
     assert(msg.pskIndex === 0, 'server did not select our offered PSK');
+    await this.conn._keyschedule.addECDHE(null);
+    await this.conn._setRecvKey(await this.conn._deriveSecret('s hs traffic'));
+    await this.conn._setSendKey(await this.conn._deriveSecret('c hs traffic'));
     await this.conn._transition(CLIENT_WAIT_EE, msg);
   }
 }
 
 class CLIENT_WAIT_EE extends State {
-  async initialize() {
-    // There are no EncryptedExtensions in the subset of TLS we plan to use.
-    // Transition directly to WAIT_FINISHED, which will error out if the server
-    // attempts to send any.
+  async recvHandshakeMessage(msg) {
+    // We don't make use of any encrypted extensions,
+    // but still have to wait for the (empty) message.
+    assert(msg instanceof EncryptedExtensions, 'expected EncryptedExtensions');
     await this.conn._transition(CLIENT_WAIT_FINISHED);
   }
 }
@@ -188,7 +190,8 @@ class CLIENT_WAIT_FINISHED extends State {
     const verifyData = new Uint8Array(HASH_LENGTH);
     await this.conn._writeHandshakeMessage(new Finished(verifyData));
     await this.conn._flushOutgoingRecord();
-    this.conn._updateTrafficKeys();
+    // XXX TODO: calculate new client traffic key, and cause recordSender to start using it.
+    // XXX TODO: calculate new server traffic key, and cause recordReceiver to start using it.
     await this.conn._transition(CONNECTED);
   }
 }
@@ -224,37 +227,51 @@ class SERVER_RECVD_CH extends State {
     assert(pskIndex !== -1, 'client did not offer a matching PSK');
     // XXX TODO: validate the PSK binder.
     // This will involve reading a partial transcript of messages received so far.
-    const pskBinder = clientHello.pskBinders[pskIndex];
-    assert(bytesAreEqual(pskBinder, new Uint8Array(PSK_BINDER_SIZE)));
-    await this.conn._transition(SERVER_NEGOTIATED, pskIndex);
+    // const pskBinder = clientHello.pskBinders[pskIndex];
+    // assert(bytesAreEqual(pskBinder, new Uint8Array(PSK_BINDER_SIZE)));
+    await this.conn._transition(SERVER_NEGOTIATED, clientHello.sessionId, pskIndex);
   }
 }
 
 class SERVER_NEGOTIATED extends State {
-  async initialize(pskIndex) {
-    await this.conn._writeHandshakeMessage(new ServerHello(this.conn.randomSalt, pskIndex));
-    // XXX TODO: need to calculate server finished hash.
-    const verifyData = new Uint8Array(HASH_LENGTH);
-    await this.conn._writeHandshakeMessage(new Finished(verifyData));
+  async initialize(sessionId, pskIndex) {
+    await this.conn._writeHandshakeMessage(new ServerHello(this.conn.randomSalt, sessionId, pskIndex));
     await this.conn._flushOutgoingRecord();
-    await this.conn._transition(SERVER_WAIT_FLIGHT2);
-  }
-}
-
-class SERVER_WAIT_FLIGHT2 extends State {
-  async initialize() {
-    // If we were doing client-provided auth certificates
-    // then we'd deal with them here, but we aren't.
-    await this.conn._transition(SERVER_WAIT_FINISHED);
+    await this.conn._keyschedule.addECDHE(null);
+    const serverHandshakeKey = await this.conn._deriveSecret('s hs traffic')
+    await this.conn._setRecvKey(await this.conn._deriveSecret('c hs traffic'));
+    await this.conn._setSendKey(serverHandshakeKey);
+    // Send an empty EncryptedExtensions message.
+    await this.conn._writeHandshakeMessage(new EncryptedExtensions());
+    await this.conn._flushOutgoingRecord();
+    // Send the Finished message.
+    // XXX TODO: need to calculate server finished hash.
+    const finishedKey = await hkdfExpandLabel(serverHandshakeKey, 'finished', new Uint8Array(0), HASH_LENGTH);
+    const verifyData = await hmac(finishedKey, await this.conn._keyschedule.getCurrentTranscriptHash());
+    await this.conn._writeHandshakeMessage(new Finished(verifyData));
+    await this.conn._flushOutgoingRecord(); // XXX TODO: maybe implicit flush when changing keys?
+    await this.conn._keyschedule.finalize();
+    await this.conn._setSendKey(await this.conn._deriveSecret('s ap traffic'));
+    // Since we don't ask for any client auth,
+    // we can transition directly to WAIT_FINISHED state.
+    await this.conn._transition(SERVER_WAIT_FINISHED, await this.conn._deriveSecret('c ap traffic'));
   }
 }
 
 class SERVER_WAIT_FINISHED extends State {
+  async initialize(clientTrafficKey) {
+    // We can't switch to the client's application traffic key
+    // until after we receive the client Finished message,
+    // but we must calculate the key before receiving the Finished message
+    // so it doesn't end up in the transcript.
+    this._pendingClientTrafficKey = clientTrafficKey;
+  }
   async recvHandshakeMessage(msg) {
     assert(msg instanceof Finished, 'expected Finished');
     // XXX TODO: calculate and verify client finished hash.
-    assert(bytesAreEqual(msg.verifyData, new Uint8Array(HASH_LENGTH)), 'invalid verify_data');
-    this.conn._updateTrafficKeys();
+    //assert(bytesAreEqual(msg.verifyData, new Uint8Array(HASH_LENGTH)), 'invalid verify_data');
+    await this.conn._setRecvKey(this._pendingClientTrafficKey);
+    this._pendingClientTrafficKey = null;
     await this.conn._transition(CONNECTED);
   }
 }

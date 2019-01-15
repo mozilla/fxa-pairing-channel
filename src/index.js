@@ -67,6 +67,10 @@ import {
   RECORD_TYPE,
 } from './recordlayer.js';
 
+import {
+  KeySchedule
+} from './keyschedule.js';
+
 // !!!!!!!
 // !!
 // !!   N.B. We have not yet implemented the actual encryption bits!
@@ -89,13 +93,16 @@ class InsecureConnection {
     this._pendingApplicationData = [];
     this._recordSender = new RecordSender();
     this._recordReceiver = new RecordReceiver();
+    this._keyschedule = new KeySchedule();
     this._lastPromise = Promise.resolve();
   }
 
   // Subclasses will override this with some async initialization logic.
   static async create(psk, pskId, sendCallback, randomSalt = null) {
     randomSalt = randomSalt === null ? await getRandomBytes(32) : randomSalt;
-    return new this(psk, pskId, sendCallback, randomSalt);
+    const instance = new this(psk, pskId, sendCallback, randomSalt);
+    await instance._keyschedule.addPSK(psk);
+    return instance;
   }
 
   // These are the three public API methods that
@@ -159,9 +166,10 @@ class InsecureConnection {
 
   async _writeHandshakeMessage(msg) {
     await this._recordSender.withBufferWriter(RECORD_TYPE.HANDSHAKE, async buf => {
-      // XXX TODO: remember buffer position here.
+      const startOfMessage = buf.tell();
       await msg.write(buf);
-      // XXX TODO: read back to prev buffer position, add it to the transcript hash.
+      const endOfMessage = buf.tell();
+      this._keyschedule.appendTranscriptMessage(buf.slice(startOfMessage - endOfMessage, endOfMessage - startOfMessage));
     });
   }
 
@@ -170,10 +178,27 @@ class InsecureConnection {
     await this.sendCallback(record);
   }
 
+  async _deriveSecret(label, transcript = undefined) {
+    return await this._keyschedule.deriveSecret(label, transcript);
+  }
+
+  async _setRecvKey(key) {
+    return await this._recordReceiver.setContentKey(key);
+  }
+
+  async _setSendKey(key) {
+    return await this._recordSender.setContentKey(key);
+  }
+
   // This is a helper for handling incoming records.
 
   async _dispatchIncomingRecord(type, buf) {
     switch (type) {
+      case RECORD_TYPE.CHANGE_CIPHER_SPEC:
+        // These may be sent for b/w compat, and must be discarded.
+        assert(buf.readUint8() === 1, 'unexpected_message');
+        assert(! buf.hasMoreBytes(), 'unexpected_message');
+        return null;
       case RECORD_TYPE.ALERT:
         // XXX TODO: implement alert records for communicating errors.
         throw new Error('received TLS alert record, aborting!');
@@ -184,9 +209,10 @@ class InsecureConnection {
         // fragmented across multiple records.  They shouldn't need to be
         // for the tiny subset of TLS that we're using.
         do {
-          // XXX TODO: remember buffer position here.
+          const startOfMessage = buf.tell();
           const msg = readHandshakeMessage(buf);
-          // XXX TODO: read back to prev buffer position, add it to the transcript hash.
+          const endOfMessage = buf.tell();
+          this._keyschedule.appendTranscriptMessage(buf.slice(startOfMessage - endOfMessage, endOfMessage - startOfMessage));
           await this._state.recvHandshakeMessage(msg);
         } while (buf.hasMoreBytes());
         return null;
@@ -206,8 +232,8 @@ class InsecureConnection {
 
 
 export class InsecureClientConnection extends InsecureConnection {
-  static async create(psk, pskId, sendCallback) {
-    const instance = await super.create(psk, pskId, sendCallback);
+  static async create(psk, pskId, sendCallback, randomSalt = null) {
+    const instance = await super.create(psk, pskId, sendCallback, randomSalt);
     await instance._transition(STATE.CLIENT_START);
     return instance;
   }
@@ -215,8 +241,8 @@ export class InsecureClientConnection extends InsecureConnection {
 
 
 export class InsecureServerConnection extends InsecureConnection {
-  static async create(psk, pskId, sendCallback) {
-    const instance = await super.create(psk, pskId, sendCallback);
+  static async create(psk, pskId, sendCallback, randomSalt = null) {
+    const instance = await super.create(psk, pskId, sendCallback, randomSalt);
     await instance._transition(STATE.SERVER_START);
     return instance;
   }

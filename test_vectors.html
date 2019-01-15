@@ -1,0 +1,55 @@
+
+<html>
+<body>
+  <script type="module">
+import { hexToBytes, bytesToHex, utf8ToBytes, bytesToUtf8, BufferReader, assert } from './src/utils.js';
+import { RecordReceiver } from './src/recordlayer.js';
+import { HandshakeMessage, readHandshakeMessage } from './src/messages.js';
+import { InsecureClientConnection, InsecureServerConnection } from './src/index.js';
+import * as mycrypto from './src/crypto.js';
+
+const PSK_ID = utf8ToBytes('testkey');
+const PSK = utf8ToBytes('aabbccddeeff');
+const CLIENT_RANDOM = utf8ToBytes('01010101010101010101010101010101');
+const SERVER_RANDOM = utf8ToBytes('02020202020202020202020202020202');
+
+const CH = '160301023a0100023603033031303130313031303130313031303130313031303130313031303130313031203030303030303030303030303030303030303030303030303030303030303031000a00ff1301c02f009e009c010001e3000b00020100000a00160014001d001e00180017001901000101010201030104000d001800160806080b0805080a0804080906010501040103010201002b00090803040303030203010033006b0069001700410419ea0ac928a7b6f5621944d3734ca6957d5cdf5a25511dc8708ddc88d479914c00760b51f3f82a16882a613141056a0b038379fbb11b8b5c30ff151a0722f5ff001d00202c4ee3de43ded5e4270aeec308eba6cc617850acf7921dd1499ae5efc1d48c73002d00020100000900020100001500e50000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000290032000d0007746573746b65790000000000212002741eeff70b084e4f1bc1c8712224f87ef139fa835d4eee0c4f6eb4c064a1ce'
+const SH = '16030300580200005403033032303230323032303230323032303230323032303230323032303230323032203030303030303030303030303030303030303030303030303030303030303031130100000c002b00020304002900020000';
+const SCCS = '140303000101'; // change cipher spec
+const SEE = '1703030017fbf0abdd6dee520e6e0f2a1b55323e0e49bbb8a81eb39c'; // encrypted extensions
+const SF = '1703030035ff2e2077a2d3c91df7a74e992819374c047ee4a5d8ac95929f233f55bf9a5fec8507981c050a17d2259e0c04b920fa84624737f134'; // Finished
+// XXX TODO: these were all sent at once
+const CCCS = '140303000101'; // change cipher spec
+const CF = '1703030035d2c10ff11d9a9e16b7fef737df96ab3c4c7dfbbc7f23d25da45496d34a265ed591c5ab72b808a173bbc21d776fa12d0f901fbd513c'; // Finished
+const CD = '170303001c63dc7bbf414c7de04af5744c0d9af21a2c97237a79b497c9ef028adc'; // Application data
+
+async function run() {
+
+  const clientSent = []
+  const serverSent = []
+  //const client = await InsecureClientConnection.create(PSK, PSK_ID, clientSent.push.bind(clientSent), CLIENT_RANDOM);
+  const server = await InsecureServerConnection.create(PSK, PSK_ID, serverSent.push.bind(serverSent), SERVER_RANDOM);
+
+  let data;
+
+  data = await server.recv(hexToBytes(CH));
+  assert(bytesToHex(serverSent[0]) === SH);
+  assert(bytesToHex(serverSent[1]) === SEE);
+  assert(bytesToHex(serverSent[2]) === SF);
+
+  data = await server.recv(hexToBytes(CCCS));
+  assert(data === null);
+  console.log("SRECV CCCS", data);
+
+  data = await server.recv(hexToBytes(CF));
+  assert(data === null);
+  console.log("SRECV CF", data);
+
+  data = await server.recv(hexToBytes(CD));
+  assert(bytesToUtf8(data) === 'hello world');
+}
+
+run();
+</script>
+</body>
+</html>

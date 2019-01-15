@@ -24,6 +24,11 @@ export function assertIsBytes(value, msg = 'value must be a Uint8Array') {
   return value;
 }
 
+export function assertIsString(value, msg = 'value must be a string') {
+  assert(typeof value === 'string', msg);
+  return value;
+}
+
 export function bytesToHex(bytes) {
   return Array.prototype.map.call(bytes, byte => {
     let s = byte.toString(16);
@@ -71,6 +76,8 @@ export function bytesAreEqual(v1, v2) {
   return true;
 }
 
+
+
 // The `BufferReader` and `BufferWriter` classes are helpers for dealing with the
 // binary struct format that's used for various TLS message.  Think of them as a
 // buffer with a pointer to the "current position" and a bunch of helper methods
@@ -105,8 +112,6 @@ class BufferWithPointer {
     const start = this._buffer.byteOffset + this._pos + offset;
     if (typeof length === 'undefined') {
       length = this.length() - this._pos;
-    } else {
-      assert(this._pos + length <= this.length(), 'do not slice past end of buffer');
     }
     return new Uint8Array(this._buffer.buffer, start, length);
   }
@@ -139,7 +144,7 @@ export class BufferReader extends BufferWithPointer {
 
   readUint24() {
     let n = this._dataview.getUint16(this._pos);
-    n = (n << 16) + this._dataview.getUint8(this._pos + 2);
+    n = (n << 8) | this._dataview.getUint8(this._pos + 2);
     this.incr(3);
     return n;
   }
@@ -264,6 +269,12 @@ export class BufferReader extends BufferWithPointer {
 export class BufferWriter extends BufferWithPointer {
   constructor(size) {
     super(new Uint8Array(size));
+  }
+
+  finalize() {
+    const length = this.tell();
+    this.seek(0);
+    return this.slice(0, length);
   }
 
   writeBytes(data) {

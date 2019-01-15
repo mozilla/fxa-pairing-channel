@@ -57,32 +57,44 @@
 //
 
 import {
-  AEADEncrypt,
-  AEADDecrypt,
+  VERSION_TLS_1_2
+} from './constants.js';
+import {
+  encrypt,
+  decrypt,
+  prepareKey,
+  hkdfExpandLabel,
   AEAD_SIZE_INFLATION,
+  IV_LENGTH,
+  KEY_LENGTH,
 } from './crypto.js';
 import {
   assert,
   assertIsBytes,
   BufferReader,
   BufferWriter,
+  bytesToHex,
 } from './utils.js';
 
 /* eslint-disable sorting/sort-object-props */
 const RECORD_TYPES = {
+  20: 'CHANGE_CIPHER_SPEC',
   21: 'ALERT',
   22: 'HANDSHAKE',
   23: 'APPLICATION_DATA',
 };
 
 export const RECORD_TYPE = {
+  CHANGE_CIPHER_SPEC: 20,
   ALERT: 21,
   HANDSHAKE: 22,
   APPLICATION_DATA: 23,
 };
 /* eslint-enable sorting/sort-object-props */
 
-const MAX_SEQUENCE_NUMBER = Math.pow(2, 32);
+// Encrypting at most 2^24 records will force us to stay
+// below data limits on AES-GCM encryption key use.
+const MAX_SEQUENCE_NUMBER = Math.pow(2, 24);
 const MAX_RECORD_SIZE = Math.pow(2, 14);
 const MAX_ENCRYPTED_RECORD_SIZE = MAX_RECORD_SIZE + 256;
 const RECORD_HEADER_SIZE = 5;
@@ -98,13 +110,13 @@ export class RecordReceiver {
 
   // Call this to set the encryption key, or to change
   // to a newly-derived key.  Any records read before calling
-  // this method are treated as plaintext.
+  // this method for the first time are treated as plaintext.
 
-  setContentKey(key, iv) {
+  async setContentKey(key) {
     assertIsBytes(key);
-    assertIsBytes(iv);
-    this.contentKey = key;
-    this.contentIV = iv;
+    // Derive key and iv per https://tools.ietf.org/html/rfc8446#section-7.3
+    this.contentKey = await prepareKey(await hkdfExpandLabel(key, 'key', new Uint8Array(0), KEY_LENGTH), 'decrypt');
+    this.contentIV = await hkdfExpandLabel(key, 'iv', new Uint8Array(0), IV_LENGTH);
     this.sequenceNumber = 0;
   }
 
@@ -135,10 +147,11 @@ export class RecordReceiver {
     //
     let type = buf.readUint8();
     assert(type in RECORD_TYPES, 'unrecognized record type');
-    assert(buf.readUint16() === 0x0303, 'unexpected legacy_record_version');
+    // The legacy_record_version "MUST be ignored for all purposes".
+    buf.readUint16();
     const length = buf.readUint16();
     let plaintext;
-    if (this.contentKey === null) {
+    if (this.contentKey === null || type === RECORD_TYPE.CHANGE_CIPHER_SPEC) {
       // An unencrypted `TLSPlaintext` struct.
       assert(type !== RECORD_TYPE.APPLICATION_DATA, 'must encrypt application data');
       assert(length < MAX_RECORD_SIZE, 'record_overflow');
@@ -168,8 +181,9 @@ export class RecordReceiver {
           break;
         }
       }
-      assert(i >= 0, 'failed to find content-type byte in TLSInnerPlaintext');
+      assert(i >= 0, 'failed to find type byte in TLSInnerPlaintext');
       type = paddedPlaintext[i];
+      assert(type !== RECORD_TYPE.CHANGE_CIPHER_SPEC, 'change_cipher_spec records must be plaintext');
       plaintext = new Uint8Array(paddedPlaintext.buffer, paddedPlaintext.byteOffset, i);
     }
     assert(! buf.hasMoreBytes(), 'record contained trailing data');
@@ -177,7 +191,7 @@ export class RecordReceiver {
   }
 
   async _decrypt(ciphertext, additionalData) {
-    const plaintext = await AEADDecrypt(this.contentKey, this.contentIV, this.sequenceNumber, ciphertext, additionalData);
+    const plaintext = await decrypt(this.contentKey, this.contentIV, this.sequenceNumber, ciphertext, additionalData);
     this.sequenceNumber += 1;
     assert(this.sequenceNumber < MAX_SEQUENCE_NUMBER, 'sequence number overflow');
     return plaintext;
@@ -206,13 +220,13 @@ export class RecordSender {
 
   // Call this to set the encryption key, or to change
   // to a newly-derived key.  Any records written before calling
-  // this method will be transmitted as plaintext.
+  // this method for the first time will be transmitted as plaintext.
 
-  setContentKey(key, iv) {
+  async setContentKey(key, iv) {
     assertIsBytes(key);
-    assertIsBytes(iv);
-    this.contentKey = key;
-    this.contentIV = iv;
+    // Derive key and iv per https://tools.ietf.org/html/rfc8446#section-7.3
+    this.contentKey = await prepareKey(await hkdfExpandLabel(key, 'key', new Uint8Array(0), KEY_LENGTH), 'encrypt');
+    this.contentIV = await hkdfExpandLabel(key, 'iv', new Uint8Array(0), IV_LENGTH);
     this.sequenceNumber = 0;
   }
 
@@ -228,7 +242,7 @@ export class RecordSender {
       this._pendingRecordBuf = new BufferWriter(RECORD_BUFFER_SIZE);
       // Reserve space at the start of the buffer for the record header,
       // which is conveniently always a fixed size.
-      this._pendingRecordBuf.seek(RECORD_HEADER_SIZE);
+      this._pendingRecordBuf.incr(RECORD_HEADER_SIZE);
     } else {
       assert(this._pendingRecordType === type, 'different record type already in progress');
     }
@@ -250,7 +264,7 @@ export class RecordSender {
       assert(type !== RECORD_TYPE.APPLICATION_DATA, 'must encrypt application data');
       buf.seek(0);
       buf.writeUint8(type);
-      buf.writeUint16(0x0303);
+      buf.writeUint16(VERSION_TLS_1_2);
       buf.writeUint16(length);
     } else {
       // Generate an encrypted `TLSCiphertext` struct.
@@ -262,7 +276,7 @@ export class RecordSender {
       // by some fixed additional amount due to the encryption.
       buf.seek(0);
       buf.writeUint8(RECORD_TYPE.APPLICATION_DATA);
-      buf.writeUint16(0x0303);
+      buf.writeUint16(VERSION_TLS_1_2);
       buf.writeUint16(length + AEAD_SIZE_INFLATION);
       // The additional data for the encryption is the `TLSCiphertext` record
       // header that  we just wrote, which we know to be the previous `RECORD_HEADER_SIZE` bytes.
@@ -277,7 +291,7 @@ export class RecordSender {
   }
 
   async _encrypt(plaintext, additionalData) {
-    const ciphertext = await AEADEncrypt(this.contentKey, this.contentIV, this.sequenceNumber, plaintext, additionalData);
+    const ciphertext = await encrypt(this.contentKey, this.contentIV, this.sequenceNumber, plaintext, additionalData);
     this.sequenceNumber += 1;
     assert(this.sequenceNumber < MAX_SEQUENCE_NUMBER, 'sequence number overflow');
     return ciphertext;
