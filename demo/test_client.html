@@ -19,15 +19,17 @@
   </div>
 
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-  <script src="../dist/fxaPairingTLS.js"></script>
-  <script src="./tlschannel.js"></script>
-  <script>
+  <!-- <script src="../dist/fxaPairingTLS.js"></script> -->
+  <!-- <script src="./tlschannel.js"></script> -->
+  <script type = "module">
+    import {PairingChannel} from './tlschannel.js';
+    import {BufferWriter} from '../src/utils.js'; window.BufferWriter = BufferWriter;
     $(() => {
       $("#code-value").val("")
       $("#chat-history").val("")
       $("#code-value").on("keypress", async evt => {
         if (evt.keyCode !== 13) { return }
-        const channel = await InsecurePairingChannel.connect($("#code-value").val())
+        const channel = await PairingChannel.connect($("#code-value").val())
         channel.onReceive = msg => {
           $("#chat-history").val($("#chat-history").val() + "\nthem>> " + msg)
         }

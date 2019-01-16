@@ -17,13 +17,14 @@
     <input type="text" id="chat-input" />
   </div>
 
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-  <script src="../dist/fxaPairingTLS.js"></script>
-  <script src="./tlschannel.js"></script>
-  <script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<!-- <script src="../dist/fxaPairingTLS.js"></script> -->
+<!-- <script src="./tlschannel.js"></script> -->
+<script type="module">
+    import { PairingChannel } from './tlschannel.js';
     $(async () => {
       $("#chat-history").val("");
-      const channel = await InsecurePairingChannel.create();
+      const channel = await PairingChannel.create();
       $("#code-value").text(channel.code);
       channel.onReceive = msg => {
         $("#chat-history").val($("#chat-history").val() + "\nthem>> " + msg);

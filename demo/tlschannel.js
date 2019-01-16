@@ -8,9 +8,11 @@
 
 const CHANNEL_SERVER = 'wss://dev.channelserver.nonprod.cloudops.mozgcp.net/v1/ws/';
 
-/* exported InsecurePairingChannel */
+import * as fxaPairingTLS from '../src/index.js';
 
-class InsecurePairingChannel {
+/* exported PairingChannel */
+
+export class PairingChannel {
 
   constructor() {
     this.socket = null;
@@ -34,7 +36,7 @@ class InsecurePairingChannel {
           const psk = new Uint8Array(32);
           crypto.getRandomValues(psk);
           instance.code = channelid + '#' + fxaPairingTLS.bytesToHex(psk);
-          instance.tlsconn = await fxaPairingTLS.InsecureServerConnection.create(psk, pskId, data => {
+          instance.tlsconn = await fxaPairingTLS.ServerConnection.create(psk, pskId, data => {
             // To send data over the channelserver, it needs to be encoded as a safe string.
             instance.socket.send(fxaPairingTLS.bytesToHex(data));
           });
@@ -63,7 +65,7 @@ class InsecurePairingChannel {
           // using the provided psk.
           const psk = fxaPairingTLS.hexToBytes(pskHex);
           const pskId = fxaPairingTLS.utf8ToBytes(channelId);
-          instance.tlsconn = await fxaPairingTLS.InsecureClientConnection.create(psk, pskId, data => {
+          instance.tlsconn = await fxaPairingTLS.ClientConnection.create(psk, pskId, data => {
             // To send data over the websocket, it needs to be encoded as a safe string.
             instance.socket.send(fxaPairingTLS.bytesToHex(data));
           });

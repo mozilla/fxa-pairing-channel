@@ -12,7 +12,7 @@
 //
 
 import {
-  assert,
+  assert, BufferWriter,
 } from './utils.js';
 import {
   HASH_LENGTH
@@ -52,6 +52,9 @@ export function readHandshakeMessage(buf) {
     case HANDSHAKE_TYPE.SERVER_HELLO:
       msg = ServerHello._read(buf);
       break;
+    case HANDSHAKE_TYPE.ENCRYPTED_EXTENSIONS:
+      msg = EncryptedExtensions._read(buf);
+      break;
     case HANDSHAKE_TYPE.FINISHED:
       msg = Finished._read(buf);
       break;
@@ -63,6 +66,25 @@ export function readHandshakeMessage(buf) {
 }
 
 export class HandshakeMessage {
+  
+  get TYPE_TAG() {
+    assert(false, 'not implemented');
+  }
+
+  static _read(buf) {
+    assert(false, 'not implemented');
+  }
+
+  static _write(buf) {
+    assert(false, 'not implemented');
+  }
+
+  render() {
+    const buf = new BufferWriter();
+    this.write(buf);
+    return buf.flush();
+  }
+
   write(buf) {
     // Each handshake messages has a type and length prefix, per
     // https://tools.ietf.org/html/rfc8446#appendix-B.3
@@ -78,6 +100,7 @@ export class HandshakeMessage {
   //     ExtensionType extension_type;
   //     opaque extension_data<0..2^16-1>;
   //   } Extension;
+  //
   _writeExtension(buf, type, cb) {
     buf.writeUint16(type);
     buf.writeVector16(cb);
@@ -284,9 +307,7 @@ export class ServerHello extends HandshakeMessage {
     // Random bytes from the server.
     const random = buf.readBytes(32);
     // It should have echoed our vector for legacy_session_id.
-    // XXX TODO: check that it echoed correctly.
     const sessionId = buf.readVectorBytes8();
-    // XXX TODO: test vector won't have this; assert(sessionId.byteLength === 0, 'illegal_parameter sessionid');
     // It should have selected our single offered ciphersuite.
     const foundCipherSuite = buf.readUint16();
     assert(foundCipherSuite === TLS_AES_128_GCM_SHA256, 'illegal_parameter ciphersuite');
@@ -366,8 +387,8 @@ export class EncryptedExtensions extends HandshakeMessage {
   static _read(buf) {
     // We should not receive any encrypted extensions,
     // since we do not advertize any in the ClientHello.
-    buf.readVector16(buf => {
-      assert(false, 'unexpected encrypted extension');
+    buf.readVector16((buf, length) => {
+      assert(length === 0, 'unexpected encrypted extension');
     });
     return new this();
   }

@@ -4,9 +4,11 @@
 
 'use strict';
 
-// The top-level APIs offered by this library are `ClientConnection` and
-// `ServerConnection` classes.  They each take a callback to be used for
-// sending data to the remote peer, and operate like this:
+// The top-level APIs offered by this module are `ClientConnection` and
+// `ServerConnection` classes, which provide authenticated and encrypted
+// communication via the "externally-provisioned PSK" mode of TLS1.3.
+// They each take a callback to be used for sending data to the remote peer,
+// and operate like this:
 //
 //    conn = await ClientConnection.create(psk, pskId, async function send_data_to_server(data) {
 //      // application-specific sending logic here.
@@ -49,50 +51,25 @@ import {
   bytesToUtf8,
   utf8ToBytes,
   noop,
+  BufferWriter,
+  BufferReader,
 } from './utils.js';
 
-import {
-  getRandomBytes
-} from './crypto.js';
-
 import * as STATE from './states.js';
+import { getRandomBytes } from './crypto.js';
+import { readHandshakeMessage } from './messages.js';
+import { KeySchedule } from './keyschedule.js';
+import { RecordLayer, RECORD_TYPE } from './recordlayer.js';
 
-import {
-  readHandshakeMessage,
-} from './messages.js';
-
-import {
-  RecordSender,
-  RecordReceiver,
-  RECORD_TYPE,
-} from './recordlayer.js';
-
-import {
-  KeySchedule
-} from './keyschedule.js';
-
-// !!!!!!!
-// !!
-// !!   N.B. We have not yet implemented the actual encryption bits!
-// !!
-// !!!!!!!
-//
-// This first version of the code uses the same "framework" as we would use for
-// implementing TLS1.3, including the basic sequence of messages between client and
-// server, and the use of binary encoding in an ArrayBuffer for data processing.
-// Using an implementation with proper crypto should feel identical to using
-// this mock version, except it won't have "Insecure" in the class name...
-
-class InsecureConnection {
+class Connection {
   constructor(psk, pskId, sendCallback, randomSalt) {
     this.psk = assertIsBytes(psk);
     this.pskId = assertIsBytes(pskId);
-    this.sendCallback = sendCallback;
-    this.randomSalt = randomSalt;
+    this.randomSalt = assertIsBytes(randomSalt);
     this._state = new STATE.UNINITIALIZED(this);
-    this._pendingApplicationData = [];
-    this._recordSender = new RecordSender();
-    this._recordReceiver = new RecordReceiver();
+    this._sendBuffer = new BufferWriter();
+    this._recvBuffer = new BufferWriter();
+    this._recordlayer = new RecordLayer(sendCallback);
     this._keyschedule = new KeySchedule();
     this._lastPromise = Promise.resolve();
   }
@@ -100,13 +77,12 @@ class InsecureConnection {
   // Subclasses will override this with some async initialization logic.
   static async create(psk, pskId, sendCallback, randomSalt = null) {
     randomSalt = randomSalt === null ? await getRandomBytes(32) : randomSalt;
-    const instance = new this(psk, pskId, sendCallback, randomSalt);
-    await instance._keyschedule.addPSK(psk);
-    return instance;
+    return new this(psk, pskId, sendCallback, randomSalt);
   }
 
   // These are the three public API methods that
-  // consumers can use to connunicate over TLS.
+  // consumers can use to send and receive data encrypted
+  // with TLS1.3.
 
   async send(data) {
     assertIsBytes(data);
@@ -118,13 +94,17 @@ class InsecureConnection {
   async recv(data) {
     assertIsBytes(data);
     return await this._synchronized(async () => {
-      const [type, buf] = await this._recordReceiver.recv(data);
-      return await this._dispatchIncomingRecord(type, buf);
+      await this._recordlayer.recv(data, async (type, bytes) => {
+        await this._dispatchIncomingMessage(type, bytes);
+      });
+      const appData = this._recvBuffer.flush();
+      return appData.byteLength > 0 ? appData : null;
     });
   }
 
   async close() {
     await this._synchronized(async () => {
+      // XXX TODO: check for partially-consumed records?
       await this._state.close();
     });
   }
@@ -139,6 +119,7 @@ class InsecureConnection {
       return cb();
     }).catch(async err => {
       // All errors immediately put us in a terminal "error" state.
+      // XXX TODO: send specific 'alert' messages for specific errors?
       await this._transition(STATE.ERROR, err);
       throw err;
     });
@@ -156,82 +137,63 @@ class InsecureConnection {
     await this._state.initialize(...args);
   }
 
-  // These are helpers to allow the state to add data to the next outgoing record.
+  // These are helpers to allow the State to manipulate the recordlayer
+  // and send out various types of data.
 
-  async _writeApplicationData(bytes) {
-    await this._recordSender.withBufferWriter(RECORD_TYPE.APPLICATION_DATA, async buf => {
-      await buf.writeBytes(bytes);
-    });
+  async _sendApplicationData(bytes) {
+    await this._recordlayer.send(RECORD_TYPE.APPLICATION_DATA, bytes);
+    // XXX TODO: explicit flush?
+  }
+
+  async _sendHandshakeMessage(bytes) {
+    this._keyschedule.addToTranscript(bytes);
+    await this._recordlayer.send(RECORD_TYPE.HANDSHAKE, bytes);
   }
 
   async _writeHandshakeMessage(msg) {
-    await this._recordSender.withBufferWriter(RECORD_TYPE.HANDSHAKE, async buf => {
-      const startOfMessage = buf.tell();
-      await msg.write(buf);
-      const endOfMessage = buf.tell();
-      this._keyschedule.appendTranscriptMessage(buf.slice(startOfMessage - endOfMessage, endOfMessage - startOfMessage));
-    });
+    const buf = new BufferWriter();
+    msg.write(buf);
+    return await this._sendHandshakeMessage(buf.flush());
   }
 
   async _flushOutgoingRecord() {
-    const record = await this._recordSender.flush();
-    await this.sendCallback(record);
-  }
-
-  async _deriveSecret(label, transcript = undefined) {
-    return await this._keyschedule.deriveSecret(label, transcript);
-  }
-
-  async _setRecvKey(key) {
-    return await this._recordReceiver.setContentKey(key);
+    await this._recordlayer.flush();
   }
 
   async _setSendKey(key) {
-    return await this._recordSender.setContentKey(key);
+    return await this._recordlayer.setSendKey(key);
   }
 
-  // This is a helper for handling incoming records.
+  async _setRecvKey(key) {
+    return await this._recordlayer.setRecvKey(key);
+  }
 
-  async _dispatchIncomingRecord(type, buf) {
+  // This is a helper for handling incoming messages from the recordlayer.
+
+  async _dispatchIncomingMessage(type, bytes) {
     switch (type) {
       case RECORD_TYPE.CHANGE_CIPHER_SPEC:
         // These may be sent for b/w compat, and must be discarded.
-        assert(buf.readUint8() === 1, 'unexpected_message');
-        assert(! buf.hasMoreBytes(), 'unexpected_message');
-        return null;
+        assert(bytes.byteLength === 1 && bytes[0] === 1, 'unexpected_message');
+        break;
       case RECORD_TYPE.ALERT:
         // XXX TODO: implement alert records for communicating errors.
-        throw new Error('received TLS alert record, aborting!');
+        throw new Error('received TLS alert record, unceremoniously aborting!');
       case RECORD_TYPE.APPLICATION_DATA:
-        return await this._state.recvApplicationData(buf);
+        await this._state.recvApplicationData(bytes);
+        break;
       case RECORD_TYPE.HANDSHAKE:
-        // For simplicity, we assume that handshake messages will not be
-        // fragmented across multiple records.  They shouldn't need to be
-        // for the tiny subset of TLS that we're using.
-        do {
-          const startOfMessage = buf.tell();
-          const msg = readHandshakeMessage(buf);
-          const endOfMessage = buf.tell();
-          this._keyschedule.appendTranscriptMessage(buf.slice(startOfMessage - endOfMessage, endOfMessage - startOfMessage));
-          await this._state.recvHandshakeMessage(msg);
-        } while (buf.hasMoreBytes());
-        return null;
+        this._keyschedule.addToTranscript(bytes);
+        await this._state.recvHandshakeMessage(readHandshakeMessage(new BufferReader(bytes)));
+        break;
       default:
         assert(false, `unknown record type: ${type}`);
     }
   }
 
-  // This is a placeholder, until we implement the full key schedule.
-  // XXX TODO: the full key schedule.
-
-  _updateTrafficKeys() {
-    this._recordSender.setContentKey(this.psk, new Uint8Array(32));
-    this._recordReceiver.setContentKey(this.psk, new Uint8Array(32));
-  }
 }
 
-
-export class InsecureClientConnection extends InsecureConnection {
+export class ClientConnection extends Connection {
   static async create(psk, pskId, sendCallback, randomSalt = null) {
     const instance = await super.create(psk, pskId, sendCallback, randomSalt);
     await instance._transition(STATE.CLIENT_START);
@@ -239,15 +201,13 @@ export class InsecureClientConnection extends InsecureConnection {
   }
 }
 
-
-export class InsecureServerConnection extends InsecureConnection {
+export class ServerConnection extends Connection {
   static async create(psk, pskId, sendCallback, randomSalt = null) {
     const instance = await super.create(psk, pskId, sendCallback, randomSalt);
     await instance._transition(STATE.SERVER_START);
     return instance;
   }
 }
-
 
 // Re-export helpful utilities for calling code to use.
 export { bytesToHex, hexToBytes, bytesToUtf8, utf8ToBytes };

@@ -68,15 +68,18 @@ export function bytesAreEqual(v1, v2) {
   if (v1.length !== v2.length) {
     return false;
   }
+  let mismatch = false;
   for (let i = 0; i < v1.length; i++) {
-    if (v1[i] !== v2[i]) {
-      return false;
-    }
+    mismatch &= v1[i] !== v2[i]
   }
-  return true;
+  return ! mismatch;
 }
 
+export function zeros(n) {
+  return new Uint8Array(n);
+}
 
+export const EMPTY = new Uint8Array(0);
 
 // The `BufferReader` and `BufferWriter` classes are helpers for dealing with the
 // binary struct format that's used for various TLS message.  Think of them as a
@@ -89,6 +92,14 @@ class BufferWithPointer {
     this._buffer = buf;
     this._dataview = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
     this._pos = 0;
+  }
+
+  resize(size) {
+    assert(size > this.length(), 'cant resize BufferWithPointer to be smaller');
+    const newbuf = new Uint8Array(size);
+    newbuf.set(this._buffer.slice(0, this.tell()), 0);
+    this._buffer = newbuf;
+    this._dataview = new DataView(newbuf.buffer, newbuf.byteOffset, newbuf.byteLength);
   }
 
   length() {
@@ -108,12 +119,8 @@ class BufferWithPointer {
     this.seek(this._pos + offset);
   }
 
-  slice(offset, length) {
-    const start = this._buffer.byteOffset + this._pos + offset;
-    if (typeof length === 'undefined') {
-      length = this.length() - this._pos;
-    }
-    return new Uint8Array(this._buffer.buffer, start, length);
+  slice(start = 0, end = this.tell()) {
+    return this._buffer.slice(start, end);
   }
 }
 
@@ -125,9 +132,13 @@ export class BufferReader extends BufferWithPointer {
   }
 
   readBytes(length) {
-    const slice = this.slice(0, length);
+    const slice = this.slice(this.tell(), this.tell() + length);
     this.incr(length);
     return slice;
+  }
+
+  readRemainingBytes() {
+    return this.readBytes(this.length() - this.tell());
   }
 
   readUint8() {
@@ -267,11 +278,21 @@ export class BufferReader extends BufferWithPointer {
 
 
 export class BufferWriter extends BufferWithPointer {
-  constructor(size) {
+  constructor(size = 1024) {
     super(new Uint8Array(size));
   }
 
-  finalize() {
+  _maybeResize(n) {
+    const newPos = this._pos + n;
+    if (newPos > this.length()) {
+      // Classic grow-by-doubling, up to 16kB max increment.
+      let incr = Math.min(this._buffer.byteLength, 16 * 1024);
+      incr = Math.max(incr, this.length() - newPos);
+      this.resize(this.length() + incr);
+    }
+  }
+
+  flush() {
     const length = this.tell();
     this.seek(0);
     return this.slice(0, length);
@@ -279,27 +300,32 @@ export class BufferWriter extends BufferWithPointer {
 
   writeBytes(data) {
     assertIsBytes(data);
+    this._maybeResize(data.byteLength);
     this._buffer.set(data, this.tell());
     this.incr(data.byteLength);
   }
 
   writeUint8(n) {
+    this._maybeResize(1);
     this._dataview.setUint8(this._pos, n);
     this.incr(1);
   }
 
   writeUint16(n) {
+    this._maybeResize(2);
     this._dataview.setUint16(this._pos, n);
     this.incr(2);
   }
 
   writeUint24(n) {
+    this._maybeResize(3);
     this._dataview.setUint16(this._pos, n >> 8);
     this._dataview.setUint8(this._pos + 2, n & 0xFF);
     this.incr(3);
   }
 
   writeUint32(n) {
+    this._maybeResize(4);
     this._dataview.setUint32(this._pos, n);
     this.incr(4);
   }

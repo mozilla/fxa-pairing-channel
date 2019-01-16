@@ -1,9 +1,19 @@
+#
+# This is a WIP script to generate some TLS test vectors using tlslite-ng,
+# which we can use to testing compatibility of the pairing-channel code.
+# Run it like so:
+#
+#    python ./test_vectors.py
+#
+# Then copy the various "SEND client" lines into `test_vectors.html`
+# to try replaying them against the pairing-channel ServerConnection.
+# 
 
 from binascii import hexlify
 import threading
 import queue
 
-from tlslite.api import *
+from tlslite.api import TLSConnection, HandshakeSettings
 from tlslite.constants import CipherSuite, HashAlgorithm, SignatureAlgorithm, \
     GroupName, SignatureScheme
 from tlslite import __version__
@@ -96,6 +106,7 @@ def run_client():
 def run_server():
     server.handshakeServer(settings=settings)
     assert server.recv(1024) == b'hello world'
+    server.close()
 
 
 tc = threading.Thread(target=run_client)
