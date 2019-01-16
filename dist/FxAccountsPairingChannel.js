@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:e44d4d5b65434d3ceab3, Chunkhash:3d20192f7b03e0786bc0.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-tls.git. Hash:f683649640c4bc3b464e, Chunkhash:322d7cb20dead4861fc0.
  * 
  */
 module.exports =
@@ -124,8 +124,12 @@ function assert(cond, msg) {
 }
 
 function assertIsBytes(value, msg = 'value must be a Uint8Array') {
-  // XXX: Disabled until Gecko problems are resolved
-  //assert(value instanceof Uint8Array, msg);
+  assert(value instanceof Uint8Array, msg);
+  return value;
+}
+
+function assertIsString(value, msg = 'value must be a string') {
+  assert(typeof value === 'string', msg);
   return value;
 }
 
@@ -168,13 +172,18 @@ function bytesAreEqual(v1, v2) {
   if (v1.length !== v2.length) {
     return false;
   }
+  let mismatch = false;
   for (let i = 0; i < v1.length; i++) {
-    if (v1[i] !== v2[i]) {
-      return false;
-    }
+    mismatch &= v1[i] !== v2[i]
   }
-  return true;
+  return ! mismatch;
 }
+
+function zeros(n) {
+  return new Uint8Array(n);
+}
+
+const EMPTY = new Uint8Array(0);
 
 // The `BufferReader` and `BufferWriter` classes are helpers for dealing with the
 // binary struct format that's used for various TLS message.  Think of them as a
@@ -187,6 +196,14 @@ class BufferWithPointer {
     this._buffer = buf;
     this._dataview = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
     this._pos = 0;
+  }
+
+  resize(size) {
+    assert(size > this.length(), 'cant resize BufferWithPointer to be smaller');
+    const newbuf = new Uint8Array(size);
+    newbuf.set(this._buffer.slice(0, this.tell()), 0);
+    this._buffer = newbuf;
+    this._dataview = new DataView(newbuf.buffer, newbuf.byteOffset, newbuf.byteLength);
   }
 
   length() {
@@ -206,14 +223,8 @@ class BufferWithPointer {
     this.seek(this._pos + offset);
   }
 
-  slice(offset, length) {
-    const start = this._buffer.byteOffset + this._pos + offset;
-    if (typeof length === 'undefined') {
-      length = this.length() - this._pos;
-    } else {
-      assert(this._pos + length <= this.length(), 'do not slice past end of buffer');
-    }
-    return new Uint8Array(this._buffer.buffer, start, length);
+  slice(start = 0, end = this.tell()) {
+    return this._buffer.slice(start, end);
   }
 }
 
@@ -225,9 +236,13 @@ class BufferReader extends BufferWithPointer {
   }
 
   readBytes(length) {
-    const slice = this.slice(0, length);
+    const slice = this.slice(this.tell(), this.tell() + length);
     this.incr(length);
     return slice;
+  }
+
+  readRemainingBytes() {
+    return this.readBytes(this.length() - this.tell());
   }
 
   readUint8() {
@@ -244,7 +259,7 @@ class BufferReader extends BufferWithPointer {
 
   readUint24() {
     let n = this._dataview.getUint16(this._pos);
-    n = (n << 16) + this._dataview.getUint8(this._pos + 2);
+    n = (n << 8) | this._dataview.getUint8(this._pos + 2);
     this.incr(3);
     return n;
   }
@@ -367,33 +382,54 @@ class BufferReader extends BufferWithPointer {
 
 
 class BufferWriter extends BufferWithPointer {
-  constructor(size) {
+  constructor(size = 1024) {
     super(new Uint8Array(size));
+  }
+
+  _maybeResize(n) {
+    const newPos = this._pos + n;
+    if (newPos > this.length()) {
+      // Classic grow-by-doubling, up to 16kB max increment.
+      let incr = Math.min(this._buffer.byteLength, 16 * 1024);
+      incr = Math.max(incr, this.length() - newPos);
+      this.resize(this.length() + incr);
+    }
+  }
+
+  flush() {
+    const length = this.tell();
+    this.seek(0);
+    return this.slice(0, length);
   }
 
   writeBytes(data) {
     assertIsBytes(data);
+    this._maybeResize(data.byteLength);
     this._buffer.set(data, this.tell());
     this.incr(data.byteLength);
   }
 
   writeUint8(n) {
+    this._maybeResize(1);
     this._dataview.setUint8(this._pos, n);
     this.incr(1);
   }
 
   writeUint16(n) {
+    this._maybeResize(2);
     this._dataview.setUint16(this._pos, n);
     this.incr(2);
   }
 
   writeUint24(n) {
+    this._maybeResize(3);
     this._dataview.setUint16(this._pos, n >> 8);
     this._dataview.setUint8(this._pos + 2, n & 0xFF);
     this.incr(3);
   }
 
   writeUint32(n) {
+    this._maybeResize(4);
     this._dataview.setUint32(this._pos, n);
     this.incr(4);
   }
@@ -489,43 +525,99 @@ class BufferWriter extends BufferWithPointer {
 //
 // Low-level crypto primitives.
 //
-// We haven't actually implemented any of the crypto yet,
-// but when we do, this is the file where we'll define the basics.
+// This file implements the AEAD encrypt/decrypt and hashing routines
+// for the TLS_AES_128_GCM_SHA256 ciphersuite.
 //
 
 
 
-const AEAD_SIZE_INFLATION = 4;
+const AEAD_SIZE_INFLATION = 16;
+const KEY_LENGTH = 16;
+const IV_LENGTH = 12;
 const HASH_LENGTH = 32;
 
-// Fake crypto for now, just to try out the message layer.
-
-async function AEADEncrypt(key, iv, seqNum, plaintext, additionalData) {
-  const ciphertext = new Uint8Array(plaintext.byteLength + 4);
-  ciphertext[0] = seqNum >> 24;
-  ciphertext[1] = seqNum >> 16;
-  ciphertext[2] = seqNum >> 8;
-  ciphertext[3] = seqNum;
-  ciphertext.set(plaintext, 4);
-  return ciphertext;
+async function prepareKey(key, mode) {
+  return window.crypto.subtle.importKey('raw', key, { name: 'AES-GCM' }, false, [mode]);
 }
 
-async function AEADDecrypt(key, iv, seqNum, ciphertext, additionalData) {
-  let foundSeqNum = ciphertext[0];
-  foundSeqNum = foundSeqNum << 8 | ciphertext[1];
-  foundSeqNum = foundSeqNum << 8 | ciphertext[2];
-  foundSeqNum = foundSeqNum << 8 | ciphertext[3];
-  assert(foundSeqNum === seqNum, 'sequence number mismatch');
-  const plaintext = new Uint8Array(ciphertext.buffer, ciphertext.byteOffset + 4, ciphertext.byteLength - 4);
-  return plaintext;
+async function encrypt(key, iv, plaintext, additionalData) {
+  const ciphertext = await window.crypto.subtle.encrypt({
+    additionalData,
+    iv,
+    name: 'AES-GCM',
+    tagLength: AEAD_SIZE_INFLATION * 8
+  }, key, plaintext);
+  assert(plaintext.byteLength + AEAD_SIZE_INFLATION === ciphertext.byteLength, 'incorrect AEAD_SIZE_INFLATION');
+  return new Uint8Array(ciphertext);
 }
 
-async function getRandomBytes(crypto, size) {
+async function decrypt(key, iv, ciphertext, additionalData) {
+  const plaintext = await window.crypto.subtle.decrypt({
+    additionalData,
+    iv,
+    name: 'AES-GCM',
+    tagLength: AEAD_SIZE_INFLATION * 8
+  }, key, ciphertext);
+  assert(plaintext.byteLength + AEAD_SIZE_INFLATION === ciphertext.byteLength, 'incorrect AEAD_SIZE_INFLATION');
+  return new Uint8Array(plaintext);
+}
+
+async function hash(message) {
+  return new Uint8Array(await window.crypto.subtle.digest({ name: 'SHA-256' }, message));
+}
+
+async function hmac(keyBytes, message) {
+  const key = await window.crypto.subtle.importKey('raw', keyBytes, {
+    hash: { name: 'SHA-256' },
+    name: 'HMAC',
+  }, false, ['sign']);
+  const sig = await window.crypto.subtle.sign({ name: 'HMAC' }, key, message);
+  return new Uint8Array(sig);
+}
+
+async function hkdfExtract(salt, ikm) {
+  // Ref https://tools.ietf.org/html/rfc5869#section-2.2
+  return await hmac(salt, ikm);
+}
+
+async function hkdfExpand(prk, info, length) {
+  // Ref https://tools.ietf.org/html/rfc5869#section-2.3
+  const N = Math.ceil(length / HASH_LENGTH);
+  assert(N < 255, 'too much key material requested from hkdfExpand');
+  const input = new BufferWriter();
+  const output = new BufferWriter();
+  let T = new Uint8Array(0);
+  for (let i = 1; i <= N; i++) {
+    input.writeBytes(T);
+    input.writeBytes(info);
+    input.writeUint8(i);
+    T = await hmac(prk, input.flush());
+    output.writeBytes(T);
+  }
+  assert(output.tell() === N * HASH_LENGTH, 'hkdfExpand generated too much data');
+  return output.slice(0, length);
+}
+
+async function hkdfExpandLabel(secret, label, context, length) {
+  assertIsString(label);
+  assertIsBytes(context);
+  //  struct {
+  //    uint16 length = Length;
+  //    opaque label < 7..255 > = "tls13 " + Label;
+  //    opaque context < 0..255 > = Context;
+  //  } HkdfLabel;
+  const hkdfLabel = new BufferWriter();
+  hkdfLabel.writeUint16(length);
+  hkdfLabel.writeVectorBytes8(utf8ToBytes('tls13 ' + label));
+  hkdfLabel.writeVectorBytes8(context);
+  return hkdfExpand(secret, hkdfLabel.flush(), length);
+}
+
+async function getRandomBytes(size) {
   const bytes = new Uint8Array(size);
   crypto.getRandomValues(bytes);
   return bytes;
 }
-
 // CONCATENATED MODULE: ./src/messages.js
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -547,6 +639,7 @@ async function getRandomBytes(crypto, size) {
 const HANDSHAKE_TYPE = {
   CLIENT_HELLO: 1,
   SERVER_HELLO: 2,
+  ENCRYPTED_EXTENSIONS: 8,
   FINISHED: 20,
 };
 
@@ -566,7 +659,8 @@ function readHandshakeMessage(buf) {
   // Each handshake messages has a type and length prefix, per
   // https://tools.ietf.org/html/rfc8446#appendix-B.3
   const type = buf.readUint8();
-  const expectedEnd = buf.readUint24() + buf.tell();
+  const size = buf.readUint24();
+  const expectedEnd = size + buf.tell();
   let msg;
   switch (type) {
     case HANDSHAKE_TYPE.CLIENT_HELLO:
@@ -574,6 +668,9 @@ function readHandshakeMessage(buf) {
       break;
     case HANDSHAKE_TYPE.SERVER_HELLO:
       msg = messages_ServerHello._read(buf);
+      break;
+    case HANDSHAKE_TYPE.ENCRYPTED_EXTENSIONS:
+      msg = messages_EncryptedExtensions._read(buf);
       break;
     case HANDSHAKE_TYPE.FINISHED:
       msg = messages_Finished._read(buf);
@@ -585,7 +682,26 @@ function readHandshakeMessage(buf) {
   return msg;
 }
 
-class HandshakeMessage {
+class messages_HandshakeMessage {
+  
+  get TYPE_TAG() {
+    assert(false, 'not implemented');
+  }
+
+  static _read(buf) {
+    assert(false, 'not implemented');
+  }
+
+  static _write(buf) {
+    assert(false, 'not implemented');
+  }
+
+  render() {
+    const buf = new BufferWriter();
+    this.write(buf);
+    return buf.flush();
+  }
+
   write(buf) {
     // Each handshake messages has a type and length prefix, per
     // https://tools.ietf.org/html/rfc8446#appendix-B.3
@@ -601,6 +717,7 @@ class HandshakeMessage {
   //     ExtensionType extension_type;
   //     opaque extension_data<0..2^16-1>;
   //   } Extension;
+  //
   _writeExtension(buf, type, cb) {
     buf.writeUint16(type);
     buf.writeVector16(cb);
@@ -621,11 +738,12 @@ class HandshakeMessage {
 // This requires few fancy parts for writing the PSK binder
 // which we haven't quite figured out yet...
 
-class messages_ClientHello extends HandshakeMessage {
+class messages_ClientHello extends messages_HandshakeMessage {
 
-  constructor(random, pskIds, pskBinders) {
+  constructor(random, sessionId, pskIds, pskBinders) {
     super();
     this.random = random;
+    this.sessionId = sessionId;
     this.pskIds = pskIds;
     this.pskBinders = pskBinders;
     assert(random.byteLength === 32, 'random must be 32 bytes');
@@ -641,8 +759,8 @@ class messages_ClientHello extends HandshakeMessage {
     assert(buf.readUint16() === VERSION_TLS_1_2, 'unexpected legacy_version');
     // The random bytes provided by the peer.
     const random = buf.readBytes(32);
-    // Skip over legacy_session_id.
-    buf.readVectorBytes8();
+    // Read legacy_session_id so the server can echo it.
+    const sessionId = buf.readVectorBytes8();
     // We only support a single ciphersuite, but the peer may offer several.
     // Scan the list to confirm that the one we want is present.
     let found = false;
@@ -726,14 +844,13 @@ class messages_ClientHello extends HandshakeMessage {
         }
       });
     });
-    return new this(random, pskIds, pskBinders);
+    return new this(random, sessionId, pskIds, pskBinders);
   }
 
   _write(buf) {
     buf.writeUint16(VERSION_TLS_1_2);
     buf.writeBytes(this.random);
-    // Empty vector for legacy_session_id
-    buf.writeVectorBytes8(new Uint8Array(0));
+    buf.writeVectorBytes8(this.sessionId);
     // Our single supported ciphersuite
     buf.writeVector16(buf => {
       buf.writeUint16(TLS_AES_128_GCM_SHA256);
@@ -787,11 +904,12 @@ class messages_ClientHello extends HandshakeMessage {
 //      Extension extensions < 6..2 ^ 16 - 1 >;
 //  } ServerHello;
 
-class messages_ServerHello extends HandshakeMessage {
+class messages_ServerHello extends messages_HandshakeMessage {
 
-  constructor(random, pskIndex) {
+  constructor(random, sessionId, pskIndex) {
     super();
     this.random = random;
+    this.sessionId = sessionId;
     this.pskIndex = pskIndex;
     assert(random.byteLength === 32, 'random must be 32 bytes');
   }
@@ -805,11 +923,11 @@ class messages_ServerHello extends HandshakeMessage {
     assert(buf.readUint16() === VERSION_TLS_1_2, 'unexpected legacy_version');
     // Random bytes from the server.
     const random = buf.readBytes(32);
-    // It should have echoed our empty vector for legacy_session_id.
-    assert(buf.readVectorBytes8().byteLength === 0, 'illegal_parameter');
+    // It should have echoed our vector for legacy_session_id.
+    const sessionId = buf.readVectorBytes8();
     // It should have selected our single offered ciphersuite.
     const foundCipherSuite = buf.readUint16();
-    assert(foundCipherSuite === TLS_AES_128_GCM_SHA256, 'illegal_parameter');
+    assert(foundCipherSuite === TLS_AES_128_GCM_SHA256, 'illegal_parameter ciphersuite');
     // legacy_compression_methods must be zero.
     assert(buf.readUint8() === 0, 'unexpected legacy_compression_methods');
     // The only extensions we should receive back are the mandatory "supported_versions",
@@ -842,14 +960,13 @@ class messages_ServerHello extends HandshakeMessage {
       });
     });
     assert(pskIndex !== false, 'server did not select a PSK');
-    return new this(random, pskIndex);
+    return new this(random, sessionId, pskIndex);
   }
 
   _write(buf) {
     buf.writeUint16(VERSION_TLS_1_2);
     buf.writeBytes(this.random);
-    // Empty vector for legacy_session_id
-    buf.writeVectorBytes8(new Uint8Array(0));
+    buf.writeVectorBytes8(this.sessionId);
     // Our single supported ciphersuite
     buf.writeUint16(TLS_AES_128_GCM_SHA256);
     // A single zero byte for legacy_compression_method
@@ -868,13 +985,45 @@ class messages_ServerHello extends HandshakeMessage {
   }
 }
 
+
+// The EncryptedExtensions message:
+//
+//  struct {
+//    Extension extensions < 0..2 ^ 16 - 1 >;
+//  } EncryptedExtensions;
+//
+// We don't actually send any EncryptedExtensions,
+// but still have to send an empty message.
+
+class messages_EncryptedExtensions extends messages_HandshakeMessage {
+
+  get TYPE_TAG() {
+    return HANDSHAKE_TYPE.ENCRYPTED_EXTENSIONS;
+  }
+
+  static _read(buf) {
+    // We should not receive any encrypted extensions,
+    // since we do not advertize any in the ClientHello.
+    buf.readVector16((buf, length) => {
+      assert(length === 0, 'unexpected encrypted extension');
+    });
+    return new this();
+  }
+
+  _write(buf) {
+    // Empty vector of extensions
+    buf.writeVector16(buf => {});
+  }
+}
+
+
 // The Finished message:
 //
 // struct {
 //   opaque verify_data[Hash.length];
 // } Finished;
 
-class messages_Finished extends HandshakeMessage {
+class messages_Finished extends messages_HandshakeMessage {
 
   constructor(verifyData) {
     super();
@@ -907,7 +1056,11 @@ class messages_Finished extends HandshakeMessage {
 
 
 
-const PSK_BINDER_SIZE = 32;
+// The length of the data for PSK binders at the end of the ClientHello.
+// We only support a single PSK, so it's the length of the hash plus one
+// for rendering it as a variable-length byte array, plus two for rendering
+// the variable-length list of PSK binders.
+const PSK_BINDERS_SIZE = HASH_LENGTH + 1 + 2;
 
 //
 // State-machine for TLS Handshake Management.
@@ -917,10 +1070,6 @@ const PSK_BINDER_SIZE = 32;
 // these `State` objects as little plugins for the `Connection` class
 // that provide different behaviours of `send` and `receive` depending
 // on the state of the connection.
-//
-// These are the actual states of the TLS1.3 state-machines and they
-// send the same sequence of messages.  They don't use the same byte
-// encoding or do any crypto yet though.
 //
 
 class states_State {
@@ -933,23 +1082,24 @@ class states_State {
     // By default, nothing to do when entering the state.
   }
 
-  async sendApplicationData(data) {
+  async sendApplicationData(bytes) {
     // By default, assume we're not ready to send yet
     // and just let the data queue up for a future state.
     // XXX TODO: should this block until it's successfuly sent?
-    this.conn._pendingApplicationData.push(data);
+    this.conn._sendBuffer.writeBytes(bytes);
   }
 
-  async recvApplicationData() {
+  async recvApplicationData(bytes) {
     assert(false, 'not ready to receive application data');
   }
 
-  async recvHandshakeMessage() {
+  async recvHandshakeMessage(msg) {
     assert(false, 'not expecting to receive a handhake message');
   }
 
   async close() {
-    console.warn('close() not implemented yet');
+    // XXX TODO: implement explicit close, including the `close_notify` alert message.
+    assert(false, 'close() not implemented yet');
   }
 
 }
@@ -961,13 +1111,13 @@ class states_UNINITIALIZED extends states_State {
   async initialize() {
     assert(false, 'uninitialized state');
   }
-  async sendApplicationData(data) {
+  async sendApplicationData(bytes) {
     assert(false, 'uninitialized state');
   }
-  async recvApplicationData(record) {
+  async recvApplicationData(bytes) {
     assert(false, 'uninitialized state');
   }
-  async recvHandshakeMessage(type, record) {
+  async recvHandshakeMessage(msg) {
     assert(false, 'uninitialized state');
   }
   async close() {
@@ -983,13 +1133,13 @@ class ERROR extends states_State {
   async initialize(err) {
     this.error = err;
   }
-  async sendApplicationData(data) {
+  async sendApplicationData(bytes) {
     throw this.error;
   }
-  async recvApplicationData(record) {
+  async recvApplicationData(bytes) {
     throw this.error;
   }
-  async recvHandshakeMessage(type, record) {
+  async recvHandshakeMessage(msg) {
     throw this.error;
   }
   async close() {
@@ -997,7 +1147,7 @@ class ERROR extends states_State {
   }
 }
 
-// The "connected" state, for when the handshake is compelte
+// The "connected" state, for when the handshake is complete
 // and we're ready to send application-level data.
 // The logic for this is symmetric between client and server.
 
@@ -1005,18 +1155,16 @@ class CONNECTED extends states_State {
   async initialize() {
     // We can now send any application data that was
     // submitted before the handshake was complete.
-    while (this.conn._pendingApplicationData.length > 0) {
-      const data = this.conn._pendingApplicationData.shift();
-      await this.sendApplicationData(data);
+    if (this.conn._sendBuffer.tell() > 0) {
+      await this.sendApplicationData(this.conn._sendBuffer.flush());
     }
   }
-  async sendApplicationData(data) {
-    await this.conn._writeApplicationData(data);
+  async sendApplicationData(bytes) {
+    await this.conn._sendApplicationData(bytes);
     await this.conn._flushOutgoingRecord();
   }
-  async recvApplicationData(record) {
-    // Application data has no framing, just return the entire buffer.
-    return record.slice(0);
+  async recvApplicationData(bytes) {
+    this.conn._recvBuffer.writeBytes(bytes);
   }
 }
 
@@ -1028,6 +1176,7 @@ class CONNECTED extends states_State {
 //
 //   * send ClientHello
 //   * receive ServerHello
+//   * receive EncryptedExtensions
 //   * receive server Finished
 //   * send client Finished
 //
@@ -1036,49 +1185,74 @@ class CONNECTED extends states_State {
 
 class states_CLIENT_START extends states_State {
   async initialize() {
-    // Write a ClientHello message with our single PSK.
-    // We can't know the binder value yet, write zeros for now.
+    const keyschedule = this.conn._keyschedule;
+    await keyschedule.addPSK(this.conn.psk);
+    // Construct a ClientHello message with our single PSK.
+    // We can't know the PSK binder value yet, so we initially write zeros.
     const clientHello = new messages_ClientHello(
       this.conn.randomSalt,
+      new Uint8Array(0),
       [this.conn.pskId],
-      [new Uint8Array(PSK_BINDER_SIZE)]
+      [new Uint8Array(HASH_LENGTH)],
     );
-    await this.conn._writeHandshakeMessage(clientHello);
+    const buf = new BufferWriter();
+    clientHello.write(buf);
     // Now that we know what the ClientHello looks like,
-    // go back and calculate the appropriate binder value.
-    // XXX TODO: we'll need to actually change the bytes that just got written out.
+    // go back and calculate the appropriate PSK binder value.
+    const truncatedTranscript = buf.slice(0, -PSK_BINDERS_SIZE);
+    clientHello.pskBinders[0] = await keyschedule.calculateFinishedMAC(keyschedule.extBinderKey, truncatedTranscript);
+    buf.incr(-HASH_LENGTH);
+    buf.writeBytes(clientHello.pskBinders[0]);
+    await this.conn._sendHandshakeMessage(buf.flush());
     await this.conn._flushOutgoingRecord();
-    await this.conn._transition(states_CLIENT_WAIT_SH);
+    await this.conn._transition(states_CLIENT_WAIT_SH, clientHello);
   }
 }
 
 class states_CLIENT_WAIT_SH extends states_State {
+  async initialize(clientHello) {
+    this._clientHello = clientHello;
+  }
   async recvHandshakeMessage(msg) {
     assert(msg instanceof messages_ServerHello, 'expected ServerHello');
+    assert(bytesAreEqual(msg.sessionId, this._clientHello.sessionId), 'server did not echo our sessionId');
     assert(msg.pskIndex === 0, 'server did not select our offered PSK');
-    await this.conn._transition(CLIENT_WAIT_EE, msg);
+    await this.conn._keyschedule.addECDHE(null);
+    await this.conn._setSendKey(this.conn._keyschedule.clientHandshakeTrafficSecret);
+    await this.conn._setRecvKey(this.conn._keyschedule.serverHandshakeTrafficSecret);
+    await this.conn._transition(states_CLIENT_WAIT_EE);
   }
 }
 
-class CLIENT_WAIT_EE extends states_State {
-  async initialize() {
-    // There are no EncryptedExtensions in the subset of TLS we plan to use.
-    // Transition directly to WAIT_FINISHED, which will error out if the server
-    // attempts to send any.
-    await this.conn._transition(states_CLIENT_WAIT_FINISHED);
+class states_CLIENT_WAIT_EE extends states_State {
+  async recvHandshakeMessage(msg) {
+    // We don't make use of any encrypted extensions, but we still
+    // have to wait for the server to send the (empty) list of them.
+    assert(msg instanceof messages_EncryptedExtensions, 'expected EncryptedExtensions');
+    const keyschedule = this.conn._keyschedule;
+    const expectedServerFinishedMAC = await keyschedule.calculateFinishedMAC(keyschedule.serverHandshakeTrafficSecret);
+    await this.conn._transition(states_CLIENT_WAIT_FINISHED, expectedServerFinishedMAC);
   }
 }
 
 class states_CLIENT_WAIT_FINISHED extends states_State {
+  async initialize(expectedServerFinishedMAC) {
+    this._expectedServerFinishedMAC = expectedServerFinishedMAC;
+  }
   async recvHandshakeMessage(msg) {
     assert(msg instanceof messages_Finished, 'expected Finished');
-    // XXX TODO: calculate and verify server finished hash.
-    assert(bytesAreEqual(msg.verifyData, new Uint8Array(HASH_LENGTH)), 'invalid verifyData');
-    // XXX TODO: need to calculate client finished hash.
-    const verifyData = new Uint8Array(HASH_LENGTH);
-    await this.conn._writeHandshakeMessage(new messages_Finished(verifyData));
+    // Verify server Finished MAC.
+    assert(bytesAreEqual(msg.verifyData, this._expectedServerFinishedMAC), 'invalid Finished MAC');
+    // Send our own Finished message in return.
+    // This must be encrypted with the handshake traffic key,
+    // but must not appear in the transscript used to calculate the application keys.
+    const keyschedule = this.conn._keyschedule;
+    const clientFinishedMAC = await keyschedule.calculateFinishedMAC(keyschedule.clientHandshakeTrafficSecret);
+    await keyschedule.finalize();
+    await this.conn._writeHandshakeMessage(new messages_Finished(clientFinishedMAC));
     await this.conn._flushOutgoingRecord();
-    this.conn._updateTrafficKeys();
+    await this.conn._setSendKey(keyschedule.clientApplicationTrafficSecret);
+    await this.conn._setRecvKey(keyschedule.serverApplicationTrafficSecret);
     await this.conn._transition(CONNECTED);
   }
 }
@@ -1091,6 +1265,7 @@ class states_CLIENT_WAIT_FINISHED extends states_State {
 //
 //   * receive ClientHello
 //   * send ServerHello
+//   * send empty EncryptedExtensions
 //   * send server Finished
 //   * receive client Finished
 //
@@ -1112,43 +1287,151 @@ class states_SERVER_RECVD_CH extends states_State {
     // is whether they provided an acceptable PSK.
     const pskIndex = clientHello.pskIds.findIndex(pskId => bytesAreEqual(pskId, this.conn.pskId));
     assert(pskIndex !== -1, 'client did not offer a matching PSK');
-    // XXX TODO: validate the PSK binder.
-    // This will involve reading a partial transcript of messages received so far.
-    const pskBinder = clientHello.pskBinders[pskIndex];
-    assert(bytesAreEqual(pskBinder, new Uint8Array(PSK_BINDER_SIZE)));
-    await this.conn._transition(states_SERVER_NEGOTIATED, pskIndex);
+    await this.conn._keyschedule.addPSK(this.conn.psk);
+    // Validate the PSK binder.
+    const keyschedule = this.conn._keyschedule;
+    const transcript = keyschedule.getTranscript();
+    const expectedPskBinder = await keyschedule.calculateFinishedMAC(keyschedule.extBinderKey, transcript.slice(0, -PSK_BINDERS_SIZE));
+    assert(bytesAreEqual(clientHello.pskBinders[pskIndex], expectedPskBinder), 'incorrect pskBinder');
+    await this.conn._transition(states_SERVER_NEGOTIATED, clientHello, pskIndex);
   }
 }
 
 class states_SERVER_NEGOTIATED extends states_State {
-  async initialize(pskIndex) {
-    await this.conn._writeHandshakeMessage(new messages_ServerHello(this.conn.randomSalt, pskIndex));
-    // XXX TODO: need to calculate server finished hash.
-    const verifyData = new Uint8Array(HASH_LENGTH);
-    await this.conn._writeHandshakeMessage(new messages_Finished(verifyData));
+  async initialize(clientHello, pskIndex) {
+    await this.conn._writeHandshakeMessage(new messages_ServerHello(this.conn.randomSalt, clientHello.sessionId, pskIndex));
     await this.conn._flushOutgoingRecord();
-    await this.conn._transition(SERVER_WAIT_FLIGHT2);
-  }
-}
-
-class SERVER_WAIT_FLIGHT2 extends states_State {
-  async initialize() {
-    // If we were doing client-provided auth certificates
-    // then we'd deal with them here, but we aren't.
-    await this.conn._transition(states_SERVER_WAIT_FINISHED);
+    // We can now transition to the encrypted part of the handshake.
+    const keyschedule = this.conn._keyschedule;
+    await keyschedule.addECDHE(null);
+    await this.conn._setSendKey(keyschedule.serverHandshakeTrafficSecret);
+    await this.conn._setRecvKey(keyschedule.clientHandshakeTrafficSecret);
+    // Send an empty EncryptedExtensions message.
+    await this.conn._writeHandshakeMessage(new messages_EncryptedExtensions());
+    await this.conn._flushOutgoingRecord();
+    // Send the Finished message.
+    const serverFinishedMAC = await keyschedule.calculateFinishedMAC(keyschedule.serverHandshakeTrafficSecret);
+    await this.conn._writeHandshakeMessage(new messages_Finished(serverFinishedMAC));
+    await this.conn._flushOutgoingRecord();
+    const expectedClientFinishedMAC = await keyschedule.calculateFinishedMAC(keyschedule.clientHandshakeTrafficSecret);
+    // We can now *send* using the application traffic key,
+    // but have to wait to receive the client Finished before receiving under that key.
+    await this.conn._keyschedule.finalize();
+    await this.conn._setSendKey(keyschedule.serverApplicationTrafficSecret);
+    await this.conn._transition(states_SERVER_WAIT_FINISHED, expectedClientFinishedMAC);
   }
 }
 
 class states_SERVER_WAIT_FINISHED extends states_State {
+  async initialize(expectedClientFinishedMAC) {
+    this._expectedClientFinishedMAC = expectedClientFinishedMAC;
+  }
   async recvHandshakeMessage(msg) {
     assert(msg instanceof messages_Finished, 'expected Finished');
-    // XXX TODO: calculate and verify client finished hash.
-    assert(bytesAreEqual(msg.verifyData, new Uint8Array(HASH_LENGTH)), 'invalid verify_data');
-    this.conn._updateTrafficKeys();
+    assert(bytesAreEqual(msg.verifyData, this._expectedClientFinishedMAC, 'invalid Finished MAC'));
+    await this.conn._setRecvKey(this.conn._keyschedule.clientApplicationTrafficSecret);
     await this.conn._transition(CONNECTED);
   }
 }
+// CONCATENATED MODULE: ./src/keyschedule.js
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+
+
+// TLS1.3 Key Schedule.
+//
+// In this file we implement the "key schedule" from
+// https://tools.ietf.org/html/rfc8446#section-7.1, which
+// defines how to calculate various keys as the handshake
+// state progresses.
+//
+
+
+
+
+
+const STAGE_UNINITIALIZED = 0;
+const STAGE_EARLY_SECRET = 1;
+const STAGE_HANDSHAKE_SECRET = 2;
+const STAGE_MASTER_SECRET = 3;
+
+class keyschedule_KeySchedule {
+  constructor() {
+    // WebCrypto doesn't support a rolling hash construct, so we have to
+    // keep the entire message transcript in memory.
+    this.transcript = new BufferWriter();
+    // This tracks the main secret from with other keys are derived at each stage.
+    this.secret = null;
+    this.stage = STAGE_UNINITIALIZED;
+    // And these are all the various keys we'll derive as the handshake progresses.
+    this.extBinderKey = null;
+    this.clientHandshakeTrafficSecret = null;
+    this.serverHandshakeTrafficSecret = null;
+    this.clientApplicationTrafficSecret = null;
+    this.serverApplicationTrafficSecret = null;
+  }
+
+  async addPSK(psk) {
+    // Use the selected PSK (if any) to calculate the "early secret".
+    psk = psk || zeros(HASH_LENGTH);
+    assert(this.stage === STAGE_UNINITIALIZED, 'PSK added at incorrect state');
+    this.secret = await hkdfExtract(zeros(HASH_LENGTH), psk);
+    this.stage = STAGE_EARLY_SECRET;
+    this.extBinderKey = await this.deriveSecret('ext binder', EMPTY);
+  }
+
+  async addECDHE(ecdhe) {
+    // Mix in the ECDHE output (if any) to calculate the "handshake secret".
+    ecdhe = ecdhe || zeros(HASH_LENGTH);;
+    assert(this.stage === STAGE_EARLY_SECRET, 'ECDHE added at incorrect state');
+    this.secret = await hkdfExtract(await this.deriveSecret('derived', EMPTY), ecdhe);
+    this.stage = STAGE_HANDSHAKE_SECRET;
+    this.clientHandshakeTrafficSecret = await this.deriveSecret('c hs traffic');
+    this.serverHandshakeTrafficSecret = await this.deriveSecret('s hs traffic');
+  }
+
+  async finalize() {
+    assert(this.stage === STAGE_HANDSHAKE_SECRET, 'finalized in incorrect state');
+    this.secret = await hkdfExtract(await this.deriveSecret('derived', EMPTY), zeros(HASH_LENGTH));
+    this.stage = STAGE_MASTER_SECRET;
+    this.clientApplicationTrafficSecret = await this.deriveSecret('c ap traffic');
+    this.serverApplicationTrafficSecret = await this.deriveSecret('s ap traffic');
+  }
+
+  addToTranscript(bytes) {
+    this.transcript.writeBytes(bytes);
+  }
+
+  getTranscript() {
+    return this.transcript.slice();
+  }
+
+  async deriveSecret(label, transcript = undefined) {
+    transcript = transcript || this.getTranscript();
+    return await hkdfExpandLabel(this.secret, label, await hash(transcript), HASH_LENGTH);
+  }
+
+  async calculateFinishedMAC(baseKey, transcript = undefined) {
+    transcript = transcript || this.getTranscript();
+    const finishedKey = await hkdfExpandLabel(baseKey, 'finished', EMPTY, HASH_LENGTH);
+    return await hmac(finishedKey, await hash(transcript));
+  }
+}
+
+// CONCATENATED MODULE: ./src/constants.js
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+
+const VERSION_TLS_1_0 = 0x0301;
+const constants_VERSION_TLS_1_2 = 0x0303;
+const constants_VERSION_TLS_1_3 = 0x0304;
+const constants_TLS_AES_128_GCM_SHA256 = 0x1301;
+const constants_PSK_MODE_KE = 0;
 // CONCATENATED MODULE: ./src/recordlayer.js
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -1164,237 +1447,173 @@ class states_SERVER_WAIT_FINISHED extends states_State {
 // sent over the wire, including stateful management of sequence numbers
 // for the incoming and outgoing stream.
 //
-// For simplicity, we assume that the application receives whole records
-// from the peer and receives them one at a time, and likewise that is
-// prepares and sends messages that fit in an individual record.  It would
-// not be too complicated to add some buffering to deal with fragementation,
-// but it's not needed for now.
+// The main interface is the RecordLayer class, which takes a callback function
+// sending data and can be used like so:
 //
-// To read incoming data from the peer, use the `RecordReceiver` class
-// like this:
+//    rl = new RecordLayer(async function send_encrypted_data(data) {
+//      // application-specific sending logic here.
+//    });
 //
-//    receiver = new RecordReceiver()
+//    // Records are sent and received in plaintext by default,
+//    // until you specify the key to use.
+//    await rl.setSendKey(key)
 //
-//    // Specify the decryption key to use, if any.
-//    receiver.setContentKey(key, iv)
+//    // Send some data by specifying the record type and the bytes.
+//    // Where allowed by the record type, it will be buffered until
+//    // explicitly flushed, and then sent by calling the callback.
+//    await rl.send(RECORD_TYPE.HANDSHAKE, <bytes for a handshake message>)
+//    await rl.send(RECORD_TYPE.HANDSHAKE, <bytes for another handshake message>)
+//    await rl.flush()
 //
-//    // Decode/decrypt a record
-//    [type, buf] = await receiver.recv(dataReceivedFromPeer)
-//    switch (type) {
-//      // Handle the received data based on its type tag.
-//    }
+//    // Separate keys are used for sending and receiving.
+//    rl.setRecvKey(key);
 //
-// To prepare outgoing data to send to the peer, use the `RecordSender` class
-// like this:
+//    // When data is received, push it into the RecordLayer
+//    // and pass a callback that will be called with a [type, bytes]
+//    // pair for each message parsed from the data.
+//    rl.recv(dataReceivedFromPeer, async (type, bytes) => {
+//      switch (type) {
+//        case RECORD_TYPE.APPLICATION_DATA:
+//          // do something with application data
+//        case RECORD_TYPE.HANDSHAKE:
+//          // do something with a handshake message
+//        default:
+//          // etc...
+//      }
+//    });
 //
-//    sender = new RecordSender()
-//
-//    // Specify the encryption key to use, if any.
-//    receiver.setContentKey(key, iv)
-//
-//    // Write data into the pending record.
-//    sender.withBufferWriter(TYPE_TAG, buf => {
-//      buf.writeBytes('data here')
-//    })
-//
-//    // You can concatenate several things in the buffer,
-//    // as long as they belong to the same record type.
-//    sender.withBufferWriter(TYPE_TAG, buf => {
-//      buf.writeBytes('more data here')
-//    })
-//
-//    // When ready to send, flush the pending record.
-//    record = await sender.flush()
-//    send_record_to_peer(record)
-//
+
+
 
 
 
 
 /* eslint-disable sorting/sort-object-props */
-const RECORD_TYPES = {
-  21: 'ALERT',
-  22: 'HANDSHAKE',
-  23: 'APPLICATION_DATA',
-};
-
 const RECORD_TYPE = {
+  CHANGE_CIPHER_SPEC: 20,
   ALERT: 21,
   HANDSHAKE: 22,
   APPLICATION_DATA: 23,
 };
 /* eslint-enable sorting/sort-object-props */
 
-const MAX_SEQUENCE_NUMBER = Math.pow(2, 32);
+// Encrypting at most 2^24 records will force us to stay
+// below data limits on AES-GCM encryption key use, and also
+// means we can accurately represent the sequence number as
+// a javascript double.
+const MAX_SEQUENCE_NUMBER = Math.pow(2, 24);
 const MAX_RECORD_SIZE = Math.pow(2, 14);
 const MAX_ENCRYPTED_RECORD_SIZE = MAX_RECORD_SIZE + 256;
 const RECORD_HEADER_SIZE = 5;
-const RECORD_BUFFER_SIZE = MAX_ENCRYPTED_RECORD_SIZE + RECORD_HEADER_SIZE;
 
+// This is a helper class to manage the encryption/decryption state
+// for a particular key.
 
-class recordlayer_RecordReceiver {
+class recordlayer_CipherState {
   constructor() {
-    this.contentKey = null;
-    this.contentIV = null;
-    this.sequenceNumber = 0;
+    this.key = null;
+    this.iv = null;
+    this.seqnum = 0;
   }
 
-  // Call this to set the encryption key, or to change
-  // to a newly-derived key.  Any records read before calling
-  // this method are treated as plaintext.
-
-  setContentKey(key, iv) {
+  async setKey(key, mode) {
     assertIsBytes(key);
-    assertIsBytes(iv);
-    this.contentKey = key;
-    this.contentIV = iv;
-    this.sequenceNumber = 0;
+    // Derive key and iv per https://tools.ietf.org/html/rfc8446#section-7.3
+    this.key = await prepareKey(await hkdfExpandLabel(key, 'key', EMPTY, KEY_LENGTH), mode);
+    this.iv = await hkdfExpandLabel(key, 'iv', EMPTY, IV_LENGTH);
+    this.seqnum = 0;
   }
 
-  // Call this method when a record is received from the peer.
-  // It will decode and decrypt the record and return its contents
-  // as a `[type, reader]` pair, where `type` is the record type tag
-  // and `reader` is a `BufferReader` instance that can be used for
-  // structured reading of the record contents.
-
-  async recv(data) {
-    const buf = new BufferReader(data);
-    // The data to read is either a TLSPlaintext or TLSCiphertext struct,
-    // depending on whether record protection has been enabled yet:
-    //
-    //    struct {
-    //        ContentType type;
-    //        ProtocolVersion legacy_record_version;
-    //        uint16 length;
-    //        opaque fragment[TLSPlaintext.length];
-    //    } TLSPlaintext;
-    //
-    //    struct {
-    //        ContentType opaque_type = application_data; /* 23 */
-    //        ProtocolVersion legacy_record_version = 0x0303; /* TLS v1.2 */
-    //        uint16 length;
-    //        opaque encrypted_record[TLSCiphertext.length];
-    //    } TLSCiphertext;
-    //
-    let type = buf.readUint8();
-    assert(type in RECORD_TYPES, 'unrecognized record type');
-    assert(buf.readUint16() === 0x0303, 'unexpected legacy_record_version');
-    const length = buf.readUint16();
-    let plaintext;
-    if (this.contentKey === null) {
-      // An unencrypted `TLSPlaintext` struct.
-      assert(type !== RECORD_TYPE.APPLICATION_DATA, 'must encrypt application data');
-      assert(length < MAX_RECORD_SIZE, 'record_overflow');
-      plaintext = buf.readBytes(length);
-    } else {
-      // An encrypted `TLSCiphertext` struct.
-      assert(length < MAX_ENCRYPTED_RECORD_SIZE, 'record_overflow');
-      assert(type === RECORD_TYPE.APPLICATION_DATA, 'outer opaque_type should always be application data');
-      // Decrypt and decode the contained `TLSInnerPlaintext` struct:
-      //
-      //    struct {
-      //        opaque content[TLSPlaintext.length];
-      //        ContentType type;
-      //        uint8 zeros[length_of_padding];
-      //    } TLSInnerPlaintext;
-      //
-      // The additional data for the decryption is the `TLSCiphertext` record
-      // header that we just read over, which we know to be the previous `RECORD_HEADER_SIZE` bytes.
-      const additionalData = buf.slice(-RECORD_HEADER_SIZE, RECORD_HEADER_SIZE);
-      const ciphertext = buf.readBytes(length);
-      const paddedPlaintext = await this._decrypt(ciphertext, additionalData);
-      // We have to scan backwards over the zero padding at the end of the struct
-      // in order to find the non-zero `type` byte.
-      let i;
-      for (i = paddedPlaintext.byteLength - 1; i >= 0; i--) {
-        if (paddedPlaintext[i] !== 0) {
-          break;
-        }
-      }
-      assert(i >= 0, 'failed to find content-type byte in TLSInnerPlaintext');
-      type = paddedPlaintext[i];
-      plaintext = new Uint8Array(paddedPlaintext.buffer, paddedPlaintext.byteOffset, i);
+  nonce() {
+    // Ref https://tools.ietf.org/html/rfc8446#section-5.3:
+    // * left-pad the sequence number with zeros to IV_LENGTH
+    // * xor with the provided iv
+    const nonce = new Uint8Array(IV_LENGTH);
+    // Our sequence numbers are always less than 2^24, so fit in a Uint32.
+    (new DataView(nonce.buffer)).setUint32(IV_LENGTH - 4, this.seqnum);
+    for (let i = 0; i < IV_LENGTH; i++) {
+      nonce[i] ^= this.iv[i];
     }
-    assert(! buf.hasMoreBytes(), 'record contained trailing data');
-    return [type, new BufferReader(plaintext)];
+    this.seqnum += 1;
+    assert(this.seqnum < MAX_SEQUENCE_NUMBER, 'sequence number overflow');
+    return nonce;
   }
 
-  async _decrypt(ciphertext, additionalData) {
-    const plaintext = await AEADDecrypt(this.contentKey, this.contentIV, this.sequenceNumber, ciphertext, additionalData);
-    this.sequenceNumber += 1;
-    assert(this.sequenceNumber < MAX_SEQUENCE_NUMBER, 'sequence number overflow');
-    return plaintext;
+  async encrypt(plaintext, additionalData) {
+    return await encrypt(this.key, this.nonce(), plaintext, additionalData);
+  }
+
+  async decrypt(ciphertext, additionalData) {
+    return await decrypt(this.key, this.nonce(), ciphertext, additionalData);
   }
 }
 
-//
-// This class is a simple fixed-sized buffer for accumulating outgoing messages,
-// allowing multiple messages to be coalesced into a single record for the application
-// to send.
-//
-// For simplicity we assume that the application will not try to accumulate
-// more data than can fit in a single record, and so we can work with a fixed-size
-// buffer. (But for safety, we'll throw a hard error if it does write too much
-// data into the record).
-//
+// The main RecordLayer class.
 
-class recordlayer_RecordSender {
-  constructor() {
-    this.contentKey = null;
-    this.contentIV = null;
-    this.sequenceNumber = 0;
+class recordlayer_RecordLayer {
+  constructor(sendCallback) {
+    this.sendCallback = sendCallback;
+    this._sendCipherState = new recordlayer_CipherState();
+    this._recvCipherState = new recordlayer_CipherState();
     this._pendingRecordType = 0;
     this._pendingRecordBuf = null;
   }
 
-  // Call this to set the encryption key, or to change
-  // to a newly-derived key.  Any records written before calling
-  // this method will be transmitted as plaintext.
-
-  setContentKey(key, iv) {
-    assertIsBytes(key);
-    assertIsBytes(iv);
-    this.contentKey = key;
-    this.contentIV = iv;
-    this.sequenceNumber = 0;
+  async setSendKey(key) {
+    // XXX TODO: flush any pending records.
+    await this._sendCipherState.setKey(key, 'encrypt');
   }
 
-  // Call this method to obtain a `BufferWriter` that can be used to
-  // add more data to the outgoing record.  The provided callback will
-  // receive the `BufferWriter` as its only argument.
-  // You must specify the intended record type in order to prevent mixing
-  // different types in the one record.
+  async setRecvKey(key) {
+    // XXX TODO: check that we weren't part-way through reading a record.
+    await this._recvCipherState.setKey(key, 'decrypt');
+  }
 
-  async withBufferWriter(type, cb) {
+  async send(type, data) {
+    assertIsBytes(data);
+    // Flush if we're switching to a different record type.
+    if (this._pendingRecordType && this._pendingRecordType !== type) {
+      await this.flush();
+    }
+    // Flush if we would overflow the max size of a record.
+    if (this._pendingRecordBuf !== null) {
+      if (this._pendingRecordBuf.tell() + data.byteLength > MAX_RECORD_SIZE) {
+        await this.flush();
+      }
+    }
+    // Forbid sending data that doesn't fit into a single record.
+    // XXX TODO: implement fragmentation of data across multiple records.
+    // This is not necessary for current use-cases, but it should at least fail cleanly.
+    assert(data.byteLength < MAX_RECORD_SIZE, 'data too large to fit in a single record');
+    // Start a new pending record if necessary.
+    // We reserve space at the start of the buffer for the record header,
+    // which is conveniently always a fixed size.
     if (this._pendingRecordBuf === null) {
       this._pendingRecordType = type;
-      this._pendingRecordBuf = new BufferWriter(RECORD_BUFFER_SIZE);
-      // Reserve space at the start of the buffer for the record header,
-      // which is conveniently always a fixed size.
-      this._pendingRecordBuf.seek(RECORD_HEADER_SIZE);
-    } else {
-      assert(this._pendingRecordType === type, 'different record type already in progress');
+      this._pendingRecordBuf = new BufferWriter();
+      this._pendingRecordBuf.incr(RECORD_HEADER_SIZE);
     }
-    return await cb(this._pendingRecordBuf);
+    this._pendingRecordBuf.writeBytes(data);
   }
-
-  // When you're finished writing to the record via `withBufferWriter` above,
-  // call `flush()` to produce an encrypted record to send to the peer.
 
   async flush() {
     const buf = this._pendingRecordBuf;
     const type = this._pendingRecordType;
-    this._pendingRecordBuf = null;
-    assert(type !== null, 'no messages written to buffer');
+    // If there's nothing to flush, bail out early.
+    // Note that it *is* possible to send an empty record of type APPLICATION_DATA.
+    if (! type) {
+      return;
+    }
     let length = buf.tell() - RECORD_HEADER_SIZE;
-    if (this.contentKey === null) {
+    if (this._sendCipherState.key === null) {
       // Generate an unencrypted `TLSPlaintext` struct by just
       // filling in an appropriate record header.
       assert(type !== RECORD_TYPE.APPLICATION_DATA, 'must encrypt application data');
       buf.seek(0);
       buf.writeUint8(type);
-      buf.writeUint16(0x0303);
+      buf.writeUint16(constants_VERSION_TLS_1_2);
       buf.writeUint16(length);
+      buf.incr(length);
     } else {
       // Generate an encrypted `TLSCiphertext` struct.
       // First, turn the existing buffer contents into a `TLSInnerPlaintext` by
@@ -1405,25 +1624,106 @@ class recordlayer_RecordSender {
       // by some fixed additional amount due to the encryption.
       buf.seek(0);
       buf.writeUint8(RECORD_TYPE.APPLICATION_DATA);
-      buf.writeUint16(0x0303);
+      buf.writeUint16(constants_VERSION_TLS_1_2);
       buf.writeUint16(length + AEAD_SIZE_INFLATION);
-      // The additional data for the encryption is the `TLSCiphertext` record
-      // header that  we just wrote, which we know to be the previous `RECORD_HEADER_SIZE` bytes.
-      const additionalData = buf.slice(-RECORD_HEADER_SIZE, RECORD_HEADER_SIZE);
-      const ciphertext = await this._encrypt(buf.slice(0, length), additionalData);
+      // The additional data for the encryption is the `TLSCiphertext` record header
+      // that  we just wrote, which we know to be the first `RECORD_HEADER_SIZE` bytes.
+      const additionalData = buf.slice(0, RECORD_HEADER_SIZE);
+      const ciphertext = await this._sendCipherState.encrypt(buf.slice(RECORD_HEADER_SIZE, RECORD_HEADER_SIZE + length), additionalData);
       length += AEAD_SIZE_INFLATION;
       assert(ciphertext.byteLength === length, 'unexpected ciphertext length');
       buf.writeBytes(ciphertext);
     }
-    buf.seek(0);
-    return buf.slice(0, length + RECORD_HEADER_SIZE);
+    this._pendingRecordBuf = null;
+    this._pendingRecordType = 0;
+    await this.sendCallback(buf.slice());
   }
 
-  async _encrypt(plaintext, additionalData) {
-    const ciphertext = await AEADEncrypt(this.contentKey, this.contentIV, this.sequenceNumber, plaintext, additionalData);
-    this.sequenceNumber += 1;
-    assert(this.sequenceNumber < MAX_SEQUENCE_NUMBER, 'sequence number overflow');
-    return ciphertext;
+  async recv(data, messageCallback) {
+    // The given data may contain multiple records concatenated together, but for the initial
+    // version we will assume that:
+    //  * it does not contain partial records
+    //  * handshake messages are not fragmented across multiple records.
+    // We can add the code to handle these cases, but it's fiddly and is not
+    // necessary for our initial implementation since we never emit such data ourselves.
+    // XXX TODO: record fragmentation, message fragmentation.
+    const buf = new BufferReader(data);
+    while (buf.hasMoreBytes()) {
+      // The data to read is either a TLSPlaintext or TLSCiphertext struct,
+      // depending on whether record protection has been enabled yet:
+      //
+      //    struct {
+      //        ContentType type;
+      //        ProtocolVersion legacy_record_version;
+      //        uint16 length;
+      //        opaque fragment[TLSPlaintext.length];
+      //    } TLSPlaintext;
+      //
+      //    struct {
+      //        ContentType opaque_type = application_data; /* 23 */
+      //        ProtocolVersion legacy_record_version = 0x0303; /* TLS v1.2 */
+      //        uint16 length;
+      //        opaque encrypted_record[TLSCiphertext.length];
+      //    } TLSCiphertext;
+      //
+      let type = buf.readUint8();
+      // The legacy_record_version "MUST be ignored for all purposes".
+      buf.readUint16();
+      const length = buf.readUint16();
+      let plaintext;
+      if (this._recvCipherState.key === null || type === RECORD_TYPE.CHANGE_CIPHER_SPEC) {
+        // An unencrypted `TLSPlaintext` struct.
+        assert(type !== RECORD_TYPE.APPLICATION_DATA, 'must encrypt application data');
+        assert(length < MAX_RECORD_SIZE, 'record_overflow');
+        plaintext = buf.readBytes(length);
+      } else {
+        // An encrypted `TLSCiphertext` struct.
+        assert(length < MAX_ENCRYPTED_RECORD_SIZE, 'record_overflow');
+        assert(type === RECORD_TYPE.APPLICATION_DATA, 'outer opaque_type should always be application data');
+        // Decrypt and decode the contained `TLSInnerPlaintext` struct:
+        //
+        //    struct {
+        //        opaque content[TLSPlaintext.length];
+        //        ContentType type;
+        //        uint8 zeros[length_of_padding];
+        //    } TLSInnerPlaintext;
+        //
+        // The additional data for the decryption is the `TLSCiphertext` record
+        // header that we just read over, which we know to be the previous `RECORD_HEADER_SIZE` bytes.
+        const additionalData = buf.slice(buf.tell() - RECORD_HEADER_SIZE, buf.tell());
+        const ciphertext = buf.readBytes(length);
+        const paddedPlaintext = await this._recvCipherState.decrypt(ciphertext, additionalData);
+        // We have to scan backwards over the zero padding at the end of the struct
+        // in order to find the non-zero `type` byte.
+        let i;
+        for (i = paddedPlaintext.byteLength - 1; i >= 0; i--) {
+          if (paddedPlaintext[i] !== 0) {
+            break;
+          }
+        }
+        assert(i >= 0, 'failed to find type byte in TLSInnerPlaintext');
+        type = paddedPlaintext[i];
+        assert(type !== RECORD_TYPE.CHANGE_CIPHER_SPEC, 'change_cipher_spec records must be plaintext');
+        plaintext = paddedPlaintext.slice(0, i);
+      }
+      // Several handshake messages may be coalesced into a single record.
+      // Parse them out and dispatch them individually.
+      if (type !== RECORD_TYPE.HANDSHAKE) {
+        await messageCallback(type, plaintext);
+      } else {
+        const mbuf = new BufferReader(plaintext);
+        do {
+          // Each handshake messages has a type and length prefix, per
+          // https://tools.ietf.org/html/rfc8446#appendix-B.3
+          // XXX TODO: This will get more complicated when we handle messages
+          // fragmented across multiple records.
+          mbuf.readUint8();
+          const mlength = mbuf.readUint24();
+          mbuf.incr(-4);
+          await messageCallback(type, mbuf.readBytes(mlength + 4));
+        } while (mbuf.hasMoreBytes());
+      }
+    }
   }
 }
 
@@ -1434,9 +1734,11 @@ class recordlayer_RecordSender {
 
 
 
-// The top-level APIs offered by this library are `ClientConnection` and
-// `ServerConnection` classes.  They each take a callback to be used for
-// sending data to the remote peer, and operate like this:
+// The top-level APIs offered by this module are `ClientConnection` and
+// `ServerConnection` classes, which provide authenticated and encrypted
+// communication via the "externally-provisioned PSK" mode of TLS1.3.
+// They each take a callback to be used for sending data to the remote peer,
+// and operate like this:
 //
 //    conn = await ClientConnection.create(psk, pskId, async function send_data_to_server(data) {
 //      // application-specific sending logic here.
@@ -1479,41 +1781,28 @@ class recordlayer_RecordSender {
 
 
 
-
-
-// !!!!!!!
-// !!
-// !!   N.B. We have not yet implemented the actual encryption bits!
-// !!
-// !!!!!!!
-//
-// This first version of the code uses the same "framework" as we would use for
-// implementing TLS1.3, including the basic sequence of messages between client and
-// server, and the use of binary encoding in an ArrayBuffer for data processing.
-// Using an implementation with proper crypto should feel identical to using
-// this mock version, except it won't have "Insecure" in the class name...
-
-class tlsconnection_InsecureConnection {
+class tlsconnection_Connection {
   constructor(psk, pskId, sendCallback, randomSalt) {
     this.psk = assertIsBytes(psk);
     this.pskId = assertIsBytes(pskId);
-    this.sendCallback = sendCallback;
-    this.randomSalt = randomSalt;
+    this.randomSalt = assertIsBytes(randomSalt);
     this._state = new states_UNINITIALIZED(this);
-    this._pendingApplicationData = [];
-    this._recordSender = new recordlayer_RecordSender();
-    this._recordReceiver = new recordlayer_RecordReceiver();
+    this._sendBuffer = new BufferWriter();
+    this._recvBuffer = new BufferWriter();
+    this._recordlayer = new recordlayer_RecordLayer(sendCallback);
+    this._keyschedule = new keyschedule_KeySchedule();
     this._lastPromise = Promise.resolve();
   }
 
   // Subclasses will override this with some async initialization logic.
   static async create(psk, pskId, sendCallback, randomSalt = null) {
-    randomSalt = randomSalt === null ? await getRandomBytes(crypto, 32) : randomSalt;
+    randomSalt = randomSalt === null ? await getRandomBytes(32) : randomSalt;
     return new this(psk, pskId, sendCallback, randomSalt);
   }
 
   // These are the three public API methods that
-  // consumers can use to connunicate over TLS.
+  // consumers can use to send and receive data encrypted
+  // with TLS1.3.
 
   async send(data) {
     assertIsBytes(data);
@@ -1525,13 +1814,17 @@ class tlsconnection_InsecureConnection {
   async recv(data) {
     assertIsBytes(data);
     return await this._synchronized(async () => {
-      const [type, buf] = await this._recordReceiver.recv(data);
-      return await this._dispatchIncomingRecord(type, buf);
+      await this._recordlayer.recv(data, async (type, bytes) => {
+        await this._dispatchIncomingMessage(type, bytes);
+      });
+      const appData = this._recvBuffer.flush();
+      return appData.byteLength > 0 ? appData : null;
     });
   }
 
   async close() {
     await this._synchronized(async () => {
+      // XXX TODO: check for partially-consumed records?
       await this._state.close();
     });
   }
@@ -1546,6 +1839,7 @@ class tlsconnection_InsecureConnection {
       return cb();
     }).catch(async err => {
       // All errors immediately put us in a terminal "error" state.
+      // XXX TODO: send specific 'alert' messages for specific errors?
       await this._transition(ERROR, err);
       throw err;
     });
@@ -1563,81 +1857,82 @@ class tlsconnection_InsecureConnection {
     await this._state.initialize(...args);
   }
 
-  // These are helpers to allow the state to add data to the next outgoing record.
+  // These are helpers to allow the State to manipulate the recordlayer
+  // and send out various types of data.
 
-  async _writeApplicationData(bytes) {
-    await this._recordSender.withBufferWriter(RECORD_TYPE.APPLICATION_DATA, async buf => {
-      await buf.writeBytes(bytes);
-    });
+  async _sendApplicationData(bytes) {
+    await this._recordlayer.send(RECORD_TYPE.APPLICATION_DATA, bytes);
+    // XXX TODO: explicit flush?
+  }
+
+  async _sendHandshakeMessage(bytes) {
+    this._keyschedule.addToTranscript(bytes);
+    await this._recordlayer.send(RECORD_TYPE.HANDSHAKE, bytes);
   }
 
   async _writeHandshakeMessage(msg) {
-    await this._recordSender.withBufferWriter(RECORD_TYPE.HANDSHAKE, async buf => {
-      // XXX TODO: remember buffer position here.
-      await msg.write(buf);
-      // XXX TODO: read back to prev buffer position, add it to the transcript hash.
-    });
+    const buf = new BufferWriter();
+    msg.write(buf);
+    return await this._sendHandshakeMessage(buf.flush());
   }
 
   async _flushOutgoingRecord() {
-    const record = await this._recordSender.flush();
-    await this.sendCallback(record);
+    await this._recordlayer.flush();
   }
 
-  // This is a helper for handling incoming records.
+  async _setSendKey(key) {
+    return await this._recordlayer.setSendKey(key);
+  }
 
-  async _dispatchIncomingRecord(type, buf) {
+  async _setRecvKey(key) {
+    return await this._recordlayer.setRecvKey(key);
+  }
+
+  // This is a helper for handling incoming messages from the recordlayer.
+
+  async _dispatchIncomingMessage(type, bytes) {
     switch (type) {
+      case RECORD_TYPE.CHANGE_CIPHER_SPEC:
+        // These may be sent for b/w compat, and must be discarded.
+        assert(bytes.byteLength === 1 && bytes[0] === 1, 'unexpected_message');
+        break;
       case RECORD_TYPE.ALERT:
         // XXX TODO: implement alert records for communicating errors.
-        throw new Error('received TLS alert record, aborting!');
+        throw new Error('received TLS alert record, unceremoniously aborting!');
       case RECORD_TYPE.APPLICATION_DATA:
-        return await this._state.recvApplicationData(buf);
+        await this._state.recvApplicationData(bytes);
+        break;
       case RECORD_TYPE.HANDSHAKE:
-        // For simplicity, we assume that handshake messages will not be
-        // fragmented across multiple records.  They shouldn't need to be
-        // for the tiny subset of TLS that we're using.
-        do {
-          // XXX TODO: remember buffer position here.
-          const msg = readHandshakeMessage(buf);
-          // XXX TODO: read back to prev buffer position, add it to the transcript hash.
-          await this._state.recvHandshakeMessage(msg);
-        } while (buf.hasMoreBytes());
-        return null;
+        this._keyschedule.addToTranscript(bytes);
+        await this._state.recvHandshakeMessage(readHandshakeMessage(new BufferReader(bytes)));
+        break;
       default:
         assert(false, `unknown record type: ${type}`);
     }
   }
 
-  // This is a placeholder, until we implement the full key schedule.
-  // XXX TODO: the full key schedule.
-
-  _updateTrafficKeys() {
-    this._recordSender.setContentKey(this.psk, new Uint8Array(32));
-    this._recordReceiver.setContentKey(this.psk, new Uint8Array(32));
-  }
 }
 
-
-class tlsconnection_InsecureClientConnection extends tlsconnection_InsecureConnection {
-  static async create(psk, pskId, sendCallback) {
-    const instance = await super.create(psk, pskId, sendCallback);
+class tlsconnection_ClientConnection extends tlsconnection_Connection {
+  static async create(psk, pskId, sendCallback, randomSalt = null) {
+    const instance = await super.create(psk, pskId, sendCallback, randomSalt);
     await instance._transition(states_CLIENT_START);
     return instance;
   }
 }
 
-
-class tlsconnection_InsecureServerConnection extends tlsconnection_InsecureConnection {
-  static async create(psk, pskId, sendCallback) {
-    const instance = await super.create(psk, pskId, sendCallback);
+class tlsconnection_ServerConnection extends tlsconnection_Connection {
+  static async create(psk, pskId, sendCallback, randomSalt = null) {
+    const instance = await super.create(psk, pskId, sendCallback, randomSalt);
     await instance._transition(states_SERVER_START);
     return instance;
   }
 }
 
+// Re-export helpful utilities for calling code to use.
+
 // CONCATENATED MODULE: ./src/index.js
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "InsecurePairingChannel", function() { return src_InsecurePairingChannel; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PairingChannel", function() { return src_PairingChannel; });
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -1656,7 +1951,7 @@ const utf8Decoder = new TextDecoder();
 const CLOSE_FLUSH_BUFFER_INTERVAL_MS = 200;
 const CLOSE_FLUSH_BUFFER_MAX_TRIES = 5;
 
-class src_InsecurePairingChannel extends EventTarget {
+class src_PairingChannel extends EventTarget {
   constructor(channelId, channelKey, socket, tlsConnection) {
     super();
     this._channelId = channelId;
@@ -1669,22 +1964,22 @@ class src_InsecurePairingChannel extends EventTarget {
   /**
    * Create a new pairing channel.
    *
-   * @returns Promise<InsecurePairingChannel>
+   * @returns Promise<PairingChannel>
    */
   static create(channelServerURI) {
     const wsURI = new URL('/v1/ws/', channelServerURI).href;
     const channelKey = crypto.getRandomValues(new Uint8Array(32));
-    return this._makePairingChannel(wsURI, tlsconnection_InsecureServerConnection, channelKey);
+    return this._makePairingChannel(wsURI, tlsconnection_ServerConnection, channelKey);
   }
 
   /**
    * Connect to an existing pairing channel.
    *
-   * @returns Promise<InsecurePairingChannel>
+   * @returns Promise<PairingChannel>
    */
   static connect(channelServerURI, channelId, channelKey) {
     const wsURI = new URL(`/v1/ws/${channelId}`, channelServerURI).href;
-    return this._makePairingChannel(wsURI, tlsconnection_InsecureClientConnection, channelKey);
+    return this._makePairingChannel(wsURI, tlsconnection_ClientConnection, channelKey);
   }
 
   static _makePairingChannel(wsUri, TlsConnection, psk) {

@@ -12,7 +12,7 @@ describe('FxAccountsPairingChannel', () => {
       // into a single state-machine that doesn't have any deadlocks.
       const CLIENT_RECV = [];
       const SERVER_RECV = [];
-      const server = await FxAccountsPairingChannel.InsecurePairingChannel.create(CHANNEL_SERVER);
+      const server = await FxAccountsPairingChannel.PairingChannel.create(CHANNEL_SERVER);
       const messageReceived = new Promise(res => {
         server.addEventListener('message', ({detail: {data}}) => {
           SERVER_RECV.push(data.msg);
@@ -20,7 +20,7 @@ describe('FxAccountsPairingChannel', () => {
         });
       });
       const {channelId, channelKey} = server;
-      const client = await FxAccountsPairingChannel.InsecurePairingChannel.connect(CHANNEL_SERVER, channelId, channelKey);
+      const client = await FxAccountsPairingChannel.PairingChannel.connect(CHANNEL_SERVER, channelId, channelKey);
       client.addEventListener('message', ({detail: {data}}) => {
         CLIENT_RECV.push(data.msg);
       });
@@ -37,7 +37,7 @@ describe('FxAccountsPairingChannel', () => {
     it('should fail to complete the handshake if they have a different PSK', async () => {
       // const SERVER_ERR = [];
       // const SERVER_RECV = [];
-      // const server = await FxAccountsPairingChannel.InsecurePairingChannel.create(CHANNEL_SERVER);
+      // const server = await FxAccountsPairingChannel.PairingChannel.create(CHANNEL_SERVER);
       // server.addEventListener('message', ({detail: {payload}}) => {
       //   SERVER_RECV.push(new TextDecoder().decode(payload));
       // });
@@ -49,7 +49,7 @@ describe('FxAccountsPairingChannel', () => {
       // });
       // const {channelId} = server;
       // const wrongPsk = new Uint8Array(crypto.getRandomValues(new Uint8Array(server.channelKey.length)));
-      // const client = await FxAccountsPairingChannel.InsecurePairingChannel.connect(CHANNEL_SERVER, channelId, wrongPsk);
+      // const client = await FxAccountsPairingChannel.PairingChannel.connect(CHANNEL_SERVER, channelId, wrongPsk);
 
       // await client.send(new TextEncoder().encode('Hi test message!'));
 

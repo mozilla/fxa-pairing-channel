@@ -12,7 +12,7 @@
 //
 
 import {
-  assert,
+  assert, BufferWriter,
 } from './utils.js';
 import {
   HASH_LENGTH
@@ -22,6 +22,7 @@ import {
 export const HANDSHAKE_TYPE = {
   CLIENT_HELLO: 1,
   SERVER_HELLO: 2,
+  ENCRYPTED_EXTENSIONS: 8,
   FINISHED: 20,
 };
 
@@ -41,7 +42,8 @@ export function readHandshakeMessage(buf) {
   // Each handshake messages has a type and length prefix, per
   // https://tools.ietf.org/html/rfc8446#appendix-B.3
   const type = buf.readUint8();
-  const expectedEnd = buf.readUint24() + buf.tell();
+  const size = buf.readUint24();
+  const expectedEnd = size + buf.tell();
   let msg;
   switch (type) {
     case HANDSHAKE_TYPE.CLIENT_HELLO:
@@ -49,6 +51,9 @@ export function readHandshakeMessage(buf) {
       break;
     case HANDSHAKE_TYPE.SERVER_HELLO:
       msg = ServerHello._read(buf);
+      break;
+    case HANDSHAKE_TYPE.ENCRYPTED_EXTENSIONS:
+      msg = EncryptedExtensions._read(buf);
       break;
     case HANDSHAKE_TYPE.FINISHED:
       msg = Finished._read(buf);
@@ -61,6 +66,25 @@ export function readHandshakeMessage(buf) {
 }
 
 export class HandshakeMessage {
+  
+  get TYPE_TAG() {
+    assert(false, 'not implemented');
+  }
+
+  static _read(buf) {
+    assert(false, 'not implemented');
+  }
+
+  static _write(buf) {
+    assert(false, 'not implemented');
+  }
+
+  render() {
+    const buf = new BufferWriter();
+    this.write(buf);
+    return buf.flush();
+  }
+
   write(buf) {
     // Each handshake messages has a type and length prefix, per
     // https://tools.ietf.org/html/rfc8446#appendix-B.3
@@ -76,6 +100,7 @@ export class HandshakeMessage {
   //     ExtensionType extension_type;
   //     opaque extension_data<0..2^16-1>;
   //   } Extension;
+  //
   _writeExtension(buf, type, cb) {
     buf.writeUint16(type);
     buf.writeVector16(cb);
@@ -98,9 +123,10 @@ export class HandshakeMessage {
 
 export class ClientHello extends HandshakeMessage {
 
-  constructor(random, pskIds, pskBinders) {
+  constructor(random, sessionId, pskIds, pskBinders) {
     super();
     this.random = random;
+    this.sessionId = sessionId;
     this.pskIds = pskIds;
     this.pskBinders = pskBinders;
     assert(random.byteLength === 32, 'random must be 32 bytes');
@@ -116,8 +142,8 @@ export class ClientHello extends HandshakeMessage {
     assert(buf.readUint16() === VERSION_TLS_1_2, 'unexpected legacy_version');
     // The random bytes provided by the peer.
     const random = buf.readBytes(32);
-    // Skip over legacy_session_id.
-    buf.readVectorBytes8();
+    // Read legacy_session_id so the server can echo it.
+    const sessionId = buf.readVectorBytes8();
     // We only support a single ciphersuite, but the peer may offer several.
     // Scan the list to confirm that the one we want is present.
     let found = false;
@@ -201,14 +227,13 @@ export class ClientHello extends HandshakeMessage {
         }
       });
     });
-    return new this(random, pskIds, pskBinders);
+    return new this(random, sessionId, pskIds, pskBinders);
   }
 
   _write(buf) {
     buf.writeUint16(VERSION_TLS_1_2);
     buf.writeBytes(this.random);
-    // Empty vector for legacy_session_id
-    buf.writeVectorBytes8(new Uint8Array(0));
+    buf.writeVectorBytes8(this.sessionId);
     // Our single supported ciphersuite
     buf.writeVector16(buf => {
       buf.writeUint16(TLS_AES_128_GCM_SHA256);
@@ -264,9 +289,10 @@ export class ClientHello extends HandshakeMessage {
 
 export class ServerHello extends HandshakeMessage {
 
-  constructor(random, pskIndex) {
+  constructor(random, sessionId, pskIndex) {
     super();
     this.random = random;
+    this.sessionId = sessionId;
     this.pskIndex = pskIndex;
     assert(random.byteLength === 32, 'random must be 32 bytes');
   }
@@ -280,11 +306,11 @@ export class ServerHello extends HandshakeMessage {
     assert(buf.readUint16() === VERSION_TLS_1_2, 'unexpected legacy_version');
     // Random bytes from the server.
     const random = buf.readBytes(32);
-    // It should have echoed our empty vector for legacy_session_id.
-    assert(buf.readVectorBytes8().byteLength === 0, 'illegal_parameter');
+    // It should have echoed our vector for legacy_session_id.
+    const sessionId = buf.readVectorBytes8();
     // It should have selected our single offered ciphersuite.
     const foundCipherSuite = buf.readUint16();
-    assert(foundCipherSuite === TLS_AES_128_GCM_SHA256, 'illegal_parameter');
+    assert(foundCipherSuite === TLS_AES_128_GCM_SHA256, 'illegal_parameter ciphersuite');
     // legacy_compression_methods must be zero.
     assert(buf.readUint8() === 0, 'unexpected legacy_compression_methods');
     // The only extensions we should receive back are the mandatory "supported_versions",
@@ -317,14 +343,13 @@ export class ServerHello extends HandshakeMessage {
       });
     });
     assert(pskIndex !== false, 'server did not select a PSK');
-    return new this(random, pskIndex);
+    return new this(random, sessionId, pskIndex);
   }
 
   _write(buf) {
     buf.writeUint16(VERSION_TLS_1_2);
     buf.writeBytes(this.random);
-    // Empty vector for legacy_session_id
-    buf.writeVectorBytes8(new Uint8Array(0));
+    buf.writeVectorBytes8(this.sessionId);
     // Our single supported ciphersuite
     buf.writeUint16(TLS_AES_128_GCM_SHA256);
     // A single zero byte for legacy_compression_method
@@ -342,6 +367,38 @@ export class ServerHello extends HandshakeMessage {
     });
   }
 }
+
+
+// The EncryptedExtensions message:
+//
+//  struct {
+//    Extension extensions < 0..2 ^ 16 - 1 >;
+//  } EncryptedExtensions;
+//
+// We don't actually send any EncryptedExtensions,
+// but still have to send an empty message.
+
+export class EncryptedExtensions extends HandshakeMessage {
+
+  get TYPE_TAG() {
+    return HANDSHAKE_TYPE.ENCRYPTED_EXTENSIONS;
+  }
+
+  static _read(buf) {
+    // We should not receive any encrypted extensions,
+    // since we do not advertize any in the ClientHello.
+    buf.readVector16((buf, length) => {
+      assert(length === 0, 'unexpected encrypted extension');
+    });
+    return new this();
+  }
+
+  _write(buf) {
+    // Empty vector of extensions
+    buf.writeVector16(buf => {});
+  }
+}
+
 
 // The Finished message:
 //

@@ -8,8 +8,8 @@
 // with a TLS Connection for encryption.
 
 import {
-  InsecureClientConnection,
-  InsecureServerConnection,
+  ClientConnection,
+  ServerConnection,
 } from './tlsconnection.js';
 
 import {
@@ -23,7 +23,7 @@ const utf8Decoder = new TextDecoder();
 const CLOSE_FLUSH_BUFFER_INTERVAL_MS = 200;
 const CLOSE_FLUSH_BUFFER_MAX_TRIES = 5;
 
-export class InsecurePairingChannel extends EventTarget {
+export class PairingChannel extends EventTarget {
   constructor(channelId, channelKey, socket, tlsConnection) {
     super();
     this._channelId = channelId;
@@ -36,22 +36,22 @@ export class InsecurePairingChannel extends EventTarget {
   /**
    * Create a new pairing channel.
    *
-   * @returns Promise<InsecurePairingChannel>
+   * @returns Promise<PairingChannel>
    */
   static create(channelServerURI) {
     const wsURI = new URL('/v1/ws/', channelServerURI).href;
     const channelKey = crypto.getRandomValues(new Uint8Array(32));
-    return this._makePairingChannel(wsURI, InsecureServerConnection, channelKey);
+    return this._makePairingChannel(wsURI, ServerConnection, channelKey);
   }
 
   /**
    * Connect to an existing pairing channel.
    *
-   * @returns Promise<InsecurePairingChannel>
+   * @returns Promise<PairingChannel>
    */
   static connect(channelServerURI, channelId, channelKey) {
     const wsURI = new URL(`/v1/ws/${channelId}`, channelServerURI).href;
-    return this._makePairingChannel(wsURI, InsecureClientConnection, channelKey);
+    return this._makePairingChannel(wsURI, ClientConnection, channelKey);
   }
 
   static _makePairingChannel(wsUri, TlsConnection, psk) {
