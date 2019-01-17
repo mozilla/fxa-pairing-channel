@@ -4,4 +4,4 @@ env:
   node: true
 globals:
   assert: true
-  fxaPairingTLS: true
+  FxAccountsPairingChannel: true

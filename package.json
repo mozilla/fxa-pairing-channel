@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack --env=build",
     "dev": "webpack --progress --colors --watch --env dev",
-    "test": "webpack && karma start test/karma.conf.js --single-run",
+    "test": "eslint src test && webpack && karma start test/karma.conf.js --single-run",
     "test-dev": "webpack && karma start test/karma.conf.js",
     "lint": "eslint src test"
   },
@@ -36,7 +36,6 @@
     "karma-firefox-launcher": "~1.1.0",
     "karma-mocha": "~1.3.0",
     "mocha": "~5.2.0",
-    "uglifyjs-webpack-plugin": "~2.0.1",
     "webpack": "~4.27.1",
     "webpack-cli": "~3.1.2"
   }

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>fxa-pairing-tls demo client</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <h2>fxa-pairing-tls demo client</h2>
+  <div id="enter-code-ui">
+    <p>Enter code to chat: <input type="text" id="code-value" /></p>
+  </div>
+  <div id="chat-ui" style="display: none">
+    <p>Connected! Let's chat...</p>
+    <textarea id="chat-history"></textarea>
+    <input type="text" id="chat-input" />
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="../dist/fxaPairingTLS.js"></script>
+  <script>
+    $(() => {
+      const {InsecurePairingChannel} = fxaPairingTLS;
+      const CHANNEL_SERVER = 'wss://dev.channelserver.nonprod.cloudops.mozgcp.net';
+      $("#code-value").val("")
+      $("#chat-history").val("")
+      $("#code-value").on("keypress", async evt => {
+        if (evt.keyCode !== 13) { return }
+        const [channelId, pskHex] = $("#code-value").val().split("#");
+        const psk = hexToBytes(pskHex);
+        const channel = await InsecurePairingChannel.connect(CHANNEL_SERVER, channelId, psk);
+        channel.addEventListener("message", event => {
+          const {msg} = event.detail.data;
+          $("#chat-history").val($("#chat-history").val() + "\nthem>> " + msg)
+        });
+        $("#chat-input").on("keypress", (evt) => {
+          if (evt.keyCode !== 13) { return }
+          let msg = $("#chat-input").val()
+          $("#chat-input").val("")
+          $("#chat-history").val($("#chat-history").val() + "\nme>>>> " + msg)
+          channel.send({msg});
+        });
+        $("#enter-code-ui").hide();
+        $("#chat-ui").show();
+      })
+    })
+    function hexToBytes(hexstr) {
+      return new Uint8Array(Array.prototype.map.call(hexstr, (c, n) => {
+        if (n % 2 === 1) {
+          return hexstr[n - 1] + c;
+        } else {
+          return '';
+        }
+      }).filter(s => {
+        return !! s;
+      }).map(s => {
+        return parseInt(s, 16);
+      }));
+    }
+  </script>
+</body>
+
+</html>

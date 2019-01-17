@@ -2,22 +2,153 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+'use strict';
 
-class Exchange {
+// A wrapper that combines a WebSocket to the channelserver
+// with a TLS Connection for encryption.
+
+import {
+  InsecureClientConnection,
+  InsecureServerConnection,
+} from './tlsconnection.js';
+
+import {
+  bytesToHex,
+  hexToBytes,
+  utf8ToBytes,
+} from './utils.js';
+
+const utf8Encoder = new TextEncoder();
+const utf8Decoder = new TextDecoder();
+const CLOSE_FLUSH_BUFFER_INTERVAL_MS = 200;
+const CLOSE_FLUSH_BUFFER_MAX_TRIES = 5;
+
+export class InsecurePairingChannel extends EventTarget {
+  constructor(channelId, channelKey, socket, tlsConnection) {
+    super();
+    this._channelId = channelId;
+    this._channelKey = channelKey;
+    this._socket = socket;
+    this._tlsConnection = tlsConnection;
+    this._setupListeners();
+  }
+
   /**
-   * @constructor
+   * Create a new pairing channel.
+   *
+   * @returns Promise<InsecurePairingChannel>
    */
-  constructor() {
-    this.state = null;
+  static create(channelServerURI) {
+    const wsURI = new URL('/v1/ws/', channelServerURI).href;
+    const channelKey = crypto.getRandomValues(new Uint8Array(32));
+    return this._makePairingChannel(wsURI, InsecureServerConnection, channelKey);
   }
 
-  thing() {
-    console.log('2');
-    return 1;
+  /**
+   * Connect to an existing pairing channel.
+   *
+   * @returns Promise<InsecurePairingChannel>
+   */
+  static connect(channelServerURI, channelId, channelKey) {
+    const wsURI = new URL(`/v1/ws/${channelId}`, channelServerURI).href;
+    return this._makePairingChannel(wsURI, InsecureClientConnection, channelKey);
   }
 
+  static _makePairingChannel(wsUri, TlsConnection, psk) {
+    const socket = new WebSocket(wsUri);
+    return new Promise((resolve, reject) => {
+      // eslint-disable-next-line prefer-const
+      let stopListening;
+      const onConnectionError = async () => {
+        stopListening();
+        reject(new Error('Error while creating the pairing channel'));
+      };
+      const onFirstMessage = async event => {
+        stopListening();
+        try {
+          const {channelid: channelId} = JSON.parse(event.data);
+          const pskId = utf8ToBytes(channelId);
+          const tlsConnection = await TlsConnection.create(psk, pskId, data => {
+            // To send data over the websocket, it needs to be encoded as a safe string.
+            socket.send(bytesToHex(data));
+          });
+          const instance = new this(channelId, psk, socket, tlsConnection);
+          resolve(instance);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      stopListening = () => {
+        socket.removeEventListener('error', onConnectionError);
+        socket.removeEventListener('message', onFirstMessage);
+      };
+      socket.addEventListener('error', onConnectionError);
+      socket.addEventListener('message', onFirstMessage);
+    });
+  }
+
+  _setupListeners() {
+    this._socket.addEventListener('message', async event => {
+      try {
+        const channelServerEnvelope = JSON.parse(event.data);
+        const payload = await this._tlsConnection.recv(hexToBytes(channelServerEnvelope.message));
+        if (payload !== null) {
+          const data = JSON.parse(utf8Decoder.decode(payload));
+          this.dispatchEvent(new CustomEvent('message', {
+            detail: {
+              data,
+              sender: channelServerEnvelope.sender,
+            },
+          }));
+        }
+      } catch (error) {
+        this.dispatchEvent(new CustomEvent('error', {
+          detail: {
+            error,
+          },
+        }));
+      }
+    });
+    // Relay the other events.
+    this._socket.addEventListener('error', this.dispatchEvent);
+    this._socket.addEventListener('close', this.dispatchEvent);
+  }
+
+  /**
+   * @param {Object} data
+   */
+  async send(data) {
+    const payload = utf8Encoder.encode(JSON.stringify(data));
+    await this._tlsConnection.send(payload);
+  }
+
+  async close() {
+    await this._tlsConnection.close();
+    this._tlsConnection = null;
+    try {
+      // Ensure all queued bytes have been sent before closing the connection.
+      let tries = 0;
+      while (this._socket.bufferedAmount > 0) {
+        if (++tries > CLOSE_FLUSH_BUFFER_MAX_TRIES) {
+          throw new Error('Could not flush the outgoing buffer in time.');
+        }
+        await new Promise(res => setTimeout(res, CLOSE_FLUSH_BUFFER_INTERVAL_MS));
+      }
+    } finally {
+      this._socket.close();
+      this._socket = null;
+    }
+  }
+
+  get closed() {
+    return this._socket.readyState === 3;
+  }
+
+  get channelId() {
+    return this._channelId;
+  }
+
+  get channelKey() {
+    return this._channelKey;
+  }
 }
-
-module.exports = {
-  Exchange: Exchange,
-};
