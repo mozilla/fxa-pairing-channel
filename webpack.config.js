@@ -1,6 +1,7 @@
 /* global __dirname, require, module*/
 
 const webpack = require('webpack');
+const fs = require('fs');
 
 const BANNER = `
 This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,10 +13,6 @@ Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:[
 const LIBRARY_NAME = 'FxAccountsPairingChannel';
 const ENTRYPOINT = __dirname + '/src/index.js';
 const EXPORT_PATH = __dirname + '/dist';
-
-const bannerPlugin = new webpack.BannerPlugin({
-  banner: BANNER
-});
 
 const MODULE_CONFIG = {
   rules: [
@@ -33,16 +30,27 @@ const MODULE_CONFIG = {
   ]
 };
 
-const PLUGINS = [];
+const WrapperPlugin = require('wrapper-webpack-plugin');
+const bannerPlugin = new webpack.BannerPlugin({
+  banner: BANNER
+});
 
-// Adds a banner to the generated source
-PLUGINS.push(bannerPlugin);
+function plugins(isJsm) {
+  // Adds a banner to the generated source
+  const PLUGINS = [];
+  if (isJsm) {
+    const headerDoc = fs.readFileSync('./src/jsm_header.js.inc', 'utf8');
+    PLUGINS.push(new WrapperPlugin({
+      header: headerDoc,
+    }));
+  }
+  PLUGINS.push(bannerPlugin);
+  return PLUGINS;
+}
 
 const outputConfig = {
   library: LIBRARY_NAME,
-  libraryTarget: 'commonjs2',
   path: EXPORT_PATH,
-  umdNamedDefine: true,
 };
 
 const libraryConfig = {
@@ -52,15 +60,17 @@ const libraryConfig = {
   optimization: {
     minimize: false,
   },
-  plugins: PLUGINS,
 };
 
-const commonJsConfig = {
+const firefoxJsmConfig = {
   ...libraryConfig,
   output: {
     ...outputConfig,
-    filename: `${LIBRARY_NAME}.js`
-  }
+    filename: `${LIBRARY_NAME}.js`,
+    libraryTarget: 'var',
+    libraryExport: 'InsecurePairingChannel',
+  },
+  plugins: plugins(true),
 };
 
 const babelLibraryConfig = {
@@ -68,13 +78,15 @@ const babelLibraryConfig = {
   output: {
     ...outputConfig,
     filename: `${LIBRARY_NAME}.babel.umd.js`,
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
+    umdNamedDefine: true,
   },
   module: MODULE_CONFIG,
+  plugins: plugins(false),
 };
 
 const config = [
-  commonJsConfig,
+  firefoxJsmConfig,
   babelLibraryConfig,
 ];
 

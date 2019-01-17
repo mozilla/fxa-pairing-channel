@@ -4,10 +4,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:0f25ca3815b1bbc3874a, Chunkhash:e446a473ec97255d21e0.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:81bdbe8801bbbb7a2f3e, Chunkhash:9930af9ee2b74c65c81d.
  * 
  */
-module.exports =
+
+ChromeUtils.import("resource://gre/modules/Services.jsm");
+let browser = Services.appShell.createWindowlessBrowser(true);
+const {WebSocket} = browser.document.ownerGlobal;
+
+const EXPORTED_SYMBOLS = ["FxAccountsPairingChannel"];
+
+var FxAccountsPairingChannel =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -2654,4 +2661,4 @@ class src_InsecurePairingChannel extends EventTarget {
 
 
 /***/ })
-/******/ ]);
+/******/ ])["InsecurePairingChannel"];
