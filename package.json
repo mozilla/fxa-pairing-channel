@@ -20,7 +20,9 @@
   },
   "homepage": "https://github.com/mozilla/fxa-pairing-channel#readme",
   "dependencies": {
-    "@babel/runtime": "^7.2.0"
+    "@babel/runtime": "^7.2.0",
+    "event-target-shim": "^4.0.3",
+    "wrapper-webpack-plugin": "^2.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.2.0",

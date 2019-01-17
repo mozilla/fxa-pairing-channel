@@ -18,6 +18,8 @@ import {
   utf8ToBytes,
 } from './utils.js';
 
+import {EventTarget} from 'event-target-shim';
+
 const utf8Encoder = new TextEncoder();
 const utf8Decoder = new TextDecoder();
 const CLOSE_FLUSH_BUFFER_INTERVAL_MS = 200;
