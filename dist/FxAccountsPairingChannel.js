@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:2b4d100614e61000f48d, Chunkhash:54d3067c65dff7d28e8b.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:aae6368ded0f29d51fdc, Chunkhash:ac5b7cfb50f4ad06e8d2.
  * 
  */
 
@@ -179,12 +179,11 @@ function bytesAreEqual(v1, v2) {
   if (v1.length !== v2.length) {
     return false;
   }
+  let mismatch = false;
   for (let i = 0; i < v1.length; i++) {
-    if (v1[i] !== v2[i]) {
-      return false;
-    }
+    mismatch &= v1[i] !== v2[i];
   }
-  return true;
+  return ! mismatch;
 }
 
 // CONCATENATED MODULE: ./src/rot128.js
@@ -1285,8 +1284,8 @@ class src_InsecurePairingChannel extends EventTarget {
       }
     });
     // Relay the other events.
-    this._socket.addEventListener('error', this.dispatchEvent);
-    this._socket.addEventListener('close', this.dispatchEvent);
+    this._socket.addEventListener('error', e => this.dispatchEvent(e));
+    this._socket.addEventListener('close', e => this.dispatchEvent(e));
   }
 
   /**
