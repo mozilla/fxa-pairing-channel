@@ -18,11 +18,11 @@
   </div>
 
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-  <script src="../dist/fxaPairingTLS.js"></script>
+  <script src="../dist/FxAccountsPairingChannel.babel.umd.js"></script>
   <script>
     $(async () => {
       // TODO: do we want to export InsecurePairingChannel directly?
-      const {InsecurePairingChannel} = fxaPairingTLS;
+      const {InsecurePairingChannel, bytesToHex} = FxAccountsPairingChannel;
       const CHANNEL_SERVER = 'wss://dev.channelserver.nonprod.cloudops.mozgcp.net';
       $("#chat-history").val("");
       const channel = await InsecurePairingChannel.create(CHANNEL_SERVER);
@@ -39,15 +39,6 @@
         channel.send({msg});
       });
     })
-    function bytesToHex(bytes) {
-      return Array.prototype.map.call(bytes, byte => {
-        let s = byte.toString(16);
-        if (s.length === 1) {
-          s = '0' + s;
-        }
-        return s;
-      }).join('');
-    }
   </script>
 </body>
 

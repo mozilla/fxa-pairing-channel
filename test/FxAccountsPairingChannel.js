@@ -13,10 +13,13 @@ describe('FxAccountsPairingChannel', () => {
       const CLIENT_RECV = [];
       const SERVER_RECV = [];
       const server = await FxAccountsPairingChannel.InsecurePairingChannel.create(CHANNEL_SERVER);
-      const messageReceived = new Promise(res => {
+      const messageReceived = new Promise((resolve, reject) => {
         server.addEventListener('message', ({detail: {data}}) => {
           SERVER_RECV.push(data.msg);
-          res();
+          resolve();
+        });
+        server.addEventListener('error', err => {
+          reject(err);
         });
       });
       const {channelId, channelKey} = server;
