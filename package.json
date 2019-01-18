@@ -4,7 +4,7 @@
   "description": "TLS for FxA Pairing",
   "main": "index.js",
   "scripts": {
-    "build": "webpack --env=build",
+    "build": "webpack --env=build && sed -i'' -e '/\\/\\/# sourceMappingURL.*/d' dist/FxAccountsPairingChannel.js",
     "dev": "webpack --progress --colors --watch --env dev",
     "test": "eslint src test && webpack && karma start test/karma.conf.js --single-run",
     "test-dev": "webpack && karma start test/karma.conf.js",
