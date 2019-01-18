@@ -18,8 +18,11 @@ jobs:
           shell: /bin/bash --login
           command: |
             sudo npm install -g npm@6
-            npm install
+            npm ci
             DISPLAY=:99 FIREFOX_BIN=./firefox/firefox-bin npm test
+
+      - store_artifacts:
+          path: ./coverage/
 
       - run: npm run lint
 workflows:
