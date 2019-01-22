@@ -5,33 +5,33 @@
 'use strict';
 
 // A wrapper that combines a WebSocket to the channelserver
-// with a TLS Connection for encryption.
+// with some client-side encryption for securing the channel.
+// We'll improve the encryption before initial release...
 
 import {
   InsecureClientConnection,
   InsecureServerConnection,
-} from './tlsconnection.js';
+} from './rot128.js';
 
 import {
   bytesToHex,
   hexToBytes,
   utf8ToBytes,
+  bytesToUtf8,
 } from './utils.js';
 
 import {EventTarget} from 'event-target-shim';
 
-const utf8Encoder = new TextEncoder();
-const utf8Decoder = new TextDecoder();
 const CLOSE_FLUSH_BUFFER_INTERVAL_MS = 200;
 const CLOSE_FLUSH_BUFFER_MAX_TRIES = 5;
 
 export class InsecurePairingChannel extends EventTarget {
-  constructor(channelId, channelKey, socket, tlsConnection) {
+  constructor(channelId, channelKey, socket, connection) {
     super();
     this._channelId = channelId;
     this._channelKey = channelKey;
     this._socket = socket;
-    this._tlsConnection = tlsConnection;
+    this._connection = connection;
     this._setupListeners();
   }
 
@@ -56,7 +56,7 @@ export class InsecurePairingChannel extends EventTarget {
     return this._makePairingChannel(wsURI, InsecureClientConnection, channelKey);
   }
 
-  static _makePairingChannel(wsUri, TlsConnection, psk) {
+  static _makePairingChannel(wsUri, ConnectionClass, psk) {
     const socket = new WebSocket(wsUri);
     return new Promise((resolve, reject) => {
       // eslint-disable-next-line prefer-const
@@ -70,11 +70,11 @@ export class InsecurePairingChannel extends EventTarget {
         try {
           const {channelid: channelId} = JSON.parse(event.data);
           const pskId = utf8ToBytes(channelId);
-          const tlsConnection = await TlsConnection.create(psk, pskId, data => {
+          const connection = await ConnectionClass.create(psk, pskId, data => {
             // To send data over the websocket, it needs to be encoded as a safe string.
             socket.send(bytesToHex(data));
           });
-          const instance = new this(channelId, psk, socket, tlsConnection);
+          const instance = new this(channelId, psk, socket, connection);
           resolve(instance);
         } catch (err) {
           reject(err);
@@ -93,9 +93,9 @@ export class InsecurePairingChannel extends EventTarget {
     this._socket.addEventListener('message', async event => {
       try {
         const channelServerEnvelope = JSON.parse(event.data);
-        const payload = await this._tlsConnection.recv(hexToBytes(channelServerEnvelope.message));
+        const payload = await this._connection.recv(hexToBytes(channelServerEnvelope.message));
         if (payload !== null) {
-          const data = JSON.parse(utf8Decoder.decode(payload));
+          const data = JSON.parse(bytesToUtf8(payload));
           this.dispatchEvent(new CustomEvent('message', {
             detail: {
               data,
@@ -120,13 +120,13 @@ export class InsecurePairingChannel extends EventTarget {
    * @param {Object} data
    */
   async send(data) {
-    const payload = utf8Encoder.encode(JSON.stringify(data));
-    await this._tlsConnection.send(payload);
+    const payload = utf8ToBytes(JSON.stringify(data));
+    await this._connection.send(payload);
   }
 
   async close() {
-    await this._tlsConnection.close();
-    this._tlsConnection = null;
+    await this._connection.close();
+    this._connection = null;
     try {
       // Ensure all queued bytes have been sent before closing the connection.
       let tries = 0;
@@ -154,3 +154,6 @@ export class InsecurePairingChannel extends EventTarget {
     return this._channelKey;
   }
 }
+
+// Re-export helpful utilities for calling code to use.
+export { bytesToHex, hexToBytes, bytesToUtf8, utf8ToBytes };
