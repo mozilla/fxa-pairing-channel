@@ -8,6 +8,9 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+This uses the event-target-shim node library published under the MIT license:
+https://github.com/mysticatea/event-target-shim/blob/master/LICENSE
+
 Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:[hash], Chunkhash:[chunkhash].
 `;
 const LIBRARY_NAME = 'FxAccountsPairingChannel';
