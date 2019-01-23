@@ -111,8 +111,15 @@ export class InsecurePairingChannel extends EventTarget {
         }));
       }
     });
-    // Relay the other events.
-    this._socket.addEventListener('error', e => this.dispatchEvent(e));
+    // Relay the WebSocket events.
+    this._socket.addEventListener('error', () => {
+      // The dispatched event that we receive has no useful information.
+      this.dispatchEvent(new CustomEvent('error', {
+        detail: {
+          error: new Error('WebSocket error.'),
+        },
+      }));
+    });
     this._socket.addEventListener('close', e => this.dispatchEvent(e));
   }
 

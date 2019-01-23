@@ -7,7 +7,7 @@
  * This uses the event-target-shim node library published under the MIT license:
  * https://github.com/mysticatea/event-target-shim/blob/master/LICENSE
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:aae6368ded0f29d51fdc, Chunkhash:ac5b7cfb50f4ad06e8d2.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:dcdb14abba5a7db14360, Chunkhash:1ae02caf1a4926f6eb78.
  * 
  */
 
@@ -1285,8 +1285,15 @@ class src_InsecurePairingChannel extends EventTarget {
         }));
       }
     });
-    // Relay the other events.
-    this._socket.addEventListener('error', e => this.dispatchEvent(e));
+    // Relay the WebSocket events.
+    this._socket.addEventListener('error', () => {
+      // The dispatched event that we receive has no useful information.
+      this.dispatchEvent(new CustomEvent('error', {
+        detail: {
+          error: new Error('WebSocket error.'),
+        },
+      }));
+    });
     this._socket.addEventListener('close', e => this.dispatchEvent(e));
   }
 
