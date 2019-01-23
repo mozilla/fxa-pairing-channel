@@ -7,7 +7,7 @@
  * This uses the event-target-shim node library published under the MIT license:
  * https://github.com/mysticatea/event-target-shim/blob/master/LICENSE
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:4a8833c9a323fd8a08d4, Chunkhash:eec061c954a47bcc2597.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:04551ca6579dd3356b83, Chunkhash:f57f4414ce4a7d10f151.
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -2529,11 +2529,16 @@ function (_EventTarget) {
         return function (_x) {
           return _ref.apply(this, arguments);
         };
-      }()); // Relay the other events.
+      }()); // Relay the WebSocket events.
 
 
-      this._socket.addEventListener('error', function (e) {
-        return _this2.dispatchEvent(e);
+      this._socket.addEventListener('error', function () {
+        // The dispatched event that we receive has no useful information.
+        _this2.dispatchEvent(new CustomEvent('error', {
+          detail: {
+            error: new Error('WebSocket error.')
+          }
+        }));
       });
 
       this._socket.addEventListener('close', function (e) {
