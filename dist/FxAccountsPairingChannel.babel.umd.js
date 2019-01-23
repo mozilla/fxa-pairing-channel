@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:a5245c9aa10a13e5cd26, Chunkhash:5a9106d31abc79d3b9a9.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:4a8833c9a323fd8a08d4, Chunkhash:eec061c954a47bcc2597.
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -1208,13 +1208,13 @@ function bytesAreEqual(v1, v2) {
     return false;
   }
 
+  var mismatch = false;
+
   for (var i = 0; i < v1.length; i++) {
-    if (v1[i] !== v2[i]) {
-      return false;
-    }
+    mismatch &= v1[i] !== v2[i];
   }
 
-  return true;
+  return !mismatch;
 }
 // CONCATENATED MODULE: ./src/rot128.js
 /* This Source Code Form is subject to the terms of the Mozilla Public
@@ -2529,9 +2529,13 @@ function (_EventTarget) {
       }()); // Relay the other events.
 
 
-      this._socket.addEventListener('error', this.dispatchEvent);
+      this._socket.addEventListener('error', function (e) {
+        return _this2.dispatchEvent(e);
+      });
 
-      this._socket.addEventListener('close', this.dispatchEvent);
+      this._socket.addEventListener('close', function (e) {
+        return _this2.dispatchEvent(e);
+      });
     }
     /**
      * @param {Object} data

@@ -112,8 +112,8 @@ export class InsecurePairingChannel extends EventTarget {
       }
     });
     // Relay the other events.
-    this._socket.addEventListener('error', this.dispatchEvent);
-    this._socket.addEventListener('close', this.dispatchEvent);
+    this._socket.addEventListener('error', e => this.dispatchEvent(e));
+    this._socket.addEventListener('close', e => this.dispatchEvent(e));
   }
 
   /**
