@@ -1,7 +1,31 @@
 parserOptions:
   sourceType: script
-env:
-  node: true
 globals:
   assert: true
+  sinon: true
   FxAccountsPairingChannel: true
+  BufferReader: true
+  BufferWriter: true
+  ClientConnection: true
+  Connection: true
+  DecryptionState: true
+  EncryptedExtensions: true
+  EncryptionState: true
+  Finished: true
+  HASH_LENGTH: true
+  KeySchedule: true
+  NewSessionTicket: true
+  RecordLayer: true
+  ServerConnection: true
+  TEST_VECTORS: true
+  TLSCloseNotify: true
+  TLSError: true
+  arrayToBytes: true
+  bytesAreEqual: true
+  bytesToHex: true
+  bytesToUtf8: true
+  hexToBytes: true
+  hkdfExpand: true
+  testHelpers: true
+  utf8ToBytes: true
+  zeros: true

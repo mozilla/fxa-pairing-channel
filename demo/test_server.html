@@ -21,12 +21,11 @@
   <script src="../dist/FxAccountsPairingChannel.babel.umd.js"></script>
   <script>
     $(async () => {
-      // TODO: do we want to export InsecurePairingChannel directly?
-      const {InsecurePairingChannel, bytesToHex} = FxAccountsPairingChannel;
+      const {PairingChannel, bytesToBase64url} = FxAccountsPairingChannel;
       const CHANNEL_SERVER = 'wss://dev.channelserver.nonprod.cloudops.mozgcp.net';
       $("#chat-history").val("");
-      const channel = await InsecurePairingChannel.create(CHANNEL_SERVER);
-      $("#code-value").text(`${channel.channelId}#${bytesToHex(channel.channelKey)}`);
+      const channel = await PairingChannel.create(CHANNEL_SERVER);
+      $("#code-value").text(`${channel.channelId}#${bytesToBase64url(channel.channelKey)}`);
       channel.addEventListener("message", event => {
         const {msg} = event.detail.data;
         $("#chat-history").val($("#chat-history").val() + "\nthem>> " + msg);

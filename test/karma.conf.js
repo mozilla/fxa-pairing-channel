@@ -9,14 +9,20 @@ module.exports = function (config) {
         // require specific files after Mocha is initialized
         require: [
           require.resolve('../node_modules/chai/chai.js'),
-          require.resolve('../dist/FxAccountsPairingChannel.babel.umd.js'),
+          require.resolve('../dist/FxAccountsPairingChannel.babel.umd.coverage.js'),
         ],
       }
     },
+    coverageReporter: {
+      dir: '../coverage/',
+      type: 'html'
+    },
     files: [
+      '../dist/FxAccountsPairingChannel.babel.umd.coverage.js',
       '**/*.js'
     ],
-    frameworks: ['mocha', 'chai'],
+    frameworks: ['mocha', 'chai', 'sinon'],
     nocache: true,
+    reporters: ['progress', 'coverage']
   });
 };

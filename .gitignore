@@ -1,3 +1,6 @@
+# Build with coverage info enabled.
+dist/FxAccountsPairingChannel.babel.umd.coverage.js 
+
 # Logs
 logs
 *.log

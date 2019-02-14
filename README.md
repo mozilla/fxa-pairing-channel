@@ -8,19 +8,15 @@ It will be used by the Firefox Accounts pairing flow, with one side
 of the channel being web content from https://accounts.firefox.com and
 the other side of the channel being a signed-in Firefox instance.
 
-The connection will *eventually* be secured using a pre-shared key
-and TLS1.3, but that code is still in progress. To parallelize
-client development we've published an initial version with a
-correctly-shapred API but no meaningful security.
 
 API
 ===
 
-The main abstraction is the `InsecurePairingChannel` class.
+The main abstraction is the `PairingChannel` class.
 One side of the connection can create a new channel like this:
 
 ```
-const channel = await InsecurePairingChannel.create(CHANNEL_SERVER_URL);
+const channel = await PairingChannel.create(CHANNEL_SERVER_URL);
 console.log(channel.channelId, channel.channelKey);
 ```
 
@@ -29,7 +25,7 @@ the intended client, perhaps by scanning a QR code.  It can then
 connect to the channel like this:
 
 ```
-const channel = await InsecurePairingChannel.connect(CHANNEL_SERVER_URL, channelId, channelKey);
+const channel = await PairingChannel.connect(CHANNEL_SERVER_URL, channelId, channelKey);
 ```
 
 Both ends of the channel can then send and receive messages using a websocket-like
@@ -47,3 +43,13 @@ channel.addEventListener("message", event => {
 You can try out a more complete demo of this API by loading
 `./demo/test_client.html` and `./demo/test_server.html` in
 parallel webpages and watching them pass messages back and forth.
+
+
+Crypto
+======
+
+Under the hood, the `PairingChannel` implements the "externally-provisioned
+pre-shared key" mode of [TLS1.3](https://tools.ietf.org/html/rfc8446).
+Each side of the channel can thus be assured that its peer is in posession
+of the `channelKey`, and that their traffic is protected from anyone who
+does not possess this key.

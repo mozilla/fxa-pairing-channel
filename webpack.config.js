@@ -17,22 +17,6 @@ const LIBRARY_NAME = 'FxAccountsPairingChannel';
 const ENTRYPOINT = __dirname + '/src/index.js';
 const EXPORT_PATH = __dirname + '/dist';
 
-const MODULE_CONFIG = {
-  rules: [
-    {
-      exclude: /(node_modules)/,
-      test: /(\.jsx|\.js)$/,
-      use: {
-        loader: 'babel-loader',
-        options: {
-          plugins: ['@babel/plugin-transform-runtime'],
-          presets: ['@babel/preset-env'],
-        }
-      }
-    }
-  ]
-};
-
 const WrapperPlugin = require('wrapper-webpack-plugin');
 const bannerPlugin = new webpack.BannerPlugin({
   banner: BANNER
@@ -71,7 +55,7 @@ const firefoxJsmConfig = {
     ...outputConfig,
     filename: `${LIBRARY_NAME}.js`,
     libraryTarget: 'var',
-    libraryExport: 'InsecurePairingChannel',
+    libraryExport: 'PairingChannel',
   },
   plugins: plugins(true),
 };
@@ -84,13 +68,57 @@ const babelLibraryConfig = {
     libraryTarget: 'umd',
     umdNamedDefine: true,
   },
-  module: MODULE_CONFIG,
+  module: {
+    rules: [
+      {
+        exclude: /(node_modules)/,
+        test: /(\.jsx|\.js)$/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            plugins: ['@babel/plugin-transform-runtime'],
+            presets: ['@babel/preset-env'],
+          }
+        }
+      }
+    ]
+  },
+  plugins: plugins(false),
+};
+
+const coverageLibraryConfig = {
+  ...libraryConfig,
+  output: {
+    ...outputConfig,
+    filename: `${LIBRARY_NAME}.babel.umd.coverage.js`,
+    libraryTarget: 'umd',
+    umdNamedDefine: true,
+  },
+  module: {
+    rules: [
+      {
+        exclude: /(node_modules)/,
+        test: /(\.jsx|\.js)$/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            plugins: ['@babel/plugin-transform-runtime', 'babel-plugin-istanbul'],
+            presets: ['@babel/preset-env'],
+          }
+        }
+      }
+    ]
+  },
+  performance: {
+    hints: false
+  },
   plugins: plugins(false),
 };
 
 const config = [
   firefoxJsmConfig,
   babelLibraryConfig,
+  coverageLibraryConfig,
 ];
 
 module.exports = config;

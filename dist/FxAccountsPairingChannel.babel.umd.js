@@ -7,7 +7,7 @@
  * This uses the event-target-shim node library published under the MIT license:
  * https://github.com/mysticatea/event-target-shim/blob/master/LICENSE
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:04551ca6579dd3356b83, Chunkhash:f57f4414ce4a7d10f151.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:0ad04506d795353753b8, Chunkhash:2c3de315a58fe5473e9b.
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -103,14 +103,14 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 14);
+/******/ 	return __webpack_require__(__webpack_require__.s = 21);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(8);
+module.exports = __webpack_require__(11);
 
 
 /***/ }),
@@ -159,6 +159,18 @@ module.exports = _asyncToGenerator;
 /* 2 */
 /***/ (function(module, exports) {
 
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+module.exports = _classCallCheck;
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
 function _getPrototypeOf(o) {
   module.exports = _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
     return o.__proto__ || Object.getPrototypeOf(o);
@@ -167,18 +179,6 @@ function _getPrototypeOf(o) {
 }
 
 module.exports = _getPrototypeOf;
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports) {
-
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-
-module.exports = _classCallCheck;
 
 /***/ }),
 /* 4 */
@@ -206,9 +206,9 @@ module.exports = _createClass;
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _typeof = __webpack_require__(10);
+var _typeof = __webpack_require__(13);
 
-var assertThisInitialized = __webpack_require__(11);
+var assertThisInitialized = __webpack_require__(14);
 
 function _possibleConstructorReturn(self, call) {
   if (call && (_typeof(call) === "object" || typeof call === "function")) {
@@ -224,7 +224,7 @@ module.exports = _possibleConstructorReturn;
 /* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var setPrototypeOf = __webpack_require__(12);
+var setPrototypeOf = __webpack_require__(9);
 
 function _inherits(subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
@@ -247,9 +247,9 @@ module.exports = _inherits;
 /* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getPrototypeOf = __webpack_require__(2);
+var getPrototypeOf = __webpack_require__(3);
 
-var superPropBase = __webpack_require__(13);
+var superPropBase = __webpack_require__(15);
 
 function _get(target, property, receiver) {
   if (typeof Reflect !== "undefined" && Reflect.get) {
@@ -277,6 +277,85 @@ module.exports = _get;
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
+var arrayWithHoles = __webpack_require__(16);
+
+var iterableToArrayLimit = __webpack_require__(17);
+
+var nonIterableRest = __webpack_require__(18);
+
+function _slicedToArray(arr, i) {
+  return arrayWithHoles(arr) || iterableToArrayLimit(arr, i) || nonIterableRest();
+}
+
+module.exports = _slicedToArray;
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports) {
+
+function _setPrototypeOf(o, p) {
+  module.exports = _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+module.exports = _setPrototypeOf;
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var getPrototypeOf = __webpack_require__(3);
+
+var setPrototypeOf = __webpack_require__(9);
+
+var isNativeFunction = __webpack_require__(19);
+
+var construct = __webpack_require__(20);
+
+function _wrapNativeSuper(Class) {
+  var _cache = typeof Map === "function" ? new Map() : undefined;
+
+  module.exports = _wrapNativeSuper = function _wrapNativeSuper(Class) {
+    if (Class === null || !isNativeFunction(Class)) return Class;
+
+    if (typeof Class !== "function") {
+      throw new TypeError("Super expression must either be null or a function");
+    }
+
+    if (typeof _cache !== "undefined") {
+      if (_cache.has(Class)) return _cache.get(Class);
+
+      _cache.set(Class, Wrapper);
+    }
+
+    function Wrapper() {
+      return construct(Class, arguments, getPrototypeOf(this).constructor);
+    }
+
+    Wrapper.prototype = Object.create(Class.prototype, {
+      constructor: {
+        value: Wrapper,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+    return setPrototypeOf(Wrapper, Class);
+  };
+
+  return _wrapNativeSuper(Class);
+}
+
+module.exports = _wrapNativeSuper;
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
 /**
  * Copyright (c) 2014-present, Facebook, Inc.
  *
@@ -301,7 +380,7 @@ var oldRuntime = hadRuntime && g.regeneratorRuntime;
 // Force reevalutation of runtime.js.
 g.regeneratorRuntime = undefined;
 
-module.exports = __webpack_require__(9);
+module.exports = __webpack_require__(12);
 
 if (hadRuntime) {
   // Restore the original runtime.
@@ -317,7 +396,7 @@ if (hadRuntime) {
 
 
 /***/ }),
-/* 9 */
+/* 12 */
 /***/ (function(module, exports) {
 
 /**
@@ -1044,7 +1123,7 @@ if (hadRuntime) {
 
 
 /***/ }),
-/* 10 */
+/* 13 */
 /***/ (function(module, exports) {
 
 function _typeof2(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof2 = function _typeof2(obj) { return typeof obj; }; } else { _typeof2 = function _typeof2(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof2(obj); }
@@ -1066,7 +1145,7 @@ function _typeof(obj) {
 module.exports = _typeof;
 
 /***/ }),
-/* 11 */
+/* 14 */
 /***/ (function(module, exports) {
 
 function _assertThisInitialized(self) {
@@ -1080,25 +1159,10 @@ function _assertThisInitialized(self) {
 module.exports = _assertThisInitialized;
 
 /***/ }),
-/* 12 */
-/***/ (function(module, exports) {
-
-function _setPrototypeOf(o, p) {
-  module.exports = _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  };
-
-  return _setPrototypeOf(o, p);
-}
-
-module.exports = _setPrototypeOf;
-
-/***/ }),
-/* 13 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getPrototypeOf = __webpack_require__(2);
+var getPrototypeOf = __webpack_require__(3);
 
 function _superPropBase(object, property) {
   while (!Object.prototype.hasOwnProperty.call(object, property)) {
@@ -1112,7 +1176,107 @@ function _superPropBase(object, property) {
 module.exports = _superPropBase;
 
 /***/ }),
-/* 14 */
+/* 16 */
+/***/ (function(module, exports) {
+
+function _arrayWithHoles(arr) {
+  if (Array.isArray(arr)) return arr;
+}
+
+module.exports = _arrayWithHoles;
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports) {
+
+function _iterableToArrayLimit(arr, i) {
+  var _arr = [];
+  var _n = true;
+  var _d = false;
+  var _e = undefined;
+
+  try {
+    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+      _arr.push(_s.value);
+
+      if (i && _arr.length === i) break;
+    }
+  } catch (err) {
+    _d = true;
+    _e = err;
+  } finally {
+    try {
+      if (!_n && _i["return"] != null) _i["return"]();
+    } finally {
+      if (_d) throw _e;
+    }
+  }
+
+  return _arr;
+}
+
+module.exports = _iterableToArrayLimit;
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports) {
+
+function _nonIterableRest() {
+  throw new TypeError("Invalid attempt to destructure non-iterable instance");
+}
+
+module.exports = _nonIterableRest;
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports) {
+
+function _isNativeFunction(fn) {
+  return Function.toString.call(fn).indexOf("[native code]") !== -1;
+}
+
+module.exports = _isNativeFunction;
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var setPrototypeOf = __webpack_require__(9);
+
+function isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function _construct(Parent, args, Class) {
+  if (isNativeReflectConstruct()) {
+    module.exports = _construct = Reflect.construct;
+  } else {
+    module.exports = _construct = function _construct(Parent, args, Class) {
+      var a = [null];
+      a.push.apply(a, args);
+      var Constructor = Function.bind.apply(Parent, a);
+      var instance = new Constructor();
+      if (Class) setPrototypeOf(instance, Class.prototype);
+      return instance;
+    };
+  }
+
+  return _construct.apply(null, arguments);
+}
+
+module.exports = _construct;
+
+/***/ }),
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1127,7 +1291,7 @@ var asyncToGenerator = __webpack_require__(1);
 var asyncToGenerator_default = /*#__PURE__*/__webpack_require__.n(asyncToGenerator);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/classCallCheck.js
-var classCallCheck = __webpack_require__(3);
+var classCallCheck = __webpack_require__(2);
 var classCallCheck_default = /*#__PURE__*/__webpack_require__.n(classCallCheck);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/createClass.js
@@ -1139,7 +1303,7 @@ var possibleConstructorReturn = __webpack_require__(5);
 var possibleConstructorReturn_default = /*#__PURE__*/__webpack_require__.n(possibleConstructorReturn);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/getPrototypeOf.js
-var getPrototypeOf = __webpack_require__(2);
+var getPrototypeOf = __webpack_require__(3);
 var getPrototypeOf_default = /*#__PURE__*/__webpack_require__.n(getPrototypeOf);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/inherits.js
@@ -1150,7 +1314,139 @@ var inherits_default = /*#__PURE__*/__webpack_require__.n(inherits);
 var get = __webpack_require__(7);
 var get_default = /*#__PURE__*/__webpack_require__.n(get);
 
+// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/slicedToArray.js
+var slicedToArray = __webpack_require__(8);
+var slicedToArray_default = /*#__PURE__*/__webpack_require__.n(slicedToArray);
+
+// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/wrapNativeSuper.js
+var wrapNativeSuper = __webpack_require__(10);
+var wrapNativeSuper_default = /*#__PURE__*/__webpack_require__.n(wrapNativeSuper);
+
+// CONCATENATED MODULE: ./src/alerts.js
+
+
+
+
+
+
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/* eslint-disable sorting/sort-object-props */
+var ALERT_LEVEL = {
+  WARNING: 1,
+  FATAL: 2
+};
+var ALERT_DESCRIPTION = {
+  CLOSE_NOTIFY: 0,
+  UNEXPECTED_MESSAGE: 10,
+  BAD_RECORD_MAC: 20,
+  RECORD_OVERFLOW: 22,
+  HANDSHAKE_FAILURE: 40,
+  ILLEGAL_PARAMETER: 47,
+  DECODE_ERROR: 50,
+  DECRYPT_ERROR: 51,
+  PROTOCOL_VERSION: 70,
+  INTERNAL_ERROR: 80,
+  MISSING_EXTENSION: 109,
+  UNSUPPORTED_EXTENSION: 110,
+  UNKNOWN_PSK_IDENTITY: 115,
+  NO_APPLICATION_PROTOCOL: 120
+};
+/* eslint-enable sorting/sort-object-props */
+
+function alertTypeToName(type) {
+  for (var name in ALERT_DESCRIPTION) {
+    if (ALERT_DESCRIPTION[name] === type) {
+      return "".concat(name, " (").concat(type, ")");
+    }
+  }
+
+  return "UNKNOWN (".concat(type, ")");
+}
+
+var alerts_TLSAlert =
+/*#__PURE__*/
+function (_Error) {
+  inherits_default()(TLSAlert, _Error);
+
+  function TLSAlert(description, level) {
+    var _this;
+
+    classCallCheck_default()(this, TLSAlert);
+
+    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(TLSAlert).call(this, "TLS Alert: ".concat(alertTypeToName(description))));
+    _this.description = description;
+    _this.level = level;
+    return _this;
+  }
+
+  createClass_default()(TLSAlert, [{
+    key: "toBytes",
+    value: function toBytes() {
+      return new Uint8Array([this.level, this.description]);
+    }
+  }], [{
+    key: "fromBytes",
+    value: function fromBytes(bytes) {
+      if (bytes.byteLength !== 2) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+      }
+
+      switch (bytes[1]) {
+        case ALERT_DESCRIPTION.CLOSE_NOTIFY:
+          if (bytes[0] !== ALERT_LEVEL.WARNING) {
+            // Close notifications should be fatal.
+            throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+          }
+
+          return new alerts_TLSCloseNotify();
+
+        default:
+          return new alerts_TLSError(bytes[1]);
+      }
+    }
+  }]);
+
+  return TLSAlert;
+}(wrapNativeSuper_default()(Error));
+var alerts_TLSCloseNotify =
+/*#__PURE__*/
+function (_TLSAlert) {
+  inherits_default()(TLSCloseNotify, _TLSAlert);
+
+  function TLSCloseNotify() {
+    classCallCheck_default()(this, TLSCloseNotify);
+
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(TLSCloseNotify).call(this, ALERT_DESCRIPTION.CLOSE_NOTIFY, ALERT_LEVEL.WARNING));
+  }
+
+  return TLSCloseNotify;
+}(alerts_TLSAlert);
+var alerts_TLSError =
+/*#__PURE__*/
+function (_TLSAlert2) {
+  inherits_default()(TLSError, _TLSAlert2);
+
+  function TLSError() {
+    var description = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : ALERT_DESCRIPTION.INTERNAL_ERROR;
+
+    classCallCheck_default()(this, TLSError);
+
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(TLSError).call(this, description, ALERT_LEVEL.FATAL));
+  }
+
+  return TLSError;
+}(alerts_TLSAlert);
 // CONCATENATED MODULE: ./src/utils.js
+
+
+
+
+
+
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -1171,9 +1467,18 @@ function assert(cond, msg) {
 }
 function assertIsBytes(value) {
   var msg = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'value must be a Uint8Array';
-  // XXX: Disabled until Gecko problems are resolved
-  //assert(value instanceof Uint8Array, msg);
+  // Using `value instanceof Uint8Array` seems to fail in Firefox chrome code
+  // for inscrutable reasons, so we do a less direct check.
+  assert(ArrayBuffer.isView(value), msg);
+  assert(value.BYTES_PER_ELEMENT === 1, msg);
   return value;
+}
+var EMPTY = new Uint8Array(0);
+function zeros(n) {
+  return new Uint8Array(n);
+}
+function arrayToBytes(value) {
+  return new Uint8Array(value);
 }
 function bytesToHex(bytes) {
   return Array.prototype.map.call(bytes, function (byte) {
@@ -1206,28 +1511,4712 @@ function bytesToUtf8(bytes) {
 function utf8ToBytes(str) {
   return UTF8_ENCODER.encode(str);
 }
+function bytesToBase64url(bytes) {
+  // XXX TODO: try to use something constant-time, in case calling code
+  // uses it to encode secrets?
+  var charCodes = String.fromCharCode.apply(String, bytes);
+  return btoa(charCodes).replace(/\+/g, '-').replace(/\//g, '_');
+}
+function base64urlToBytes(str) {
+  // XXX TODO: try to use something constant-time, in case calling code
+  // uses it to decode secrets?
+  str = atob(str.replace(/-/g, '+').replace(/_/g, '/'));
+  var bytes = new Uint8Array(str.length);
+
+  for (var i = 0; i < str.length; i++) {
+    bytes[i] = str.charCodeAt(i);
+  }
+
+  return bytes;
+}
 function bytesAreEqual(v1, v2) {
+  assertIsBytes(v1);
+  assertIsBytes(v2);
+
   if (v1.length !== v2.length) {
     return false;
   }
 
-  var mismatch = false;
-
   for (var i = 0; i < v1.length; i++) {
-    mismatch &= v1[i] !== v2[i];
+    if (v1[i] !== v2[i]) {
+      return false;
+    }
   }
 
-  return !mismatch;
-}
-// CONCATENATED MODULE: ./src/rot128.js
+  return true;
+} // The `BufferReader` and `BufferWriter` classes are helpers for dealing with the
+// binary struct format that's used for various TLS message.  Think of them as a
+// buffer with a pointer to the "current position" and a bunch of helper methods
+// to read/write structured data and advance said pointer.
+
+var utils_BufferWithPointer =
+/*#__PURE__*/
+function () {
+  function BufferWithPointer(buf) {
+    classCallCheck_default()(this, BufferWithPointer);
+
+    this._buffer = buf;
+    this._dataview = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
+    this._pos = 0;
+  }
+
+  createClass_default()(BufferWithPointer, [{
+    key: "length",
+    value: function length() {
+      return this._buffer.byteLength;
+    }
+  }, {
+    key: "tell",
+    value: function tell() {
+      return this._pos;
+    }
+  }, {
+    key: "seek",
+    value: function seek(pos) {
+      if (pos < 0) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+      }
+
+      if (pos > this.length()) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+      }
+
+      this._pos = pos;
+    }
+  }, {
+    key: "incr",
+    value: function incr(offset) {
+      this.seek(this._pos + offset);
+    }
+  }]);
+
+  return BufferWithPointer;
+}(); // The `BufferReader` class helps you read structured data from a byte array.
+// It offers methods for reading both primitive values, and the variable-length
+// vector structures defined in https://tools.ietf.org/html/rfc8446#section-3.4.
+//
+// Such vectors are represented as a length followed by the concatenated
+// bytes of each item, and the size of the length field is determined by
+// the maximum allowed number of bytes in the vector.  For example
+// to read a vector that may contain up to 65535 bytes, use `readVector16`.
+//
+// To read a variable-length vector of between 1 and 100 uint16 values,
+// defined in the RFC like this:
+//
+//    uint16 items<2..200>;
+//
+// You would do something like this:
+//
+//    const items = []
+//    buf.readVector8(buf => {
+//      items.push(buf.readUint16())
+//    })
+//
+// The various `read` will throw `DECODE_ERROR` if you attempt to read path
+// the end of the buffer, or past the end of a variable-length list.
+//
+
+
+var utils_BufferReader =
+/*#__PURE__*/
+function (_BufferWithPointer) {
+  inherits_default()(BufferReader, _BufferWithPointer);
+
+  function BufferReader() {
+    classCallCheck_default()(this, BufferReader);
+
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(BufferReader).apply(this, arguments));
+  }
+
+  createClass_default()(BufferReader, [{
+    key: "hasMoreBytes",
+    value: function hasMoreBytes() {
+      return this.tell() < this.length();
+    }
+  }, {
+    key: "readBytes",
+    value: function readBytes(length) {
+      // This avoids copies by returning a view onto the existing buffer.
+      var start = this._buffer.byteOffset + this.tell();
+      this.incr(length);
+      return new Uint8Array(this._buffer.buffer, start, length);
+    }
+  }, {
+    key: "_rangeErrorToAlert",
+    value: function _rangeErrorToAlert(cb) {
+      try {
+        return cb(this);
+      } catch (err) {
+        if (err instanceof RangeError) {
+          throw new alerts_TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+        }
+
+        throw err;
+      }
+    }
+  }, {
+    key: "readUint8",
+    value: function readUint8() {
+      var _this = this;
+
+      return this._rangeErrorToAlert(function () {
+        var n = _this._dataview.getUint8(_this._pos);
+
+        _this.incr(1);
+
+        return n;
+      });
+    }
+  }, {
+    key: "readUint16",
+    value: function readUint16() {
+      var _this2 = this;
+
+      return this._rangeErrorToAlert(function () {
+        var n = _this2._dataview.getUint16(_this2._pos);
+
+        _this2.incr(2);
+
+        return n;
+      });
+    }
+  }, {
+    key: "readUint24",
+    value: function readUint24() {
+      var _this3 = this;
+
+      return this._rangeErrorToAlert(function () {
+        var n = _this3._dataview.getUint16(_this3._pos);
+
+        n = n << 8 | _this3._dataview.getUint8(_this3._pos + 2);
+
+        _this3.incr(3);
+
+        return n;
+      });
+    }
+  }, {
+    key: "readUint32",
+    value: function readUint32() {
+      var _this4 = this;
+
+      return this._rangeErrorToAlert(function () {
+        var n = _this4._dataview.getUint32(_this4._pos);
+
+        _this4.incr(4);
+
+        return n;
+      });
+    }
+  }, {
+    key: "_readVector",
+    value: function _readVector(length, cb) {
+      var contentsBuf = new BufferReader(this.readBytes(length));
+      var expectedEnd = this.tell(); // Keep calling the callback until we've consumed the expected number of bytes.
+
+      var n = 0;
+
+      while (contentsBuf.hasMoreBytes()) {
+        var prevPos = contentsBuf.tell();
+        cb(contentsBuf, n); // Check that the callback made forward progress, otherwise we'll infinite loop.
+
+        if (contentsBuf.tell() <= prevPos) {
+          throw new alerts_TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+        }
+
+        n += 1;
+      } // Check that the callback correctly consumed the vector's entire contents.
+
+
+      if (this.tell() !== expectedEnd) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+      }
+    }
+  }, {
+    key: "readVector8",
+    value: function readVector8(cb) {
+      var length = this.readUint8();
+      return this._readVector(length, cb);
+    }
+  }, {
+    key: "readVector16",
+    value: function readVector16(cb) {
+      var length = this.readUint16();
+      return this._readVector(length, cb);
+    }
+  }, {
+    key: "readVector24",
+    value: function readVector24(cb) {
+      var length = this.readUint24();
+      return this._readVector(length, cb);
+    }
+  }, {
+    key: "readVectorBytes8",
+    value: function readVectorBytes8() {
+      return this.readBytes(this.readUint8());
+    }
+  }, {
+    key: "readVectorBytes16",
+    value: function readVectorBytes16() {
+      return this.readBytes(this.readUint16());
+    }
+  }, {
+    key: "readVectorBytes24",
+    value: function readVectorBytes24() {
+      return this.readBytes(this.readUint24());
+    }
+  }]);
+
+  return BufferReader;
+}(utils_BufferWithPointer);
+var utils_BufferWriter =
+/*#__PURE__*/
+function (_BufferWithPointer2) {
+  inherits_default()(BufferWriter, _BufferWithPointer2);
+
+  function BufferWriter() {
+    var size = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1024;
+
+    classCallCheck_default()(this, BufferWriter);
+
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(BufferWriter).call(this, new Uint8Array(size)));
+  }
+
+  createClass_default()(BufferWriter, [{
+    key: "_maybeGrow",
+    value: function _maybeGrow(n) {
+      var curSize = this._buffer.byteLength;
+      var newPos = this._pos + n;
+      var shortfall = newPos - curSize;
+
+      if (shortfall > 0) {
+        // Classic grow-by-doubling, up to 4kB max increment.
+        // This formula was not arrived at by any particular science.
+        var incr = Math.min(curSize, 4 * 1024);
+        var newbuf = new Uint8Array(curSize + Math.ceil(shortfall / incr) * incr);
+        newbuf.set(this._buffer, 0);
+        this._buffer = newbuf;
+        this._dataview = new DataView(newbuf.buffer, newbuf.byteOffset, newbuf.byteLength);
+      }
+    }
+  }, {
+    key: "slice",
+    value: function slice() {
+      var start = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      var end = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.tell();
+
+      if (end < 0) {
+        end = this.tell() + end;
+      }
+
+      if (start < 0) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+      }
+
+      if (end < 0) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+      }
+
+      if (end > this.length()) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+      }
+
+      return this._buffer.slice(start, end);
+    }
+  }, {
+    key: "flush",
+    value: function flush() {
+      var slice = this.slice();
+      this.seek(0);
+      return slice;
+    }
+  }, {
+    key: "writeBytes",
+    value: function writeBytes(data) {
+      this._maybeGrow(data.byteLength);
+
+      this._buffer.set(data, this.tell());
+
+      this.incr(data.byteLength);
+    }
+  }, {
+    key: "writeUint8",
+    value: function writeUint8(n) {
+      this._maybeGrow(1);
+
+      this._dataview.setUint8(this._pos, n);
+
+      this.incr(1);
+    }
+  }, {
+    key: "writeUint16",
+    value: function writeUint16(n) {
+      this._maybeGrow(2);
+
+      this._dataview.setUint16(this._pos, n);
+
+      this.incr(2);
+    }
+  }, {
+    key: "writeUint24",
+    value: function writeUint24(n) {
+      this._maybeGrow(3);
+
+      this._dataview.setUint16(this._pos, n >> 8);
+
+      this._dataview.setUint8(this._pos + 2, n & 0xFF);
+
+      this.incr(3);
+    }
+  }, {
+    key: "writeUint32",
+    value: function writeUint32(n) {
+      this._maybeGrow(4);
+
+      this._dataview.setUint32(this._pos, n);
+
+      this.incr(4);
+    } // These are helpers for writing the variable-length vector structure
+    // defined in https://tools.ietf.org/html/rfc8446#section-3.4.
+    //
+    // Such vectors are represented as a length followed by the concatenated
+    // bytes of each item, and the size of the length field is determined by
+    // the maximum allowed size of the vector.  For example to write a vector
+    // that may contain up to 65535 bytes, use `writeVector16`.
+    //
+    // To write a variable-length vector of between 1 and 100 uint16 values,
+    // defined in the RFC like this:
+    //
+    //    uint16 items<2..200>;
+    //
+    // You would do something like this:
+    //
+    //    buf.writeVector8(buf => {
+    //      for (let item of items) {
+    //          buf.writeUint16(item)
+    //      }
+    //    })
+    //
+    // The helper will automatically take care of writing the appropriate
+    // length field once the callback completes.
+
+  }, {
+    key: "_writeVector",
+    value: function _writeVector(maxLength, writeLength, cb) {
+      // Initially, write the length field as zero.
+      var lengthPos = this.tell();
+      writeLength(0); // Call the callback to write the vector items.
+
+      var bodyPos = this.tell();
+      cb(this);
+      var length = this.tell() - bodyPos;
+
+      if (length >= maxLength) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+      } // Backfill the actual length field.
+
+
+      this.seek(lengthPos);
+      writeLength(length);
+      this.incr(length);
+      return length;
+    }
+  }, {
+    key: "writeVector8",
+    value: function writeVector8(cb) {
+      var _this5 = this;
+
+      return this._writeVector(Math.pow(2, 8), function (len) {
+        return _this5.writeUint8(len);
+      }, cb);
+    }
+  }, {
+    key: "writeVector16",
+    value: function writeVector16(cb) {
+      var _this6 = this;
+
+      return this._writeVector(Math.pow(2, 16), function (len) {
+        return _this6.writeUint16(len);
+      }, cb);
+    }
+  }, {
+    key: "writeVector24",
+    value: function writeVector24(cb) {
+      var _this7 = this;
+
+      return this._writeVector(Math.pow(2, 24), function (len) {
+        return _this7.writeUint24(len);
+      }, cb);
+    }
+  }, {
+    key: "writeVectorBytes8",
+    value: function writeVectorBytes8(bytes) {
+      return this.writeVector8(function (buf) {
+        buf.writeBytes(bytes);
+      });
+    }
+  }, {
+    key: "writeVectorBytes16",
+    value: function writeVectorBytes16(bytes) {
+      return this.writeVector16(function (buf) {
+        buf.writeBytes(bytes);
+      });
+    }
+  }, {
+    key: "writeVectorBytes24",
+    value: function writeVectorBytes24(bytes) {
+      return this.writeVector24(function (buf) {
+        buf.writeBytes(bytes);
+      });
+    }
+  }]);
+
+  return BufferWriter;
+}(utils_BufferWithPointer);
+// CONCATENATED MODULE: ./src/crypto.js
+
+
+
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
- // The top-level APIs offered by this library are `InsecureClientConnection` and
-// `Insecure ServerConnection` classes.  They each take a callback to be used for
-// sending data to the remote peer, and operate like this:
 //
-//    conn = await InsecureClientConnection.create(psk, pskId, async function send_data_to_server(data) {
+// Low-level crypto primitives.
+//
+// This file implements the AEAD encrypt/decrypt and hashing routines
+// for the TLS_AES_128_GCM_SHA256 ciphersuite.
+//
+
+
+var AEAD_SIZE_INFLATION = 16;
+var KEY_LENGTH = 16;
+var IV_LENGTH = 12;
+var HASH_LENGTH = 32;
+function prepareKey(_x, _x2) {
+  return _prepareKey.apply(this, arguments);
+}
+
+function _prepareKey() {
+  _prepareKey = asyncToGenerator_default()(
+  /*#__PURE__*/
+  regenerator_default.a.mark(function _callee(key, mode) {
+    return regenerator_default.a.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            return _context.abrupt("return", crypto.subtle.importKey('raw', key, {
+              name: 'AES-GCM'
+            }, false, [mode]));
+
+          case 1:
+          case "end":
+            return _context.stop();
+        }
+      }
+    }, _callee, this);
+  }));
+  return _prepareKey.apply(this, arguments);
+}
+
+function crypto_encrypt(_x3, _x4, _x5, _x6) {
+  return _encrypt.apply(this, arguments);
+}
+
+function _encrypt() {
+  _encrypt = asyncToGenerator_default()(
+  /*#__PURE__*/
+  regenerator_default.a.mark(function _callee2(key, iv, plaintext, additionalData) {
+    var ciphertext;
+    return regenerator_default.a.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            _context2.next = 2;
+            return crypto.subtle.encrypt({
+              additionalData: additionalData,
+              iv: iv,
+              name: 'AES-GCM',
+              tagLength: AEAD_SIZE_INFLATION * 8
+            }, key, plaintext);
+
+          case 2:
+            ciphertext = _context2.sent;
+            return _context2.abrupt("return", new Uint8Array(ciphertext));
+
+          case 4:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, _callee2, this);
+  }));
+  return _encrypt.apply(this, arguments);
+}
+
+function crypto_decrypt(_x7, _x8, _x9, _x10) {
+  return _decrypt.apply(this, arguments);
+}
+
+function _decrypt() {
+  _decrypt = asyncToGenerator_default()(
+  /*#__PURE__*/
+  regenerator_default.a.mark(function _callee3(key, iv, ciphertext, additionalData) {
+    var plaintext;
+    return regenerator_default.a.wrap(function _callee3$(_context3) {
+      while (1) {
+        switch (_context3.prev = _context3.next) {
+          case 0:
+            _context3.prev = 0;
+            _context3.next = 3;
+            return crypto.subtle.decrypt({
+              additionalData: additionalData,
+              iv: iv,
+              name: 'AES-GCM',
+              tagLength: AEAD_SIZE_INFLATION * 8
+            }, key, ciphertext);
+
+          case 3:
+            plaintext = _context3.sent;
+            return _context3.abrupt("return", new Uint8Array(plaintext));
+
+          case 7:
+            _context3.prev = 7;
+            _context3.t0 = _context3["catch"](0);
+            throw new alerts_TLSError(ALERT_DESCRIPTION.BAD_RECORD_MAC);
+
+          case 10:
+          case "end":
+            return _context3.stop();
+        }
+      }
+    }, _callee3, this, [[0, 7]]);
+  }));
+  return _decrypt.apply(this, arguments);
+}
+
+function hash(_x11) {
+  return _hash.apply(this, arguments);
+}
+
+function _hash() {
+  _hash = asyncToGenerator_default()(
+  /*#__PURE__*/
+  regenerator_default.a.mark(function _callee4(message) {
+    return regenerator_default.a.wrap(function _callee4$(_context4) {
+      while (1) {
+        switch (_context4.prev = _context4.next) {
+          case 0:
+            _context4.t0 = Uint8Array;
+            _context4.next = 3;
+            return crypto.subtle.digest({
+              name: 'SHA-256'
+            }, message);
+
+          case 3:
+            _context4.t1 = _context4.sent;
+            return _context4.abrupt("return", new _context4.t0(_context4.t1));
+
+          case 5:
+          case "end":
+            return _context4.stop();
+        }
+      }
+    }, _callee4, this);
+  }));
+  return _hash.apply(this, arguments);
+}
+
+function hmac(_x12, _x13) {
+  return _hmac.apply(this, arguments);
+}
+
+function _hmac() {
+  _hmac = asyncToGenerator_default()(
+  /*#__PURE__*/
+  regenerator_default.a.mark(function _callee5(keyBytes, message) {
+    var key, sig;
+    return regenerator_default.a.wrap(function _callee5$(_context5) {
+      while (1) {
+        switch (_context5.prev = _context5.next) {
+          case 0:
+            _context5.next = 2;
+            return crypto.subtle.importKey('raw', keyBytes, {
+              hash: {
+                name: 'SHA-256'
+              },
+              name: 'HMAC'
+            }, false, ['sign']);
+
+          case 2:
+            key = _context5.sent;
+            _context5.next = 5;
+            return crypto.subtle.sign({
+              name: 'HMAC'
+            }, key, message);
+
+          case 5:
+            sig = _context5.sent;
+            return _context5.abrupt("return", new Uint8Array(sig));
+
+          case 7:
+          case "end":
+            return _context5.stop();
+        }
+      }
+    }, _callee5, this);
+  }));
+  return _hmac.apply(this, arguments);
+}
+
+function verifyHmac(_x14, _x15, _x16) {
+  return _verifyHmac.apply(this, arguments);
+}
+
+function _verifyHmac() {
+  _verifyHmac = asyncToGenerator_default()(
+  /*#__PURE__*/
+  regenerator_default.a.mark(function _callee6(keyBytes, signature, message) {
+    var key;
+    return regenerator_default.a.wrap(function _callee6$(_context6) {
+      while (1) {
+        switch (_context6.prev = _context6.next) {
+          case 0:
+            _context6.next = 2;
+            return crypto.subtle.importKey('raw', keyBytes, {
+              hash: {
+                name: 'SHA-256'
+              },
+              name: 'HMAC'
+            }, false, ['verify']);
+
+          case 2:
+            key = _context6.sent;
+            _context6.next = 5;
+            return crypto.subtle.verify({
+              name: 'HMAC'
+            }, key, signature, message);
+
+          case 5:
+            if (_context6.sent) {
+              _context6.next = 7;
+              break;
+            }
+
+            throw new alerts_TLSError(ALERT_DESCRIPTION.DECRYPT_ERROR);
+
+          case 7:
+          case "end":
+            return _context6.stop();
+        }
+      }
+    }, _callee6, this);
+  }));
+  return _verifyHmac.apply(this, arguments);
+}
+
+function hkdfExtract(_x17, _x18) {
+  return _hkdfExtract.apply(this, arguments);
+}
+
+function _hkdfExtract() {
+  _hkdfExtract = asyncToGenerator_default()(
+  /*#__PURE__*/
+  regenerator_default.a.mark(function _callee7(salt, ikm) {
+    return regenerator_default.a.wrap(function _callee7$(_context7) {
+      while (1) {
+        switch (_context7.prev = _context7.next) {
+          case 0:
+            _context7.next = 2;
+            return hmac(salt, ikm);
+
+          case 2:
+            return _context7.abrupt("return", _context7.sent);
+
+          case 3:
+          case "end":
+            return _context7.stop();
+        }
+      }
+    }, _callee7, this);
+  }));
+  return _hkdfExtract.apply(this, arguments);
+}
+
+function hkdfExpand(_x19, _x20, _x21) {
+  return _hkdfExpand.apply(this, arguments);
+}
+
+function _hkdfExpand() {
+  _hkdfExpand = asyncToGenerator_default()(
+  /*#__PURE__*/
+  regenerator_default.a.mark(function _callee8(prk, info, length) {
+    var N, input, output, T, i;
+    return regenerator_default.a.wrap(function _callee8$(_context8) {
+      while (1) {
+        switch (_context8.prev = _context8.next) {
+          case 0:
+            // Ref https://tools.ietf.org/html/rfc5869#section-2.3
+            N = Math.ceil(length / HASH_LENGTH);
+
+            if (!(N <= 0)) {
+              _context8.next = 3;
+              break;
+            }
+
+            throw new alerts_TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+
+          case 3:
+            if (!(N >= 255)) {
+              _context8.next = 5;
+              break;
+            }
+
+            throw new alerts_TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+
+          case 5:
+            input = new utils_BufferWriter();
+            output = new utils_BufferWriter();
+            T = new Uint8Array(0);
+            i = 1;
+
+          case 9:
+            if (!(i <= N)) {
+              _context8.next = 20;
+              break;
+            }
+
+            input.writeBytes(T);
+            input.writeBytes(info);
+            input.writeUint8(i);
+            _context8.next = 15;
+            return hmac(prk, input.flush());
+
+          case 15:
+            T = _context8.sent;
+            output.writeBytes(T);
+
+          case 17:
+            i++;
+            _context8.next = 9;
+            break;
+
+          case 20:
+            return _context8.abrupt("return", output.slice(0, length));
+
+          case 21:
+          case "end":
+            return _context8.stop();
+        }
+      }
+    }, _callee8, this);
+  }));
+  return _hkdfExpand.apply(this, arguments);
+}
+
+function hkdfExpandLabel(_x22, _x23, _x24, _x25) {
+  return _hkdfExpandLabel.apply(this, arguments);
+}
+
+function _hkdfExpandLabel() {
+  _hkdfExpandLabel = asyncToGenerator_default()(
+  /*#__PURE__*/
+  regenerator_default.a.mark(function _callee9(secret, label, context, length) {
+    var hkdfLabel;
+    return regenerator_default.a.wrap(function _callee9$(_context9) {
+      while (1) {
+        switch (_context9.prev = _context9.next) {
+          case 0:
+            //  struct {
+            //    uint16 length = Length;
+            //    opaque label < 7..255 > = "tls13 " + Label;
+            //    opaque context < 0..255 > = Context;
+            //  } HkdfLabel;
+            hkdfLabel = new utils_BufferWriter();
+            hkdfLabel.writeUint16(length);
+            hkdfLabel.writeVectorBytes8(utf8ToBytes('tls13 ' + label));
+            hkdfLabel.writeVectorBytes8(context);
+            return _context9.abrupt("return", hkdfExpand(secret, hkdfLabel.flush(), length));
+
+          case 5:
+          case "end":
+            return _context9.stop();
+        }
+      }
+    }, _callee9, this);
+  }));
+  return _hkdfExpandLabel.apply(this, arguments);
+}
+
+function getRandomBytes(_x26) {
+  return _getRandomBytes.apply(this, arguments);
+}
+
+function _getRandomBytes() {
+  _getRandomBytes = asyncToGenerator_default()(
+  /*#__PURE__*/
+  regenerator_default.a.mark(function _callee10(size) {
+    var bytes;
+    return regenerator_default.a.wrap(function _callee10$(_context10) {
+      while (1) {
+        switch (_context10.prev = _context10.next) {
+          case 0:
+            bytes = new Uint8Array(size);
+            crypto.getRandomValues(bytes);
+            return _context10.abrupt("return", bytes);
+
+          case 3:
+          case "end":
+            return _context10.stop();
+        }
+      }
+    }, _callee10, this);
+  }));
+  return _getRandomBytes.apply(this, arguments);
+}
+// CONCATENATED MODULE: ./src/extensions.js
+
+
+
+
+
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+//
+// Extension parsing.
+//
+// This file contains some helpers for reading/writing the various kinds
+// of Extension that might appear in a HandshakeMessage.
+//
+
+
+
+/* eslint-disable sorting/sort-object-props */
+
+var EXTENSION_TYPE = {
+  PRE_SHARED_KEY: 41,
+  SUPPORTED_VERSIONS: 43,
+  PSK_KEY_EXCHANGE_MODES: 45
+};
+/* eslint-enable sorting/sort-object-props */
+// Base class for generic reading/writing of extensions,
+// which are all uniformly formatted as:
+//
+//   struct {
+//     ExtensionType extension_type;
+//     opaque extension_data<0..2^16-1>;
+//   } Extension;
+//
+// Extensions always appear inside of a handshake message,
+// and their internal structure may differ based on the
+// type of that message.
+
+var extensions_Extension =
+/*#__PURE__*/
+function () {
+  function Extension() {
+    classCallCheck_default()(this, Extension);
+  }
+
+  createClass_default()(Extension, [{
+    key: "write",
+    value: function write(messageType, buf) {
+      var _this = this;
+
+      buf.writeUint16(this.TYPE_TAG);
+      buf.writeVector16(function (buf) {
+        _this._write(messageType, buf);
+      });
+    }
+  }, {
+    key: "TYPE_TAG",
+    get: function get() {
+      throw new Error('not implemented');
+    }
+  }], [{
+    key: "read",
+    value: function read(messageType, buf) {
+      var type = buf.readUint16();
+      var ext = {
+        TYPE_TAG: type
+      };
+      buf.readVector16(function (buf) {
+        switch (type) {
+          case EXTENSION_TYPE.PRE_SHARED_KEY:
+            ext = extensions_PreSharedKeyExtension._read(messageType, buf);
+            break;
+
+          case EXTENSION_TYPE.SUPPORTED_VERSIONS:
+            ext = extensions_SupportedVersionsExtension._read(messageType, buf);
+            break;
+
+          case EXTENSION_TYPE.PSK_KEY_EXCHANGE_MODES:
+            ext = extensions_PskKeyExchangeModesExtension._read(messageType, buf);
+            break;
+
+          default:
+            // Skip over unrecognised extensions.
+            buf.incr(buf.length());
+        }
+
+        if (buf.hasMoreBytes()) {
+          throw new alerts_TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+        }
+      });
+      return ext;
+    }
+  }, {
+    key: "_read",
+    value: function _read(messageType, buf) {
+      throw new Error('not implemented');
+    }
+  }, {
+    key: "_write",
+    value: function _write(messageType, buf) {
+      throw new Error('not implemented');
+    }
+  }]);
+
+  return Extension;
+}(); // The PreSharedKey extension:
+//
+//  struct {
+//    opaque identity<1..2^16-1>;
+//    uint32 obfuscated_ticket_age;
+//  } PskIdentity;
+//  opaque PskBinderEntry<32..255>;
+//  struct {
+//    PskIdentity identities<7..2^16-1>;
+//    PskBinderEntry binders<33..2^16-1>;
+//  } OfferedPsks;
+//  struct {
+//    select(Handshake.msg_type) {
+//      case client_hello: OfferedPsks;
+//      case server_hello: uint16 selected_identity;
+//    };
+//  } PreSharedKeyExtension;
+
+var extensions_PreSharedKeyExtension =
+/*#__PURE__*/
+function (_Extension) {
+  inherits_default()(PreSharedKeyExtension, _Extension);
+
+  function PreSharedKeyExtension(identities, binders, selectedIdentity) {
+    var _this2;
+
+    classCallCheck_default()(this, PreSharedKeyExtension);
+
+    _this2 = possibleConstructorReturn_default()(this, getPrototypeOf_default()(PreSharedKeyExtension).call(this));
+    _this2.identities = identities;
+    _this2.binders = binders;
+    _this2.selectedIdentity = selectedIdentity;
+    return _this2;
+  }
+
+  createClass_default()(PreSharedKeyExtension, [{
+    key: "_write",
+    value: function _write(messageType, buf) {
+      var _this3 = this;
+
+      switch (messageType) {
+        case HANDSHAKE_TYPE.CLIENT_HELLO:
+          buf.writeVector16(function (buf) {
+            _this3.identities.forEach(function (pskId) {
+              buf.writeVectorBytes16(pskId);
+              buf.writeUint32(0); // Zero for "tag age" field.
+            });
+          });
+          buf.writeVector16(function (buf) {
+            _this3.binders.forEach(function (pskBinder) {
+              buf.writeVectorBytes8(pskBinder);
+            });
+          });
+          break;
+
+        case HANDSHAKE_TYPE.SERVER_HELLO:
+          buf.writeUint16(this.selectedIdentity);
+          break;
+
+        default:
+          throw new alerts_TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+      }
+    }
+  }, {
+    key: "TYPE_TAG",
+    get: function get() {
+      return EXTENSION_TYPE.PRE_SHARED_KEY;
+    }
+  }], [{
+    key: "_read",
+    value: function _read(messageType, buf) {
+      var identities = null,
+          binders = null,
+          selectedIdentity = null;
+
+      switch (messageType) {
+        case HANDSHAKE_TYPE.CLIENT_HELLO:
+          identities = [];
+          binders = [];
+          buf.readVector16(function (buf) {
+            var identity = buf.readVectorBytes16();
+            buf.readBytes(4); // Skip over the ticket age.
+
+            identities.push(identity);
+          });
+          buf.readVector16(function (buf) {
+            var binder = buf.readVectorBytes8();
+
+            if (binder.byteLength < HASH_LENGTH) {
+              throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+            }
+
+            binders.push(binder);
+          });
+
+          if (identities.length !== binders.length) {
+            throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+          }
+
+          break;
+
+        case HANDSHAKE_TYPE.SERVER_HELLO:
+          selectedIdentity = buf.readUint16();
+          break;
+
+        default:
+          throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+      }
+
+      return new this(identities, binders, selectedIdentity);
+    }
+  }]);
+
+  return PreSharedKeyExtension;
+}(extensions_Extension); // The SupportedVersions extension:
+//
+//  struct {
+//    select(Handshake.msg_type) {
+//      case client_hello:
+//        ProtocolVersion versions < 2..254 >;
+//      case server_hello:
+//        ProtocolVersion selected_version;
+//    };
+//  } SupportedVersions;
+
+var extensions_SupportedVersionsExtension =
+/*#__PURE__*/
+function (_Extension2) {
+  inherits_default()(SupportedVersionsExtension, _Extension2);
+
+  function SupportedVersionsExtension(versions, selectedVersion) {
+    var _this4;
+
+    classCallCheck_default()(this, SupportedVersionsExtension);
+
+    _this4 = possibleConstructorReturn_default()(this, getPrototypeOf_default()(SupportedVersionsExtension).call(this));
+    _this4.versions = versions;
+    _this4.selectedVersion = selectedVersion;
+    return _this4;
+  }
+
+  createClass_default()(SupportedVersionsExtension, [{
+    key: "_write",
+    value: function _write(messageType, buf) {
+      var _this5 = this;
+
+      switch (messageType) {
+        case HANDSHAKE_TYPE.CLIENT_HELLO:
+          buf.writeVector8(function (buf) {
+            _this5.versions.forEach(function (version) {
+              buf.writeUint16(version);
+            });
+          });
+          break;
+
+        case HANDSHAKE_TYPE.SERVER_HELLO:
+          buf.writeUint16(this.selectedVersion);
+          break;
+
+        default:
+          throw new alerts_TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+      }
+    }
+  }, {
+    key: "TYPE_TAG",
+    get: function get() {
+      return EXTENSION_TYPE.SUPPORTED_VERSIONS;
+    }
+  }], [{
+    key: "_read",
+    value: function _read(messageType, buf) {
+      var versions = null,
+          selectedVersion = null;
+
+      switch (messageType) {
+        case HANDSHAKE_TYPE.CLIENT_HELLO:
+          versions = [];
+          buf.readVector8(function (buf) {
+            versions.push(buf.readUint16());
+          });
+          break;
+
+        case HANDSHAKE_TYPE.SERVER_HELLO:
+          selectedVersion = buf.readUint16();
+          break;
+
+        default:
+          throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+      }
+
+      return new this(versions, selectedVersion);
+    }
+  }]);
+
+  return SupportedVersionsExtension;
+}(extensions_Extension);
+var extensions_PskKeyExchangeModesExtension =
+/*#__PURE__*/
+function (_Extension3) {
+  inherits_default()(PskKeyExchangeModesExtension, _Extension3);
+
+  function PskKeyExchangeModesExtension(modes) {
+    var _this6;
+
+    classCallCheck_default()(this, PskKeyExchangeModesExtension);
+
+    _this6 = possibleConstructorReturn_default()(this, getPrototypeOf_default()(PskKeyExchangeModesExtension).call(this));
+    _this6.modes = modes;
+    return _this6;
+  }
+
+  createClass_default()(PskKeyExchangeModesExtension, [{
+    key: "_write",
+    value: function _write(messageType, buf) {
+      var _this7 = this;
+
+      switch (messageType) {
+        case HANDSHAKE_TYPE.CLIENT_HELLO:
+          buf.writeVector8(function (buf) {
+            _this7.modes.forEach(function (mode) {
+              buf.writeUint8(mode);
+            });
+          });
+          break;
+
+        default:
+          throw new alerts_TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+      }
+    }
+  }, {
+    key: "TYPE_TAG",
+    get: function get() {
+      return EXTENSION_TYPE.PSK_KEY_EXCHANGE_MODES;
+    }
+  }], [{
+    key: "_read",
+    value: function _read(messageType, buf) {
+      var modes = [];
+
+      switch (messageType) {
+        case HANDSHAKE_TYPE.CLIENT_HELLO:
+          buf.readVector8(function (buf) {
+            modes.push(buf.readUint8());
+          });
+          break;
+
+        default:
+          throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+      }
+
+      return new this(modes);
+    }
+  }]);
+
+  return PskKeyExchangeModesExtension;
+}(extensions_Extension);
+// CONCATENATED MODULE: ./src/constants.js
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+var VERSION_TLS_1_0 = 0x0301;
+var VERSION_TLS_1_2 = 0x0303;
+var VERSION_TLS_1_3 = 0x0304;
+var TLS_AES_128_GCM_SHA256 = 0x1301;
+var PSK_MODE_KE = 0;
+// CONCATENATED MODULE: ./src/messages.js
+
+
+
+
+
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+//
+// Message parsing.
+//
+// Herein we need code for reading and writing the various Handshake
+// messages involved in the protocol.
+//
+
+
+
+
+
+/* eslint-disable sorting/sort-object-props */
+
+var HANDSHAKE_TYPE = {
+  CLIENT_HELLO: 1,
+  SERVER_HELLO: 2,
+  NEW_SESSION_TICKET: 4,
+  ENCRYPTED_EXTENSIONS: 8,
+  FINISHED: 20
+};
+/* eslint-enable sorting/sort-object-props */
+// Base class for generic reading/writing of handshake messages,
+// which are all uniformly formatted as:
+//
+//  struct {
+//    HandshakeType msg_type;    /* handshake type */
+//    uint24 length;             /* bytes in message */
+//    select(Handshake.msg_type) {
+//        ... type specific cases here ...
+//    };
+//  } Handshake;
+
+var messages_HandshakeMessage =
+/*#__PURE__*/
+function () {
+  function HandshakeMessage() {
+    classCallCheck_default()(this, HandshakeMessage);
+  }
+
+  createClass_default()(HandshakeMessage, [{
+    key: "toBytes",
+    value: function toBytes() {
+      var buf = new utils_BufferWriter();
+      this.write(buf);
+      return buf.flush();
+    }
+  }, {
+    key: "write",
+    value: function write(buf) {
+      var _this = this;
+
+      buf.writeUint8(this.TYPE_TAG);
+      buf.writeVector24(function (buf) {
+        _this._write(buf);
+      });
+    }
+  }, {
+    key: "_write",
+    value: function _write(buf) {
+      throw new Error('not implemented');
+    } // Some little helpers for reading a list of extensions,
+    // which is uniformly represented as:
+    //
+    //   Extension extensions<8..2^16-1>;
+    //
+    // Recognized extensions are returned as a Map from extension type
+    // to extension data object, with a special `lastSeenExtension`
+    // property to make it easy to check which one came last.
+
+  }, {
+    key: "_writeExtensions",
+    value: function _writeExtensions(buf, extensions) {
+      var _this2 = this;
+
+      buf.writeVector16(function (buf) {
+        extensions.forEach(function (ext) {
+          ext.write(_this2.TYPE_TAG, buf);
+        });
+      });
+    }
+  }, {
+    key: "TYPE_TAG",
+    get: function get() {
+      throw new Error('not implemented');
+    }
+  }], [{
+    key: "fromBytes",
+    value: function fromBytes(bytes) {
+      // Each handshake message has a type and length prefix, per
+      // https://tools.ietf.org/html/rfc8446#appendix-B.3
+      var buf = new utils_BufferReader(bytes);
+      var msg = this.read(buf);
+
+      if (buf.hasMoreBytes()) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+      }
+
+      return msg;
+    }
+  }, {
+    key: "read",
+    value: function read(buf) {
+      var type = buf.readUint8();
+      var msg = null;
+      buf.readVector24(function (buf) {
+        switch (type) {
+          case HANDSHAKE_TYPE.CLIENT_HELLO:
+            msg = messages_ClientHello._read(buf);
+            break;
+
+          case HANDSHAKE_TYPE.SERVER_HELLO:
+            msg = messages_ServerHello._read(buf);
+            break;
+
+          case HANDSHAKE_TYPE.NEW_SESSION_TICKET:
+            msg = messages_NewSessionTicket._read(buf);
+            break;
+
+          case HANDSHAKE_TYPE.ENCRYPTED_EXTENSIONS:
+            msg = messages_EncryptedExtensions._read(buf);
+            break;
+
+          case HANDSHAKE_TYPE.FINISHED:
+            msg = messages_Finished._read(buf);
+            break;
+        }
+
+        if (buf.hasMoreBytes()) {
+          throw new alerts_TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+        }
+      });
+
+      if (msg === null) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
+      }
+
+      return msg;
+    }
+  }, {
+    key: "_read",
+    value: function _read(buf) {
+      throw new Error('not implemented');
+    }
+  }, {
+    key: "_readExtensions",
+    value: function _readExtensions(messageType, buf) {
+      var extensions = new Map();
+      buf.readVector16(function (buf) {
+        var ext = extensions_Extension.read(messageType, buf);
+
+        if (extensions.has(ext.TYPE_TAG)) {
+          throw new alerts_TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+        }
+
+        extensions.set(ext.TYPE_TAG, ext);
+        extensions.lastSeenExtension = ext.TYPE_TAG;
+      });
+      return extensions;
+    }
+  }]);
+
+  return HandshakeMessage;
+}(); // The ClientHello message:
+//
+// struct {
+//   ProtocolVersion legacy_version = 0x0303;
+//   Random random;
+//   opaque legacy_session_id<0..32>;
+//   CipherSuite cipher_suites<2..2^16-2>;
+//   opaque legacy_compression_methods<1..2^8-1>;
+//   Extension extensions<8..2^16-1>;
+// } ClientHello;
+
+var messages_ClientHello =
+/*#__PURE__*/
+function (_HandshakeMessage) {
+  inherits_default()(ClientHello, _HandshakeMessage);
+
+  function ClientHello(random, sessionId, extensions) {
+    var _this3;
+
+    classCallCheck_default()(this, ClientHello);
+
+    _this3 = possibleConstructorReturn_default()(this, getPrototypeOf_default()(ClientHello).call(this));
+    _this3.random = random;
+    _this3.sessionId = sessionId;
+    _this3.extensions = extensions;
+    return _this3;
+  }
+
+  createClass_default()(ClientHello, [{
+    key: "_write",
+    value: function _write(buf) {
+      buf.writeUint16(VERSION_TLS_1_2);
+      buf.writeBytes(this.random);
+      buf.writeVectorBytes8(this.sessionId); // Our single supported ciphersuite
+
+      buf.writeVector16(function (buf) {
+        buf.writeUint16(TLS_AES_128_GCM_SHA256);
+      }); // A single zero byte for legacy_compression_methods
+
+      buf.writeVectorBytes8(new Uint8Array(1));
+
+      this._writeExtensions(buf, this.extensions);
+    }
+  }, {
+    key: "TYPE_TAG",
+    get: function get() {
+      return HANDSHAKE_TYPE.CLIENT_HELLO;
+    }
+  }], [{
+    key: "_read",
+    value: function _read(buf) {
+      // The legacy_version field may indicate an earlier version of TLS
+      // for backwards compatibility, but must not predate TLS 1.0!
+      if (buf.readUint16() < VERSION_TLS_1_0) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.PROTOCOL_VERSION);
+      } // The random bytes provided by the peer.
+
+
+      var random = buf.readBytes(32); // Read legacy_session_id, so the server can echo it.
+
+      var sessionId = buf.readVectorBytes8(); // We only support a single ciphersuite, but the peer may offer several.
+      // Scan the list to confirm that the one we want is present.
+
+      var found = false;
+      buf.readVector16(function (buf) {
+        var cipherSuite = buf.readUint16();
+
+        if (cipherSuite === TLS_AES_128_GCM_SHA256) {
+          found = true;
+        }
+      });
+
+      if (!found) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.HANDSHAKE_FAILURE);
+      } // legacy_compression_methods must be a single zero byte for TLS1.3 ClientHellos.
+      // It can be non-zero in previous versions of TLS, but we're not going to
+      // make a successful handshake with such versions, so better to just bail out now.
+
+
+      var legacyCompressionMethods = buf.readVectorBytes8();
+
+      if (legacyCompressionMethods.byteLength !== 1) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+      }
+
+      if (legacyCompressionMethods[0] !== 0x00) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+      } // Read and check the extensions.
+
+
+      var extensions = this._readExtensions(HANDSHAKE_TYPE.CLIENT_HELLO, buf);
+
+      if (!extensions.has(EXTENSION_TYPE.SUPPORTED_VERSIONS)) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.MISSING_EXTENSION);
+      }
+
+      if (extensions.get(EXTENSION_TYPE.SUPPORTED_VERSIONS).versions.indexOf(VERSION_TLS_1_3) === -1) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.PROTOCOL_VERSION);
+      } // Was the PreSharedKey extension the last one?
+
+
+      if (extensions.has(EXTENSION_TYPE.PRE_SHARED_KEY)) {
+        if (extensions.lastSeenExtension !== EXTENSION_TYPE.PRE_SHARED_KEY) {
+          throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+        }
+      }
+
+      return new this(random, sessionId, extensions);
+    }
+  }]);
+
+  return ClientHello;
+}(messages_HandshakeMessage); // The ServerHello message:
+//
+//  struct {
+//      ProtocolVersion legacy_version = 0x0303;    /* TLS v1.2 */
+//      Random random;
+//      opaque legacy_session_id_echo<0..32>;
+//      CipherSuite cipher_suite;
+//      uint8 legacy_compression_method = 0;
+//      Extension extensions < 6..2 ^ 16 - 1 >;
+//  } ServerHello;
+
+var messages_ServerHello =
+/*#__PURE__*/
+function (_HandshakeMessage2) {
+  inherits_default()(ServerHello, _HandshakeMessage2);
+
+  function ServerHello(random, sessionId, extensions) {
+    var _this4;
+
+    classCallCheck_default()(this, ServerHello);
+
+    _this4 = possibleConstructorReturn_default()(this, getPrototypeOf_default()(ServerHello).call(this));
+    _this4.random = random;
+    _this4.sessionId = sessionId;
+    _this4.extensions = extensions;
+    return _this4;
+  }
+
+  createClass_default()(ServerHello, [{
+    key: "_write",
+    value: function _write(buf) {
+      buf.writeUint16(VERSION_TLS_1_2);
+      buf.writeBytes(this.random);
+      buf.writeVectorBytes8(this.sessionId); // Our single supported ciphersuite
+
+      buf.writeUint16(TLS_AES_128_GCM_SHA256); // A single zero byte for legacy_compression_method
+
+      buf.writeUint8(0);
+
+      this._writeExtensions(buf, this.extensions);
+    }
+  }, {
+    key: "TYPE_TAG",
+    get: function get() {
+      return HANDSHAKE_TYPE.SERVER_HELLO;
+    }
+  }], [{
+    key: "_read",
+    value: function _read(buf) {
+      // Fixed value for legacy_version.
+      if (buf.readUint16() !== VERSION_TLS_1_2) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+      } // Random bytes from the server.
+
+
+      var random = buf.readBytes(32); // It should have echoed our vector for legacy_session_id.
+
+      var sessionId = buf.readVectorBytes8(); // It should have selected our single offered ciphersuite.
+
+      if (buf.readUint16() !== TLS_AES_128_GCM_SHA256) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+      } // legacy_compression_method must be zero.
+
+
+      if (buf.readUint8() !== 0) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+      }
+
+      var extensions = this._readExtensions(HANDSHAKE_TYPE.SERVER_HELLO, buf);
+
+      if (!extensions.has(EXTENSION_TYPE.SUPPORTED_VERSIONS)) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.MISSING_EXTENSION);
+      }
+
+      if (extensions.get(EXTENSION_TYPE.SUPPORTED_VERSIONS).selectedVersion !== VERSION_TLS_1_3) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+      }
+
+      return new this(random, sessionId, extensions);
+    }
+  }]);
+
+  return ServerHello;
+}(messages_HandshakeMessage); // The EncryptedExtensions message:
+//
+//  struct {
+//    Extension extensions < 0..2 ^ 16 - 1 >;
+//  } EncryptedExtensions;
+//
+// We don't actually send any EncryptedExtensions,
+// but still have to send an empty message.
+
+var messages_EncryptedExtensions =
+/*#__PURE__*/
+function (_HandshakeMessage3) {
+  inherits_default()(EncryptedExtensions, _HandshakeMessage3);
+
+  function EncryptedExtensions(extensions) {
+    var _this5;
+
+    classCallCheck_default()(this, EncryptedExtensions);
+
+    _this5 = possibleConstructorReturn_default()(this, getPrototypeOf_default()(EncryptedExtensions).call(this));
+    _this5.extensions = extensions;
+    return _this5;
+  }
+
+  createClass_default()(EncryptedExtensions, [{
+    key: "_write",
+    value: function _write(buf) {
+      this._writeExtensions(buf, this.extensions);
+    }
+  }, {
+    key: "TYPE_TAG",
+    get: function get() {
+      return HANDSHAKE_TYPE.ENCRYPTED_EXTENSIONS;
+    }
+  }], [{
+    key: "_read",
+    value: function _read(buf) {
+      var extensions = this._readExtensions(HANDSHAKE_TYPE.ENCRYPTED_EXTENSIONS, buf);
+
+      return new this(extensions);
+    }
+  }]);
+
+  return EncryptedExtensions;
+}(messages_HandshakeMessage); // The Finished message:
+//
+// struct {
+//   opaque verify_data[Hash.length];
+// } Finished;
+
+var messages_Finished =
+/*#__PURE__*/
+function (_HandshakeMessage4) {
+  inherits_default()(Finished, _HandshakeMessage4);
+
+  function Finished(verifyData) {
+    var _this6;
+
+    classCallCheck_default()(this, Finished);
+
+    _this6 = possibleConstructorReturn_default()(this, getPrototypeOf_default()(Finished).call(this));
+    _this6.verifyData = verifyData;
+    return _this6;
+  }
+
+  createClass_default()(Finished, [{
+    key: "_write",
+    value: function _write(buf) {
+      buf.writeBytes(this.verifyData);
+    }
+  }, {
+    key: "TYPE_TAG",
+    get: function get() {
+      return HANDSHAKE_TYPE.FINISHED;
+    }
+  }], [{
+    key: "_read",
+    value: function _read(buf) {
+      var verifyData = buf.readBytes(HASH_LENGTH);
+      return new this(verifyData);
+    }
+  }]);
+
+  return Finished;
+}(messages_HandshakeMessage); // The NewSessionTicket message:
+//
+//   struct {
+//    uint32 ticket_lifetime;
+//    uint32 ticket_age_add;
+//    opaque ticket_nonce < 0..255 >;
+//    opaque ticket < 1..2 ^ 16 - 1 >;
+//    Extension extensions < 0..2 ^ 16 - 2 >;
+//  } NewSessionTicket;
+//
+// We don't actually make use of these, but we need to be able
+// to accept them and do basic validation.
+
+var messages_NewSessionTicket =
+/*#__PURE__*/
+function (_HandshakeMessage5) {
+  inherits_default()(NewSessionTicket, _HandshakeMessage5);
+
+  function NewSessionTicket(ticketLifetime, ticketAgeAdd, ticketNonce, ticket, extensions) {
+    var _this7;
+
+    classCallCheck_default()(this, NewSessionTicket);
+
+    _this7 = possibleConstructorReturn_default()(this, getPrototypeOf_default()(NewSessionTicket).call(this));
+    _this7.ticketLifetime = ticketLifetime;
+    _this7.ticketAgeAdd = ticketAgeAdd;
+    _this7.ticketNonce = ticketNonce;
+    _this7.ticket = ticket;
+    _this7.extensions = extensions;
+    return _this7;
+  }
+
+  createClass_default()(NewSessionTicket, [{
+    key: "_write",
+    value: function _write(buf) {
+      buf.writeUint32(this.ticketLifetime);
+      buf.writeUint32(this.ticketAgeAdd);
+      buf.writeVectorBytes8(this.ticketNonce);
+      buf.writeVectorBytes16(this.ticket);
+
+      this._writeExtensions(buf, this.extensions);
+    }
+  }, {
+    key: "TYPE_TAG",
+    get: function get() {
+      return HANDSHAKE_TYPE.NEW_SESSION_TICKET;
+    }
+  }], [{
+    key: "_read",
+    value: function _read(buf) {
+      return new this(buf.readUint32(), // ticket_lifetime
+      buf.readUint32(), // ticket_age_add
+      buf.readVectorBytes8(), // ticket_nonce
+      buf.readVectorBytes16(), // ticket
+      this._readExtensions(HANDSHAKE_TYPE.NEW_SESSION_TICKET, buf));
+    }
+  }]);
+
+  return NewSessionTicket;
+}(messages_HandshakeMessage);
+// CONCATENATED MODULE: ./src/states.js
+
+
+
+
+
+
+
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+
+
+
+ //
+// State-machine for TLS Handshake Management.
+//
+// Internally, we manage the TLS connection by explicitly modelling the
+// client and server state-machines from RFC8446.  You can think of
+// these `State` objects as little plugins for the `Connection` class
+// that provide different behaviours of `send` and `receive` depending
+// on the state of the connection.
+//
+
+var states_State =
+/*#__PURE__*/
+function () {
+  function State(conn) {
+    classCallCheck_default()(this, State);
+
+    this.conn = conn;
+  }
+
+  createClass_default()(State, [{
+    key: "initialize",
+    value: function () {
+      var _initialize = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee() {
+        return regenerator_default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function initialize() {
+        return _initialize.apply(this, arguments);
+      }
+
+      return initialize;
+    }()
+  }, {
+    key: "sendApplicationData",
+    value: function () {
+      var _sendApplicationData = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee2(bytes) {
+        return regenerator_default.a.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                throw new alerts_TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+
+              case 1:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function sendApplicationData(_x) {
+        return _sendApplicationData.apply(this, arguments);
+      }
+
+      return sendApplicationData;
+    }()
+  }, {
+    key: "recvApplicationData",
+    value: function () {
+      var _recvApplicationData = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee3(bytes) {
+        return regenerator_default.a.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                throw new alerts_TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
+
+              case 1:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function recvApplicationData(_x2) {
+        return _recvApplicationData.apply(this, arguments);
+      }
+
+      return recvApplicationData;
+    }()
+  }, {
+    key: "recvHandshakeMessage",
+    value: function () {
+      var _recvHandshakeMessage = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee4(msg) {
+        return regenerator_default.a.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                throw new alerts_TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
+
+              case 1:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function recvHandshakeMessage(_x3) {
+        return _recvHandshakeMessage.apply(this, arguments);
+      }
+
+      return recvHandshakeMessage;
+    }()
+  }, {
+    key: "recvAlertMessage",
+    value: function () {
+      var _recvAlertMessage = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee5(alert) {
+        return regenerator_default.a.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                _context5.t0 = alert.description;
+                _context5.next = _context5.t0 === ALERT_DESCRIPTION.CLOSE_NOTIFY ? 3 : 5;
+                break;
+
+              case 3:
+                this.conn._closeForRecv(alert);
+
+                throw alert;
+
+              case 5:
+                _context5.next = 7;
+                return this.handleErrorAndRethrow(alert);
+
+              case 7:
+                return _context5.abrupt("return", _context5.sent);
+
+              case 8:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this);
+      }));
+
+      function recvAlertMessage(_x4) {
+        return _recvAlertMessage.apply(this, arguments);
+      }
+
+      return recvAlertMessage;
+    }()
+  }, {
+    key: "recvChangeCipherSpec",
+    value: function () {
+      var _recvChangeCipherSpec = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee6(bytes) {
+        return regenerator_default.a.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                throw new alerts_TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
+
+              case 1:
+              case "end":
+                return _context6.stop();
+            }
+          }
+        }, _callee6, this);
+      }));
+
+      function recvChangeCipherSpec(_x5) {
+        return _recvChangeCipherSpec.apply(this, arguments);
+      }
+
+      return recvChangeCipherSpec;
+    }()
+  }, {
+    key: "handleErrorAndRethrow",
+    value: function () {
+      var _handleErrorAndRethrow = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee7(err) {
+        var alert;
+        return regenerator_default.a.wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                alert = err;
+
+                if (!(alert instanceof alerts_TLSAlert)) {
+                  alert = new alerts_TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+                } // Try to send error alert to the peer, but we may not
+                // be able to if the outgoing connection was already closed.
+
+
+                _context7.prev = 2;
+                _context7.next = 5;
+                return this.conn._sendAlertMessage(alert);
+
+              case 5:
+                _context7.next = 9;
+                break;
+
+              case 7:
+                _context7.prev = 7;
+                _context7.t0 = _context7["catch"](2);
+
+              case 9:
+                _context7.next = 11;
+                return this.conn._transition(states_ERROR, err);
+
+              case 11:
+                throw err;
+
+              case 12:
+              case "end":
+                return _context7.stop();
+            }
+          }
+        }, _callee7, this, [[2, 7]]);
+      }));
+
+      function handleErrorAndRethrow(_x6) {
+        return _handleErrorAndRethrow.apply(this, arguments);
+      }
+
+      return handleErrorAndRethrow;
+    }()
+  }, {
+    key: "close",
+    value: function () {
+      var _close = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee8() {
+        var alert;
+        return regenerator_default.a.wrap(function _callee8$(_context8) {
+          while (1) {
+            switch (_context8.prev = _context8.next) {
+              case 0:
+                alert = new alerts_TLSCloseNotify();
+                _context8.next = 3;
+                return this.conn._sendAlertMessage(alert);
+
+              case 3:
+                this.conn._closeForSend(alert);
+
+              case 4:
+              case "end":
+                return _context8.stop();
+            }
+          }
+        }, _callee8, this);
+      }));
+
+      function close() {
+        return _close.apply(this, arguments);
+      }
+
+      return close;
+    }()
+  }]);
+
+  return State;
+}(); // A special "guard" state to prevent us from using
+// an improperly-initialized Connection.
+
+
+var states_UNINITIALIZED =
+/*#__PURE__*/
+function (_State) {
+  inherits_default()(UNINITIALIZED, _State);
+
+  function UNINITIALIZED() {
+    classCallCheck_default()(this, UNINITIALIZED);
+
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(UNINITIALIZED).apply(this, arguments));
+  }
+
+  createClass_default()(UNINITIALIZED, [{
+    key: "initialize",
+    value: function () {
+      var _initialize2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee9() {
+        return regenerator_default.a.wrap(function _callee9$(_context9) {
+          while (1) {
+            switch (_context9.prev = _context9.next) {
+              case 0:
+                throw new Error('uninitialized state');
+
+              case 1:
+              case "end":
+                return _context9.stop();
+            }
+          }
+        }, _callee9, this);
+      }));
+
+      function initialize() {
+        return _initialize2.apply(this, arguments);
+      }
+
+      return initialize;
+    }()
+  }, {
+    key: "sendApplicationData",
+    value: function () {
+      var _sendApplicationData2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee10(bytes) {
+        return regenerator_default.a.wrap(function _callee10$(_context10) {
+          while (1) {
+            switch (_context10.prev = _context10.next) {
+              case 0:
+                throw new Error('uninitialized state');
+
+              case 1:
+              case "end":
+                return _context10.stop();
+            }
+          }
+        }, _callee10, this);
+      }));
+
+      function sendApplicationData(_x7) {
+        return _sendApplicationData2.apply(this, arguments);
+      }
+
+      return sendApplicationData;
+    }()
+  }, {
+    key: "recvApplicationData",
+    value: function () {
+      var _recvApplicationData2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee11(bytes) {
+        return regenerator_default.a.wrap(function _callee11$(_context11) {
+          while (1) {
+            switch (_context11.prev = _context11.next) {
+              case 0:
+                throw new Error('uninitialized state');
+
+              case 1:
+              case "end":
+                return _context11.stop();
+            }
+          }
+        }, _callee11, this);
+      }));
+
+      function recvApplicationData(_x8) {
+        return _recvApplicationData2.apply(this, arguments);
+      }
+
+      return recvApplicationData;
+    }()
+  }, {
+    key: "recvHandshakeMessage",
+    value: function () {
+      var _recvHandshakeMessage2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee12(msg) {
+        return regenerator_default.a.wrap(function _callee12$(_context12) {
+          while (1) {
+            switch (_context12.prev = _context12.next) {
+              case 0:
+                throw new Error('uninitialized state');
+
+              case 1:
+              case "end":
+                return _context12.stop();
+            }
+          }
+        }, _callee12, this);
+      }));
+
+      function recvHandshakeMessage(_x9) {
+        return _recvHandshakeMessage2.apply(this, arguments);
+      }
+
+      return recvHandshakeMessage;
+    }()
+  }, {
+    key: "recvChangeCipherSpec",
+    value: function () {
+      var _recvChangeCipherSpec2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee13(bytes) {
+        return regenerator_default.a.wrap(function _callee13$(_context13) {
+          while (1) {
+            switch (_context13.prev = _context13.next) {
+              case 0:
+                throw new Error('uninitialized state');
+
+              case 1:
+              case "end":
+                return _context13.stop();
+            }
+          }
+        }, _callee13, this);
+      }));
+
+      function recvChangeCipherSpec(_x10) {
+        return _recvChangeCipherSpec2.apply(this, arguments);
+      }
+
+      return recvChangeCipherSpec;
+    }()
+  }, {
+    key: "handleErrorAndRethrow",
+    value: function () {
+      var _handleErrorAndRethrow2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee14(err) {
+        return regenerator_default.a.wrap(function _callee14$(_context14) {
+          while (1) {
+            switch (_context14.prev = _context14.next) {
+              case 0:
+                throw err;
+
+              case 1:
+              case "end":
+                return _context14.stop();
+            }
+          }
+        }, _callee14, this);
+      }));
+
+      function handleErrorAndRethrow(_x11) {
+        return _handleErrorAndRethrow2.apply(this, arguments);
+      }
+
+      return handleErrorAndRethrow;
+    }()
+  }, {
+    key: "close",
+    value: function () {
+      var _close2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee15() {
+        return regenerator_default.a.wrap(function _callee15$(_context15) {
+          while (1) {
+            switch (_context15.prev = _context15.next) {
+              case 0:
+                throw new Error('uninitialized state');
+
+              case 1:
+              case "end":
+                return _context15.stop();
+            }
+          }
+        }, _callee15, this);
+      }));
+
+      function close() {
+        return _close2.apply(this, arguments);
+      }
+
+      return close;
+    }()
+  }]);
+
+  return UNINITIALIZED;
+}(states_State); // A special "error" state for when something goes wrong.
+// This state never transitions to another state, effectively
+// terminating the connection.
+
+var states_ERROR =
+/*#__PURE__*/
+function (_State2) {
+  inherits_default()(ERROR, _State2);
+
+  function ERROR() {
+    classCallCheck_default()(this, ERROR);
+
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(ERROR).apply(this, arguments));
+  }
+
+  createClass_default()(ERROR, [{
+    key: "initialize",
+    value: function () {
+      var _initialize3 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee16(err) {
+        return regenerator_default.a.wrap(function _callee16$(_context16) {
+          while (1) {
+            switch (_context16.prev = _context16.next) {
+              case 0:
+                this.error = err;
+
+                this.conn._setConnectionFailure(err); // Unceremoniously shut down the record layer on error.
+
+
+                this.conn._recordlayer.setSendError(err);
+
+                this.conn._recordlayer.setRecvError(err);
+
+              case 4:
+              case "end":
+                return _context16.stop();
+            }
+          }
+        }, _callee16, this);
+      }));
+
+      function initialize(_x12) {
+        return _initialize3.apply(this, arguments);
+      }
+
+      return initialize;
+    }()
+  }, {
+    key: "sendApplicationData",
+    value: function () {
+      var _sendApplicationData3 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee17(bytes) {
+        return regenerator_default.a.wrap(function _callee17$(_context17) {
+          while (1) {
+            switch (_context17.prev = _context17.next) {
+              case 0:
+                throw this.error;
+
+              case 1:
+              case "end":
+                return _context17.stop();
+            }
+          }
+        }, _callee17, this);
+      }));
+
+      function sendApplicationData(_x13) {
+        return _sendApplicationData3.apply(this, arguments);
+      }
+
+      return sendApplicationData;
+    }()
+  }, {
+    key: "recvApplicationData",
+    value: function () {
+      var _recvApplicationData3 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee18(bytes) {
+        return regenerator_default.a.wrap(function _callee18$(_context18) {
+          while (1) {
+            switch (_context18.prev = _context18.next) {
+              case 0:
+                throw this.error;
+
+              case 1:
+              case "end":
+                return _context18.stop();
+            }
+          }
+        }, _callee18, this);
+      }));
+
+      function recvApplicationData(_x14) {
+        return _recvApplicationData3.apply(this, arguments);
+      }
+
+      return recvApplicationData;
+    }()
+  }, {
+    key: "recvHandshakeMessage",
+    value: function () {
+      var _recvHandshakeMessage3 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee19(msg) {
+        return regenerator_default.a.wrap(function _callee19$(_context19) {
+          while (1) {
+            switch (_context19.prev = _context19.next) {
+              case 0:
+                throw this.error;
+
+              case 1:
+              case "end":
+                return _context19.stop();
+            }
+          }
+        }, _callee19, this);
+      }));
+
+      function recvHandshakeMessage(_x15) {
+        return _recvHandshakeMessage3.apply(this, arguments);
+      }
+
+      return recvHandshakeMessage;
+    }()
+  }, {
+    key: "recvAlertMessage",
+    value: function () {
+      var _recvAlertMessage2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee20(err) {
+        return regenerator_default.a.wrap(function _callee20$(_context20) {
+          while (1) {
+            switch (_context20.prev = _context20.next) {
+              case 0:
+                throw this.error;
+
+              case 1:
+              case "end":
+                return _context20.stop();
+            }
+          }
+        }, _callee20, this);
+      }));
+
+      function recvAlertMessage(_x16) {
+        return _recvAlertMessage2.apply(this, arguments);
+      }
+
+      return recvAlertMessage;
+    }()
+  }, {
+    key: "recvChangeCipherSpec",
+    value: function () {
+      var _recvChangeCipherSpec3 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee21(bytes) {
+        return regenerator_default.a.wrap(function _callee21$(_context21) {
+          while (1) {
+            switch (_context21.prev = _context21.next) {
+              case 0:
+                throw this.error;
+
+              case 1:
+              case "end":
+                return _context21.stop();
+            }
+          }
+        }, _callee21, this);
+      }));
+
+      function recvChangeCipherSpec(_x17) {
+        return _recvChangeCipherSpec3.apply(this, arguments);
+      }
+
+      return recvChangeCipherSpec;
+    }()
+  }, {
+    key: "handleErrorAndRethrow",
+    value: function () {
+      var _handleErrorAndRethrow3 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee22(err) {
+        return regenerator_default.a.wrap(function _callee22$(_context22) {
+          while (1) {
+            switch (_context22.prev = _context22.next) {
+              case 0:
+                throw err;
+
+              case 1:
+              case "end":
+                return _context22.stop();
+            }
+          }
+        }, _callee22, this);
+      }));
+
+      function handleErrorAndRethrow(_x18) {
+        return _handleErrorAndRethrow3.apply(this, arguments);
+      }
+
+      return handleErrorAndRethrow;
+    }()
+  }, {
+    key: "close",
+    value: function () {
+      var _close3 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee23() {
+        return regenerator_default.a.wrap(function _callee23$(_context23) {
+          while (1) {
+            switch (_context23.prev = _context23.next) {
+              case 0:
+                throw this.error;
+
+              case 1:
+              case "end":
+                return _context23.stop();
+            }
+          }
+        }, _callee23, this);
+      }));
+
+      function close() {
+        return _close3.apply(this, arguments);
+      }
+
+      return close;
+    }()
+  }]);
+
+  return ERROR;
+}(states_State); // The "connected" state, for when the handshake is complete
+// and we're ready to send application-level data.
+// The logic for this is largely symmetric between client and server.
+
+var states_CONNECTED =
+/*#__PURE__*/
+function (_State3) {
+  inherits_default()(CONNECTED, _State3);
+
+  function CONNECTED() {
+    classCallCheck_default()(this, CONNECTED);
+
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(CONNECTED).apply(this, arguments));
+  }
+
+  createClass_default()(CONNECTED, [{
+    key: "initialize",
+    value: function () {
+      var _initialize4 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee24() {
+        return regenerator_default.a.wrap(function _callee24$(_context24) {
+          while (1) {
+            switch (_context24.prev = _context24.next) {
+              case 0:
+                this.conn._setConnectionSuccess();
+
+              case 1:
+              case "end":
+                return _context24.stop();
+            }
+          }
+        }, _callee24, this);
+      }));
+
+      function initialize() {
+        return _initialize4.apply(this, arguments);
+      }
+
+      return initialize;
+    }()
+  }, {
+    key: "sendApplicationData",
+    value: function () {
+      var _sendApplicationData4 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee25(bytes) {
+        return regenerator_default.a.wrap(function _callee25$(_context25) {
+          while (1) {
+            switch (_context25.prev = _context25.next) {
+              case 0:
+                _context25.next = 2;
+                return this.conn._sendApplicationData(bytes);
+
+              case 2:
+              case "end":
+                return _context25.stop();
+            }
+          }
+        }, _callee25, this);
+      }));
+
+      function sendApplicationData(_x19) {
+        return _sendApplicationData4.apply(this, arguments);
+      }
+
+      return sendApplicationData;
+    }()
+  }, {
+    key: "recvApplicationData",
+    value: function () {
+      var _recvApplicationData4 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee26(bytes) {
+        return regenerator_default.a.wrap(function _callee26$(_context26) {
+          while (1) {
+            switch (_context26.prev = _context26.next) {
+              case 0:
+                return _context26.abrupt("return", bytes);
+
+              case 1:
+              case "end":
+                return _context26.stop();
+            }
+          }
+        }, _callee26, this);
+      }));
+
+      function recvApplicationData(_x20) {
+        return _recvApplicationData4.apply(this, arguments);
+      }
+
+      return recvApplicationData;
+    }()
+  }, {
+    key: "recvChangeCipherSpec",
+    value: function () {
+      var _recvChangeCipherSpec4 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee27(bytes) {
+        return regenerator_default.a.wrap(function _callee27$(_context27) {
+          while (1) {
+            switch (_context27.prev = _context27.next) {
+              case 0:
+                throw new alerts_TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
+
+              case 1:
+              case "end":
+                return _context27.stop();
+            }
+          }
+        }, _callee27, this);
+      }));
+
+      function recvChangeCipherSpec(_x21) {
+        return _recvChangeCipherSpec4.apply(this, arguments);
+      }
+
+      return recvChangeCipherSpec;
+    }()
+  }]);
+
+  return CONNECTED;
+}(states_State); // A base class for states that occur in the middle of the handshake
+// (that is, between ClientHello and Finished).  These states may receive
+// CHANGE_CIPHER_SPEC records for b/w compat reasons, which must contain
+// exactly a single 0x01 byte and must otherwise be ignored.
+
+var states_MidHandshakeState =
+/*#__PURE__*/
+function (_State4) {
+  inherits_default()(MidHandshakeState, _State4);
+
+  function MidHandshakeState() {
+    classCallCheck_default()(this, MidHandshakeState);
+
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(MidHandshakeState).apply(this, arguments));
+  }
+
+  createClass_default()(MidHandshakeState, [{
+    key: "recvChangeCipherSpec",
+    value: function () {
+      var _recvChangeCipherSpec5 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee28(bytes) {
+        return regenerator_default.a.wrap(function _callee28$(_context28) {
+          while (1) {
+            switch (_context28.prev = _context28.next) {
+              case 0:
+                if (!this.conn._hasSeenChangeCipherSpec) {
+                  _context28.next = 2;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
+
+              case 2:
+                if (!(bytes.byteLength !== 1 || bytes[0] !== 1)) {
+                  _context28.next = 4;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
+
+              case 4:
+                this.conn._hasSeenChangeCipherSpec = true;
+
+              case 5:
+              case "end":
+                return _context28.stop();
+            }
+          }
+        }, _callee28, this);
+      }));
+
+      function recvChangeCipherSpec(_x22) {
+        return _recvChangeCipherSpec5.apply(this, arguments);
+      }
+
+      return recvChangeCipherSpec;
+    }()
+  }]);
+
+  return MidHandshakeState;
+}(states_State); // These states implement (part of) the client state-machine from
+// https://tools.ietf.org/html/rfc8446#appendix-A.1
+//
+// Since we're only implementing a small subset of TLS1.3,
+// we only need a small subset of the handshake.  It basically goes:
+//
+//   * send ClientHello
+//   * receive ServerHello
+//   * receive EncryptedExtensions
+//   * receive server Finished
+//   * send client Finished
+//
+// We include some unused states for completeness, so that it's easier
+// to check the implementation against the diagrams in the RFC.
+
+
+var states_CLIENT_START =
+/*#__PURE__*/
+function (_State5) {
+  inherits_default()(CLIENT_START, _State5);
+
+  function CLIENT_START() {
+    classCallCheck_default()(this, CLIENT_START);
+
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(CLIENT_START).apply(this, arguments));
+  }
+
+  createClass_default()(CLIENT_START, [{
+    key: "initialize",
+    value: function () {
+      var _initialize5 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee29() {
+        var keyschedule, clientHello, buf, PSK_BINDERS_SIZE, truncatedTranscript, pskBinder;
+        return regenerator_default.a.wrap(function _callee29$(_context29) {
+          while (1) {
+            switch (_context29.prev = _context29.next) {
+              case 0:
+                keyschedule = this.conn._keyschedule;
+                _context29.next = 3;
+                return keyschedule.addPSK(this.conn.psk);
+
+              case 3:
+                _context29.t0 = messages_ClientHello;
+                _context29.next = 6;
+                return getRandomBytes(32);
+
+              case 6:
+                _context29.t1 = _context29.sent;
+                _context29.next = 9;
+                return getRandomBytes(32);
+
+              case 9:
+                _context29.t2 = _context29.sent;
+                _context29.t3 = [new extensions_SupportedVersionsExtension([VERSION_TLS_1_3]), new extensions_PskKeyExchangeModesExtension([PSK_MODE_KE]), new extensions_PreSharedKeyExtension([this.conn.pskId], [zeros(HASH_LENGTH)])];
+                clientHello = new _context29.t0(_context29.t1, _context29.t2, _context29.t3);
+                buf = new utils_BufferWriter();
+                clientHello.write(buf); // Now that we know what the ClientHello looks like,
+                // go back and calculate the appropriate PSK binder value.
+                // We only support a single PSK, so the length of the binders field is the
+                // length of the hash plus one for rendering it as a variable-length byte array,
+                // plus two for rendering the variable-length list of PSK binders.
+
+                PSK_BINDERS_SIZE = HASH_LENGTH + 1 + 2;
+                truncatedTranscript = buf.slice(0, buf.tell() - PSK_BINDERS_SIZE);
+                _context29.next = 18;
+                return keyschedule.calculateFinishedMAC(keyschedule.extBinderKey, truncatedTranscript);
+
+              case 18:
+                pskBinder = _context29.sent;
+                buf.incr(-HASH_LENGTH);
+                buf.writeBytes(pskBinder);
+                _context29.next = 23;
+                return this.conn._sendHandshakeMessageBytes(buf.flush());
+
+              case 23:
+                _context29.next = 25;
+                return this.conn._transition(states_CLIENT_WAIT_SH, clientHello.sessionId);
+
+              case 25:
+              case "end":
+                return _context29.stop();
+            }
+          }
+        }, _callee29, this);
+      }));
+
+      function initialize() {
+        return _initialize5.apply(this, arguments);
+      }
+
+      return initialize;
+    }()
+  }]);
+
+  return CLIENT_START;
+}(states_State);
+
+var states_CLIENT_WAIT_SH =
+/*#__PURE__*/
+function (_State6) {
+  inherits_default()(CLIENT_WAIT_SH, _State6);
+
+  function CLIENT_WAIT_SH() {
+    classCallCheck_default()(this, CLIENT_WAIT_SH);
+
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(CLIENT_WAIT_SH).apply(this, arguments));
+  }
+
+  createClass_default()(CLIENT_WAIT_SH, [{
+    key: "initialize",
+    value: function () {
+      var _initialize6 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee30(sessionId) {
+        return regenerator_default.a.wrap(function _callee30$(_context30) {
+          while (1) {
+            switch (_context30.prev = _context30.next) {
+              case 0:
+                this._sessionId = sessionId;
+
+              case 1:
+              case "end":
+                return _context30.stop();
+            }
+          }
+        }, _callee30, this);
+      }));
+
+      function initialize(_x23) {
+        return _initialize6.apply(this, arguments);
+      }
+
+      return initialize;
+    }()
+  }, {
+    key: "recvHandshakeMessage",
+    value: function () {
+      var _recvHandshakeMessage4 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee31(msg) {
+        var pskExt;
+        return regenerator_default.a.wrap(function _callee31$(_context31) {
+          while (1) {
+            switch (_context31.prev = _context31.next) {
+              case 0:
+                if (msg instanceof messages_ServerHello) {
+                  _context31.next = 2;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
+
+              case 2:
+                if (bytesAreEqual(msg.sessionId, this._sessionId)) {
+                  _context31.next = 4;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+
+              case 4:
+                pskExt = msg.extensions.get(EXTENSION_TYPE.PRE_SHARED_KEY);
+
+                if (pskExt) {
+                  _context31.next = 7;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.MISSING_EXTENSION);
+
+              case 7:
+                if (!(msg.extensions.size !== 2)) {
+                  _context31.next = 9;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.UNSUPPORTED_EXTENSION);
+
+              case 9:
+                if (!(pskExt.selectedIdentity !== 0)) {
+                  _context31.next = 11;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+
+              case 11:
+                _context31.next = 13;
+                return this.conn._keyschedule.addECDHE(null);
+
+              case 13:
+                _context31.next = 15;
+                return this.conn._setSendKey(this.conn._keyschedule.clientHandshakeTrafficSecret);
+
+              case 15:
+                _context31.next = 17;
+                return this.conn._setRecvKey(this.conn._keyschedule.serverHandshakeTrafficSecret);
+
+              case 17:
+                _context31.next = 19;
+                return this.conn._transition(states_CLIENT_WAIT_EE);
+
+              case 19:
+              case "end":
+                return _context31.stop();
+            }
+          }
+        }, _callee31, this);
+      }));
+
+      function recvHandshakeMessage(_x24) {
+        return _recvHandshakeMessage4.apply(this, arguments);
+      }
+
+      return recvHandshakeMessage;
+    }()
+  }]);
+
+  return CLIENT_WAIT_SH;
+}(states_State);
+
+var states_CLIENT_WAIT_EE =
+/*#__PURE__*/
+function (_MidHandshakeState) {
+  inherits_default()(CLIENT_WAIT_EE, _MidHandshakeState);
+
+  function CLIENT_WAIT_EE() {
+    classCallCheck_default()(this, CLIENT_WAIT_EE);
+
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(CLIENT_WAIT_EE).apply(this, arguments));
+  }
+
+  createClass_default()(CLIENT_WAIT_EE, [{
+    key: "recvHandshakeMessage",
+    value: function () {
+      var _recvHandshakeMessage5 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee32(msg) {
+        var keyschedule, serverFinishedTranscript;
+        return regenerator_default.a.wrap(function _callee32$(_context32) {
+          while (1) {
+            switch (_context32.prev = _context32.next) {
+              case 0:
+                if (msg instanceof messages_EncryptedExtensions) {
+                  _context32.next = 2;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
+
+              case 2:
+                if (!(msg.extensions.size !== 0)) {
+                  _context32.next = 4;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.UNSUPPORTED_EXTENSION);
+
+              case 4:
+                keyschedule = this.conn._keyschedule;
+                serverFinishedTranscript = keyschedule.getTranscript();
+                _context32.next = 8;
+                return this.conn._transition(states_CLIENT_WAIT_FINISHED, serverFinishedTranscript);
+
+              case 8:
+              case "end":
+                return _context32.stop();
+            }
+          }
+        }, _callee32, this);
+      }));
+
+      function recvHandshakeMessage(_x25) {
+        return _recvHandshakeMessage5.apply(this, arguments);
+      }
+
+      return recvHandshakeMessage;
+    }()
+  }]);
+
+  return CLIENT_WAIT_EE;
+}(states_MidHandshakeState);
+
+var states_CLIENT_WAIT_FINISHED =
+/*#__PURE__*/
+function (_MidHandshakeState2) {
+  inherits_default()(CLIENT_WAIT_FINISHED, _MidHandshakeState2);
+
+  function CLIENT_WAIT_FINISHED() {
+    classCallCheck_default()(this, CLIENT_WAIT_FINISHED);
+
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(CLIENT_WAIT_FINISHED).apply(this, arguments));
+  }
+
+  createClass_default()(CLIENT_WAIT_FINISHED, [{
+    key: "initialize",
+    value: function () {
+      var _initialize7 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee33(serverFinishedTranscript) {
+        return regenerator_default.a.wrap(function _callee33$(_context33) {
+          while (1) {
+            switch (_context33.prev = _context33.next) {
+              case 0:
+                this._serverFinishedTranscript = serverFinishedTranscript;
+
+              case 1:
+              case "end":
+                return _context33.stop();
+            }
+          }
+        }, _callee33, this);
+      }));
+
+      function initialize(_x26) {
+        return _initialize7.apply(this, arguments);
+      }
+
+      return initialize;
+    }()
+  }, {
+    key: "recvHandshakeMessage",
+    value: function () {
+      var _recvHandshakeMessage6 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee34(msg) {
+        var keyschedule, clientFinishedMAC;
+        return regenerator_default.a.wrap(function _callee34$(_context34) {
+          while (1) {
+            switch (_context34.prev = _context34.next) {
+              case 0:
+                if (msg instanceof messages_Finished) {
+                  _context34.next = 2;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
+
+              case 2:
+                // Verify server Finished MAC.
+                keyschedule = this.conn._keyschedule;
+                _context34.next = 5;
+                return keyschedule.verifyFinishedMAC(keyschedule.serverHandshakeTrafficSecret, msg.verifyData, this._serverFinishedTranscript);
+
+              case 5:
+                _context34.next = 7;
+                return keyschedule.calculateFinishedMAC(keyschedule.clientHandshakeTrafficSecret);
+
+              case 7:
+                clientFinishedMAC = _context34.sent;
+                _context34.next = 10;
+                return keyschedule.finalize();
+
+              case 10:
+                _context34.next = 12;
+                return this.conn._sendHandshakeMessage(new messages_Finished(clientFinishedMAC));
+
+              case 12:
+                _context34.next = 14;
+                return this.conn._setSendKey(keyschedule.clientApplicationTrafficSecret);
+
+              case 14:
+                _context34.next = 16;
+                return this.conn._setRecvKey(keyschedule.serverApplicationTrafficSecret);
+
+              case 16:
+                _context34.next = 18;
+                return this.conn._transition(states_CLIENT_CONNECTED);
+
+              case 18:
+              case "end":
+                return _context34.stop();
+            }
+          }
+        }, _callee34, this);
+      }));
+
+      function recvHandshakeMessage(_x27) {
+        return _recvHandshakeMessage6.apply(this, arguments);
+      }
+
+      return recvHandshakeMessage;
+    }()
+  }]);
+
+  return CLIENT_WAIT_FINISHED;
+}(states_MidHandshakeState);
+
+var states_CLIENT_CONNECTED =
+/*#__PURE__*/
+function (_CONNECTED) {
+  inherits_default()(CLIENT_CONNECTED, _CONNECTED);
+
+  function CLIENT_CONNECTED() {
+    classCallCheck_default()(this, CLIENT_CONNECTED);
+
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(CLIENT_CONNECTED).apply(this, arguments));
+  }
+
+  createClass_default()(CLIENT_CONNECTED, [{
+    key: "recvHandshakeMessage",
+    value: function () {
+      var _recvHandshakeMessage7 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee35(msg) {
+        return regenerator_default.a.wrap(function _callee35$(_context35) {
+          while (1) {
+            switch (_context35.prev = _context35.next) {
+              case 0:
+                if (msg instanceof messages_NewSessionTicket) {
+                  _context35.next = 2;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
+
+              case 2:
+              case "end":
+                return _context35.stop();
+            }
+          }
+        }, _callee35, this);
+      }));
+
+      function recvHandshakeMessage(_x28) {
+        return _recvHandshakeMessage7.apply(this, arguments);
+      }
+
+      return recvHandshakeMessage;
+    }()
+  }]);
+
+  return CLIENT_CONNECTED;
+}(states_CONNECTED); // These states implement (part of) the server state-machine from
+// https://tools.ietf.org/html/rfc8446#appendix-A.2
+//
+// Since we're only implementing a small subset of TLS1.3,
+// we only need a small subset of the handshake.  It basically goes:
+//
+//   * receive ClientHello
+//   * send ServerHello
+//   * send empty EncryptedExtensions
+//   * send server Finished
+//   * receive client Finished
+//
+// We include some unused states for completeness, so that it's easier
+// to check the implementation against the diagrams in the RFC.
+
+var states_SERVER_START =
+/*#__PURE__*/
+function (_State7) {
+  inherits_default()(SERVER_START, _State7);
+
+  function SERVER_START() {
+    classCallCheck_default()(this, SERVER_START);
+
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(SERVER_START).apply(this, arguments));
+  }
+
+  createClass_default()(SERVER_START, [{
+    key: "recvHandshakeMessage",
+    value: function () {
+      var _recvHandshakeMessage8 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee36(msg) {
+        var _this = this;
+
+        var pskExt, pskModesExt, pskIndex, keyschedule, transcript, pskBindersSize, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, binder;
+
+        return regenerator_default.a.wrap(function _callee36$(_context36) {
+          while (1) {
+            switch (_context36.prev = _context36.next) {
+              case 0:
+                if (msg instanceof messages_ClientHello) {
+                  _context36.next = 2;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
+
+              case 2:
+                // In the spec, this is where we select connection parameters, and maybe
+                // tell the client to try again if we can't find a compatible set.
+                // Since we only support a fixed cipherset, the only thing to "negotiate"
+                // is whether they provided an acceptable PSK.
+                pskExt = msg.extensions.get(EXTENSION_TYPE.PRE_SHARED_KEY);
+                pskModesExt = msg.extensions.get(EXTENSION_TYPE.PSK_KEY_EXCHANGE_MODES);
+
+                if (!(!pskExt || !pskModesExt)) {
+                  _context36.next = 6;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.MISSING_EXTENSION);
+
+              case 6:
+                if (!(pskModesExt.modes.indexOf(PSK_MODE_KE) === -1)) {
+                  _context36.next = 8;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.HANDSHAKE_FAILURE);
+
+              case 8:
+                pskIndex = pskExt.identities.findIndex(function (pskId) {
+                  return bytesAreEqual(pskId, _this.conn.pskId);
+                });
+
+                if (!(pskIndex === -1)) {
+                  _context36.next = 11;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.UNKNOWN_PSK_IDENTITY);
+
+              case 11:
+                _context36.next = 13;
+                return this.conn._keyschedule.addPSK(this.conn.psk);
+
+              case 13:
+                // Validate the PSK binder.
+                keyschedule = this.conn._keyschedule;
+                transcript = keyschedule.getTranscript(); // Calculate size occupied by the PSK binders.
+
+                pskBindersSize = 2; // Vector16 representation overhead.
+
+                _iteratorNormalCompletion = true;
+                _didIteratorError = false;
+                _iteratorError = undefined;
+                _context36.prev = 19;
+
+                for (_iterator = pskExt.binders[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                  binder = _step.value;
+                  pskBindersSize += binder.byteLength + 1; // Vector8 representation overhead.
+                }
+
+                _context36.next = 27;
+                break;
+
+              case 23:
+                _context36.prev = 23;
+                _context36.t0 = _context36["catch"](19);
+                _didIteratorError = true;
+                _iteratorError = _context36.t0;
+
+              case 27:
+                _context36.prev = 27;
+                _context36.prev = 28;
+
+                if (!_iteratorNormalCompletion && _iterator.return != null) {
+                  _iterator.return();
+                }
+
+              case 30:
+                _context36.prev = 30;
+
+                if (!_didIteratorError) {
+                  _context36.next = 33;
+                  break;
+                }
+
+                throw _iteratorError;
+
+              case 33:
+                return _context36.finish(30);
+
+              case 34:
+                return _context36.finish(27);
+
+              case 35:
+                _context36.next = 37;
+                return keyschedule.verifyFinishedMAC(keyschedule.extBinderKey, pskExt.binders[pskIndex], transcript.slice(0, -pskBindersSize));
+
+              case 37:
+                _context36.next = 39;
+                return this.conn._transition(states_SERVER_NEGOTIATED, msg.sessionId, pskIndex);
+
+              case 39:
+              case "end":
+                return _context36.stop();
+            }
+          }
+        }, _callee36, this, [[19, 23, 27, 35], [28,, 30, 34]]);
+      }));
+
+      function recvHandshakeMessage(_x29) {
+        return _recvHandshakeMessage8.apply(this, arguments);
+      }
+
+      return recvHandshakeMessage;
+    }()
+  }]);
+
+  return SERVER_START;
+}(states_State);
+
+var states_SERVER_NEGOTIATED =
+/*#__PURE__*/
+function (_MidHandshakeState3) {
+  inherits_default()(SERVER_NEGOTIATED, _MidHandshakeState3);
+
+  function SERVER_NEGOTIATED() {
+    classCallCheck_default()(this, SERVER_NEGOTIATED);
+
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(SERVER_NEGOTIATED).apply(this, arguments));
+  }
+
+  createClass_default()(SERVER_NEGOTIATED, [{
+    key: "initialize",
+    value: function () {
+      var _initialize8 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee37(sessionId, pskIndex) {
+        var keyschedule, serverFinishedMAC, clientFinishedTranscript, clientHandshakeTrafficSecret;
+        return regenerator_default.a.wrap(function _callee37$(_context37) {
+          while (1) {
+            switch (_context37.prev = _context37.next) {
+              case 0:
+                _context37.t0 = this.conn;
+                _context37.t1 = messages_ServerHello;
+                _context37.next = 4;
+                return getRandomBytes(32);
+
+              case 4:
+                _context37.t2 = _context37.sent;
+                _context37.t3 = sessionId;
+                _context37.t4 = [new extensions_SupportedVersionsExtension(null, VERSION_TLS_1_3), new extensions_PreSharedKeyExtension(null, null, pskIndex)];
+                _context37.t5 = new _context37.t1(_context37.t2, _context37.t3, _context37.t4);
+                _context37.next = 10;
+                return _context37.t0._sendHandshakeMessage.call(_context37.t0, _context37.t5);
+
+              case 10:
+                if (!(sessionId.byteLength > 0)) {
+                  _context37.next = 13;
+                  break;
+                }
+
+                _context37.next = 13;
+                return this.conn._sendChangeCipherSpec();
+
+              case 13:
+                // We can now transition to the encrypted part of the handshake.
+                keyschedule = this.conn._keyschedule;
+                _context37.next = 16;
+                return keyschedule.addECDHE(null);
+
+              case 16:
+                _context37.next = 18;
+                return this.conn._setSendKey(keyschedule.serverHandshakeTrafficSecret);
+
+              case 18:
+                _context37.next = 20;
+                return this.conn._setRecvKey(keyschedule.clientHandshakeTrafficSecret);
+
+              case 20:
+                _context37.next = 22;
+                return this.conn._sendHandshakeMessage(new messages_EncryptedExtensions([]));
+
+              case 22:
+                _context37.next = 24;
+                return keyschedule.calculateFinishedMAC(keyschedule.serverHandshakeTrafficSecret);
+
+              case 24:
+                serverFinishedMAC = _context37.sent;
+                _context37.next = 27;
+                return this.conn._sendHandshakeMessage(new messages_Finished(serverFinishedMAC));
+
+              case 27:
+                _context37.next = 29;
+                return keyschedule.getTranscript();
+
+              case 29:
+                clientFinishedTranscript = _context37.sent;
+                clientHandshakeTrafficSecret = keyschedule.clientHandshakeTrafficSecret;
+                _context37.next = 33;
+                return keyschedule.finalize();
+
+              case 33:
+                _context37.next = 35;
+                return this.conn._setSendKey(keyschedule.serverApplicationTrafficSecret);
+
+              case 35:
+                _context37.next = 37;
+                return this.conn._transition(states_SERVER_WAIT_FINISHED, clientHandshakeTrafficSecret, clientFinishedTranscript);
+
+              case 37:
+              case "end":
+                return _context37.stop();
+            }
+          }
+        }, _callee37, this);
+      }));
+
+      function initialize(_x30, _x31) {
+        return _initialize8.apply(this, arguments);
+      }
+
+      return initialize;
+    }()
+  }]);
+
+  return SERVER_NEGOTIATED;
+}(states_MidHandshakeState);
+
+var states_SERVER_WAIT_FINISHED =
+/*#__PURE__*/
+function (_MidHandshakeState4) {
+  inherits_default()(SERVER_WAIT_FINISHED, _MidHandshakeState4);
+
+  function SERVER_WAIT_FINISHED() {
+    classCallCheck_default()(this, SERVER_WAIT_FINISHED);
+
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(SERVER_WAIT_FINISHED).apply(this, arguments));
+  }
+
+  createClass_default()(SERVER_WAIT_FINISHED, [{
+    key: "initialize",
+    value: function () {
+      var _initialize9 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee38(clientHandshakeTrafficSecret, clientFinishedTranscript) {
+        return regenerator_default.a.wrap(function _callee38$(_context38) {
+          while (1) {
+            switch (_context38.prev = _context38.next) {
+              case 0:
+                this._clientHandshakeTrafficSecret = clientHandshakeTrafficSecret;
+                this._clientFinishedTranscript = clientFinishedTranscript;
+
+              case 2:
+              case "end":
+                return _context38.stop();
+            }
+          }
+        }, _callee38, this);
+      }));
+
+      function initialize(_x32, _x33) {
+        return _initialize9.apply(this, arguments);
+      }
+
+      return initialize;
+    }()
+  }, {
+    key: "recvHandshakeMessage",
+    value: function () {
+      var _recvHandshakeMessage9 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee39(msg) {
+        var keyschedule;
+        return regenerator_default.a.wrap(function _callee39$(_context39) {
+          while (1) {
+            switch (_context39.prev = _context39.next) {
+              case 0:
+                if (msg instanceof messages_Finished) {
+                  _context39.next = 2;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
+
+              case 2:
+                keyschedule = this.conn._keyschedule;
+                _context39.next = 5;
+                return keyschedule.verifyFinishedMAC(this._clientHandshakeTrafficSecret, msg.verifyData, this._clientFinishedTranscript);
+
+              case 5:
+                this._clientHandshakeTrafficSecret = this._clientFinishedTranscript = null;
+                _context39.next = 8;
+                return this.conn._setRecvKey(keyschedule.clientApplicationTrafficSecret);
+
+              case 8:
+                _context39.next = 10;
+                return this.conn._transition(states_CONNECTED);
+
+              case 10:
+              case "end":
+                return _context39.stop();
+            }
+          }
+        }, _callee39, this);
+      }));
+
+      function recvHandshakeMessage(_x34) {
+        return _recvHandshakeMessage9.apply(this, arguments);
+      }
+
+      return recvHandshakeMessage;
+    }()
+  }]);
+
+  return SERVER_WAIT_FINISHED;
+}(states_MidHandshakeState);
+// CONCATENATED MODULE: ./src/keyschedule.js
+
+
+
+
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// TLS1.3 Key Schedule.
+//
+// In this file we implement the "key schedule" from
+// https://tools.ietf.org/html/rfc8446#section-7.1, which
+// defines how to calculate various keys as the handshake
+// state progresses.
+
+
+ // The `KeySchedule` class progresses through three stages corresponding
+// to the three phases of the TLS1.3 key schedule:
+//
+//   UNINITIALIZED
+//       |
+//       | addPSK()
+//       v
+//   EARLY_SECRET
+//       |
+//       | addECDHE()
+//       v
+//   HANDSHAKE_SECRET
+//       |
+//       | finalize()
+//       v
+//   MASTER_SECRET
+//
+// It will error out if the calling code attempts to add key material
+// in the wrong order.
+
+var STAGE_UNINITIALIZED = 0;
+var STAGE_EARLY_SECRET = 1;
+var STAGE_HANDSHAKE_SECRET = 2;
+var STAGE_MASTER_SECRET = 3;
+var keyschedule_KeySchedule =
+/*#__PURE__*/
+function () {
+  function KeySchedule() {
+    classCallCheck_default()(this, KeySchedule);
+
+    this.stage = STAGE_UNINITIALIZED; // WebCrypto doesn't support a rolling hash construct, so we have to
+    // keep the entire message transcript in memory.
+
+    this.transcript = new utils_BufferWriter(); // This tracks the main secret from with other keys are derived at each stage.
+
+    this.secret = null; // And these are all the various keys we'll derive as the handshake progresses.
+
+    this.extBinderKey = null;
+    this.clientHandshakeTrafficSecret = null;
+    this.serverHandshakeTrafficSecret = null;
+    this.clientApplicationTrafficSecret = null;
+    this.serverApplicationTrafficSecret = null;
+  }
+
+  createClass_default()(KeySchedule, [{
+    key: "addPSK",
+    value: function () {
+      var _addPSK = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee(psk) {
+        return regenerator_default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                // Use the selected PSK (if any) to calculate the "early secret".
+                if (psk === null) {
+                  psk = zeros(HASH_LENGTH);
+                }
+
+                if (!(this.stage !== STAGE_UNINITIALIZED)) {
+                  _context.next = 3;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+
+              case 3:
+                this.stage = STAGE_EARLY_SECRET;
+                _context.next = 6;
+                return hkdfExtract(zeros(HASH_LENGTH), psk);
+
+              case 6:
+                this.secret = _context.sent;
+                _context.next = 9;
+                return this.deriveSecret('ext binder', EMPTY);
+
+              case 9:
+                this.extBinderKey = _context.sent;
+                _context.next = 12;
+                return this.deriveSecret('derived', EMPTY);
+
+              case 12:
+                this.secret = _context.sent;
+
+              case 13:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function addPSK(_x) {
+        return _addPSK.apply(this, arguments);
+      }
+
+      return addPSK;
+    }()
+  }, {
+    key: "addECDHE",
+    value: function () {
+      var _addECDHE = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee2(ecdhe) {
+        return regenerator_default.a.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                // Mix in the ECDHE output (if any) to calculate the "handshake secret".
+                if (ecdhe === null) {
+                  ecdhe = zeros(HASH_LENGTH);
+                }
+
+                if (!(this.stage !== STAGE_EARLY_SECRET)) {
+                  _context2.next = 3;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+
+              case 3:
+                this.stage = STAGE_HANDSHAKE_SECRET;
+                this.extBinderKey = null;
+                _context2.next = 7;
+                return hkdfExtract(this.secret, ecdhe);
+
+              case 7:
+                this.secret = _context2.sent;
+                _context2.next = 10;
+                return this.deriveSecret('c hs traffic');
+
+              case 10:
+                this.clientHandshakeTrafficSecret = _context2.sent;
+                _context2.next = 13;
+                return this.deriveSecret('s hs traffic');
+
+              case 13:
+                this.serverHandshakeTrafficSecret = _context2.sent;
+                _context2.next = 16;
+                return this.deriveSecret('derived', EMPTY);
+
+              case 16:
+                this.secret = _context2.sent;
+
+              case 17:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function addECDHE(_x2) {
+        return _addECDHE.apply(this, arguments);
+      }
+
+      return addECDHE;
+    }()
+  }, {
+    key: "finalize",
+    value: function () {
+      var _finalize = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee3() {
+        return regenerator_default.a.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                if (!(this.stage !== STAGE_HANDSHAKE_SECRET)) {
+                  _context3.next = 2;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+
+              case 2:
+                this.stage = STAGE_MASTER_SECRET;
+                this.clientHandshakeTrafficSecret = null;
+                this.serverHandshakeTrafficSecret = null;
+                _context3.next = 7;
+                return hkdfExtract(this.secret, zeros(HASH_LENGTH));
+
+              case 7:
+                this.secret = _context3.sent;
+                _context3.next = 10;
+                return this.deriveSecret('c ap traffic');
+
+              case 10:
+                this.clientApplicationTrafficSecret = _context3.sent;
+                _context3.next = 13;
+                return this.deriveSecret('s ap traffic');
+
+              case 13:
+                this.serverApplicationTrafficSecret = _context3.sent;
+                this.secret = null;
+
+              case 15:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function finalize() {
+        return _finalize.apply(this, arguments);
+      }
+
+      return finalize;
+    }()
+  }, {
+    key: "addToTranscript",
+    value: function addToTranscript(bytes) {
+      this.transcript.writeBytes(bytes);
+    }
+  }, {
+    key: "getTranscript",
+    value: function getTranscript() {
+      return this.transcript.slice();
+    }
+  }, {
+    key: "deriveSecret",
+    value: function () {
+      var _deriveSecret = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee4(label) {
+        var transcript,
+            _args4 = arguments;
+        return regenerator_default.a.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                transcript = _args4.length > 1 && _args4[1] !== undefined ? _args4[1] : undefined;
+                transcript = transcript || this.getTranscript();
+                _context4.t0 = hkdfExpandLabel;
+                _context4.t1 = this.secret;
+                _context4.t2 = label;
+                _context4.next = 7;
+                return hash(transcript);
+
+              case 7:
+                _context4.t3 = _context4.sent;
+                _context4.t4 = HASH_LENGTH;
+                _context4.next = 11;
+                return (0, _context4.t0)(_context4.t1, _context4.t2, _context4.t3, _context4.t4);
+
+              case 11:
+                return _context4.abrupt("return", _context4.sent);
+
+              case 12:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function deriveSecret(_x3) {
+        return _deriveSecret.apply(this, arguments);
+      }
+
+      return deriveSecret;
+    }()
+  }, {
+    key: "calculateFinishedMAC",
+    value: function () {
+      var _calculateFinishedMAC = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee5(baseKey) {
+        var transcript,
+            finishedKey,
+            _args5 = arguments;
+        return regenerator_default.a.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                transcript = _args5.length > 1 && _args5[1] !== undefined ? _args5[1] : undefined;
+                transcript = transcript || this.getTranscript();
+                _context5.next = 4;
+                return hkdfExpandLabel(baseKey, 'finished', EMPTY, HASH_LENGTH);
+
+              case 4:
+                finishedKey = _context5.sent;
+                _context5.t0 = hmac;
+                _context5.t1 = finishedKey;
+                _context5.next = 9;
+                return hash(transcript);
+
+              case 9:
+                _context5.t2 = _context5.sent;
+                _context5.next = 12;
+                return (0, _context5.t0)(_context5.t1, _context5.t2);
+
+              case 12:
+                return _context5.abrupt("return", _context5.sent);
+
+              case 13:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this);
+      }));
+
+      function calculateFinishedMAC(_x4) {
+        return _calculateFinishedMAC.apply(this, arguments);
+      }
+
+      return calculateFinishedMAC;
+    }()
+  }, {
+    key: "verifyFinishedMAC",
+    value: function () {
+      var _verifyFinishedMAC = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee6(baseKey, mac) {
+        var transcript,
+            finishedKey,
+            _args6 = arguments;
+        return regenerator_default.a.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                transcript = _args6.length > 2 && _args6[2] !== undefined ? _args6[2] : undefined;
+                transcript = transcript || this.getTranscript();
+                _context6.next = 4;
+                return hkdfExpandLabel(baseKey, 'finished', EMPTY, HASH_LENGTH);
+
+              case 4:
+                finishedKey = _context6.sent;
+                _context6.t0 = verifyHmac;
+                _context6.t1 = finishedKey;
+                _context6.t2 = mac;
+                _context6.next = 10;
+                return hash(transcript);
+
+              case 10:
+                _context6.t3 = _context6.sent;
+                _context6.next = 13;
+                return (0, _context6.t0)(_context6.t1, _context6.t2, _context6.t3);
+
+              case 13:
+              case "end":
+                return _context6.stop();
+            }
+          }
+        }, _callee6, this);
+      }));
+
+      function verifyFinishedMAC(_x5, _x6) {
+        return _verifyFinishedMAC.apply(this, arguments);
+      }
+
+      return verifyFinishedMAC;
+    }()
+  }]);
+
+  return KeySchedule;
+}();
+// CONCATENATED MODULE: ./src/recordlayer.js
+
+
+
+
+
+
+
+
+
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+//
+// This file implements the "record layer" for TLS1.3, as defined in
+// https://tools.ietf.org/html/rfc8446#section-5.
+//
+// The record layer is responsible for encrypting/decrypting bytes to be
+// sent over the wire, including stateful management of sequence numbers
+// for the incoming and outgoing stream.
+//
+// The main interface is the RecordLayer class, which takes a callback function
+// sending data and can be used like so:
+//
+//    rl = new RecordLayer(async function send_encrypted_data(data) {
+//      // application-specific sending logic here.
+//    });
+//
+//    // Records are sent and received in plaintext by default,
+//    // until you specify the key to use.
+//    await rl.setSendKey(key)
+//
+//    // Send some data by specifying the record type and the bytes.
+//    // Where allowed by the record type, it will be buffered until
+//    // explicitly flushed, and then sent by calling the callback.
+//    await rl.send(RECORD_TYPE.HANDSHAKE, <bytes for a handshake message>)
+//    await rl.send(RECORD_TYPE.HANDSHAKE, <bytes for another handshake message>)
+//    await rl.flush()
+//
+//    // Separate keys are used for sending and receiving.
+//    rl.setRecvKey(key);
+//
+//    // When data is received, push it into the RecordLayer
+//    // and pass a callback that will be called with a [type, bytes]
+//    // pair for each message parsed from the data.
+//    rl.recv(dataReceivedFromPeer, async (type, bytes) => {
+//      switch (type) {
+//        case RECORD_TYPE.APPLICATION_DATA:
+//          // do something with application data
+//        case RECORD_TYPE.HANDSHAKE:
+//          // do something with a handshake message
+//        default:
+//          // etc...
+//      }
+//    });
+//
+
+
+
+
+/* eslint-disable sorting/sort-object-props */
+
+var RECORD_TYPE = {
+  CHANGE_CIPHER_SPEC: 20,
+  ALERT: 21,
+  HANDSHAKE: 22,
+  APPLICATION_DATA: 23
+};
+/* eslint-enable sorting/sort-object-props */
+// Encrypting at most 2^24 records will force us to stay
+// below data limits on AES-GCM encryption key use, and also
+// means we can accurately represent the sequence number as
+// a javascript double.
+
+var MAX_SEQUENCE_NUMBER = Math.pow(2, 24);
+var MAX_RECORD_SIZE = Math.pow(2, 14);
+var MAX_ENCRYPTED_RECORD_SIZE = MAX_RECORD_SIZE + 256;
+var RECORD_HEADER_SIZE = 5; // These are some helper classes to manage the encryption/decryption state
+// for a particular key.
+
+var recordlayer_CipherState =
+/*#__PURE__*/
+function () {
+  function CipherState(key, iv) {
+    classCallCheck_default()(this, CipherState);
+
+    this.key = key;
+    this.iv = iv;
+    this.seqnum = 0;
+  }
+
+  createClass_default()(CipherState, [{
+    key: "nonce",
+    value: function nonce() {
+      // Ref https://tools.ietf.org/html/rfc8446#section-5.3:
+      // * left-pad the sequence number with zeros to IV_LENGTH
+      // * xor with the provided iv
+      // Our sequence numbers are always less than 2^24, so fit in a Uint32
+      // in the last 4 bytes of the nonce.
+      var nonce = this.iv.slice();
+      var dv = new DataView(nonce.buffer, nonce.byteLength - 4, 4);
+      dv.setUint32(0, dv.getUint32(0) ^ this.seqnum);
+      this.seqnum += 1;
+
+      if (this.seqnum > MAX_SEQUENCE_NUMBER) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+      }
+
+      return nonce;
+    }
+  }], [{
+    key: "create",
+    value: function () {
+      var _create = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee(baseKey, mode) {
+        var key, iv;
+        return regenerator_default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.t0 = prepareKey;
+                _context.next = 3;
+                return hkdfExpandLabel(baseKey, 'key', EMPTY, KEY_LENGTH);
+
+              case 3:
+                _context.t1 = _context.sent;
+                _context.t2 = mode;
+                _context.next = 7;
+                return (0, _context.t0)(_context.t1, _context.t2);
+
+              case 7:
+                key = _context.sent;
+                _context.next = 10;
+                return hkdfExpandLabel(baseKey, 'iv', EMPTY, IV_LENGTH);
+
+              case 10:
+                iv = _context.sent;
+                return _context.abrupt("return", new this(key, iv));
+
+              case 12:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function create(_x, _x2) {
+        return _create.apply(this, arguments);
+      }
+
+      return create;
+    }()
+  }]);
+
+  return CipherState;
+}();
+var recordlayer_EncryptionState =
+/*#__PURE__*/
+function (_CipherState) {
+  inherits_default()(EncryptionState, _CipherState);
+
+  function EncryptionState() {
+    classCallCheck_default()(this, EncryptionState);
+
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(EncryptionState).apply(this, arguments));
+  }
+
+  createClass_default()(EncryptionState, [{
+    key: "encrypt",
+    value: function () {
+      var _encrypt2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee2(plaintext, additionalData) {
+        return regenerator_default.a.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
+                return crypto_encrypt(this.key, this.nonce(), plaintext, additionalData);
+
+              case 2:
+                return _context2.abrupt("return", _context2.sent);
+
+              case 3:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function encrypt(_x3, _x4) {
+        return _encrypt2.apply(this, arguments);
+      }
+
+      return encrypt;
+    }()
+  }], [{
+    key: "create",
+    value: function () {
+      var _create2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee3(key) {
+        return regenerator_default.a.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                return _context3.abrupt("return", get_default()(getPrototypeOf_default()(EncryptionState), "create", this).call(this, key, 'encrypt'));
+
+              case 1:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function create(_x5) {
+        return _create2.apply(this, arguments);
+      }
+
+      return create;
+    }()
+  }]);
+
+  return EncryptionState;
+}(recordlayer_CipherState);
+var recordlayer_DecryptionState =
+/*#__PURE__*/
+function (_CipherState2) {
+  inherits_default()(DecryptionState, _CipherState2);
+
+  function DecryptionState() {
+    classCallCheck_default()(this, DecryptionState);
+
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(DecryptionState).apply(this, arguments));
+  }
+
+  createClass_default()(DecryptionState, [{
+    key: "decrypt",
+    value: function () {
+      var _decrypt2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee4(ciphertext, additionalData) {
+        return regenerator_default.a.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                _context4.next = 2;
+                return crypto_decrypt(this.key, this.nonce(), ciphertext, additionalData);
+
+              case 2:
+                return _context4.abrupt("return", _context4.sent);
+
+              case 3:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function decrypt(_x6, _x7) {
+        return _decrypt2.apply(this, arguments);
+      }
+
+      return decrypt;
+    }()
+  }], [{
+    key: "create",
+    value: function () {
+      var _create3 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee5(key) {
+        return regenerator_default.a.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                return _context5.abrupt("return", get_default()(getPrototypeOf_default()(DecryptionState), "create", this).call(this, key, 'decrypt'));
+
+              case 1:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this);
+      }));
+
+      function create(_x8) {
+        return _create3.apply(this, arguments);
+      }
+
+      return create;
+    }()
+  }]);
+
+  return DecryptionState;
+}(recordlayer_CipherState); // The main RecordLayer class.
+
+var recordlayer_RecordLayer =
+/*#__PURE__*/
+function () {
+  function RecordLayer(sendCallback) {
+    classCallCheck_default()(this, RecordLayer);
+
+    this.sendCallback = sendCallback;
+    this._sendEncryptState = null;
+    this._sendError = null;
+    this._recvDecryptState = null;
+    this._recvError = null;
+    this._pendingRecordType = 0;
+    this._pendingRecordBuf = null;
+  }
+
+  createClass_default()(RecordLayer, [{
+    key: "setSendKey",
+    value: function () {
+      var _setSendKey = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee6(key) {
+        return regenerator_default.a.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                _context6.next = 2;
+                return this.flush();
+
+              case 2:
+                _context6.next = 4;
+                return recordlayer_EncryptionState.create(key);
+
+              case 4:
+                this._sendEncryptState = _context6.sent;
+
+              case 5:
+              case "end":
+                return _context6.stop();
+            }
+          }
+        }, _callee6, this);
+      }));
+
+      function setSendKey(_x9) {
+        return _setSendKey.apply(this, arguments);
+      }
+
+      return setSendKey;
+    }()
+  }, {
+    key: "setRecvKey",
+    value: function () {
+      var _setRecvKey = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee7(key) {
+        return regenerator_default.a.wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                _context7.next = 2;
+                return recordlayer_DecryptionState.create(key);
+
+              case 2:
+                this._recvDecryptState = _context7.sent;
+
+              case 3:
+              case "end":
+                return _context7.stop();
+            }
+          }
+        }, _callee7, this);
+      }));
+
+      function setRecvKey(_x10) {
+        return _setRecvKey.apply(this, arguments);
+      }
+
+      return setRecvKey;
+    }()
+  }, {
+    key: "setSendError",
+    value: function () {
+      var _setSendError = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee8(err) {
+        return regenerator_default.a.wrap(function _callee8$(_context8) {
+          while (1) {
+            switch (_context8.prev = _context8.next) {
+              case 0:
+                this._sendError = err;
+
+              case 1:
+              case "end":
+                return _context8.stop();
+            }
+          }
+        }, _callee8, this);
+      }));
+
+      function setSendError(_x11) {
+        return _setSendError.apply(this, arguments);
+      }
+
+      return setSendError;
+    }()
+  }, {
+    key: "setRecvError",
+    value: function () {
+      var _setRecvError = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee9(err) {
+        return regenerator_default.a.wrap(function _callee9$(_context9) {
+          while (1) {
+            switch (_context9.prev = _context9.next) {
+              case 0:
+                this._recvError = err;
+
+              case 1:
+              case "end":
+                return _context9.stop();
+            }
+          }
+        }, _callee9, this);
+      }));
+
+      function setRecvError(_x12) {
+        return _setRecvError.apply(this, arguments);
+      }
+
+      return setRecvError;
+    }()
+  }, {
+    key: "send",
+    value: function () {
+      var _send = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee10(type, data) {
+        return regenerator_default.a.wrap(function _callee10$(_context10) {
+          while (1) {
+            switch (_context10.prev = _context10.next) {
+              case 0:
+                if (!(this._sendError !== null)) {
+                  _context10.next = 2;
+                  break;
+                }
+
+                throw this._sendError;
+
+              case 2:
+                if (!(data.byteLength > MAX_RECORD_SIZE)) {
+                  _context10.next = 4;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+
+              case 4:
+                if (!(this._pendingRecordType && this._pendingRecordType !== type)) {
+                  _context10.next = 7;
+                  break;
+                }
+
+                _context10.next = 7;
+                return this.flush();
+
+              case 7:
+                if (!(this._pendingRecordBuf !== null)) {
+                  _context10.next = 11;
+                  break;
+                }
+
+                if (!(this._pendingRecordBuf.tell() + data.byteLength > MAX_RECORD_SIZE)) {
+                  _context10.next = 11;
+                  break;
+                }
+
+                _context10.next = 11;
+                return this.flush();
+
+              case 11:
+                // Start a new pending record if necessary.
+                // We reserve space at the start of the buffer for the record header,
+                // which is conveniently always a fixed size.
+                if (this._pendingRecordBuf === null) {
+                  this._pendingRecordType = type;
+                  this._pendingRecordBuf = new utils_BufferWriter();
+
+                  this._pendingRecordBuf.incr(RECORD_HEADER_SIZE);
+                }
+
+                this._pendingRecordBuf.writeBytes(data);
+
+              case 13:
+              case "end":
+                return _context10.stop();
+            }
+          }
+        }, _callee10, this);
+      }));
+
+      function send(_x13, _x14) {
+        return _send.apply(this, arguments);
+      }
+
+      return send;
+    }()
+  }, {
+    key: "flush",
+    value: function () {
+      var _flush = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee11() {
+        var buf, type, inflation, innerPlaintext, length, additionalData, ciphertext;
+        return regenerator_default.a.wrap(function _callee11$(_context11) {
+          while (1) {
+            switch (_context11.prev = _context11.next) {
+              case 0:
+                // If there's nothing to flush, bail out early.
+                // Don't throw `_sendError` if we're not sending anything, because `flush()`
+                // can be called when we're trying to transition into an error state.
+                buf = this._pendingRecordBuf;
+                type = this._pendingRecordType;
+
+                if (type) {
+                  _context11.next = 6;
+                  break;
+                }
+
+                if (!(buf !== null)) {
+                  _context11.next = 5;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+
+              case 5:
+                return _context11.abrupt("return");
+
+              case 6:
+                if (!(this._sendError !== null)) {
+                  _context11.next = 8;
+                  break;
+                }
+
+                throw this._sendError;
+
+              case 8:
+                // If we're encrypting, turn the existing buffer contents into a `TLSInnerPlaintext` by
+                // appending the type. We don't do any zero-padding, although the spec allows it.
+                inflation = 0, innerPlaintext = null;
+
+                if (this._sendEncryptState !== null) {
+                  buf.writeUint8(type);
+                  innerPlaintext = buf.slice(RECORD_HEADER_SIZE);
+                  inflation = AEAD_SIZE_INFLATION;
+                  type = RECORD_TYPE.APPLICATION_DATA;
+                } // Write the common header for either `TLSPlaintext` or `TLSCiphertext` record.
+
+
+                length = buf.tell() - RECORD_HEADER_SIZE + inflation;
+                buf.seek(0);
+                buf.writeUint8(type);
+                buf.writeUint16(VERSION_TLS_1_2);
+                buf.writeUint16(length); // Followed by different payload depending on encryption status.
+
+                if (!(this._sendEncryptState !== null)) {
+                  _context11.next = 23;
+                  break;
+                }
+
+                additionalData = buf.slice(0, RECORD_HEADER_SIZE);
+                _context11.next = 19;
+                return this._sendEncryptState.encrypt(innerPlaintext, additionalData);
+
+              case 19:
+                ciphertext = _context11.sent;
+                buf.writeBytes(ciphertext);
+                _context11.next = 24;
+                break;
+
+              case 23:
+                buf.incr(length);
+
+              case 24:
+                this._pendingRecordBuf = null;
+                this._pendingRecordType = 0;
+                _context11.next = 28;
+                return this.sendCallback(buf.flush());
+
+              case 28:
+              case "end":
+                return _context11.stop();
+            }
+          }
+        }, _callee11, this);
+      }));
+
+      function flush() {
+        return _flush.apply(this, arguments);
+      }
+
+      return flush;
+    }()
+  }, {
+    key: "recv",
+    value: function () {
+      var _recv = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee12(data) {
+        var buf, type, version, length, plaintext, _ref, _ref2, _ref3, _ref4;
+
+        return regenerator_default.a.wrap(function _callee12$(_context12) {
+          while (1) {
+            switch (_context12.prev = _context12.next) {
+              case 0:
+                if (!(this._recvError !== null)) {
+                  _context12.next = 2;
+                  break;
+                }
+
+                throw this._recvError;
+
+              case 2:
+                // For simplicity, we assume that the given data contains exactly one record.
+                // Peers using this library will send one record at a time over the websocket
+                // connection, and we can assume that the server-side websocket bridge will split
+                // up any traffic into individual records if we ever start interoperating with
+                // peers using a different TLS implementation.
+                // Similarly, we assume that handshake messages will not be fragmented across
+                // multiple records. This should be trivially true for the PSK-only mode used
+                // by this library, but we may want to relax it in future for interoperability
+                // with e.g. large ClientHello messages that contain lots of different options.
+                buf = new utils_BufferReader(data); // The data to read is either a TLSPlaintext or TLSCiphertext struct,
+                // depending on whether record protection has been enabled yet:
+                //
+                //    struct {
+                //        ContentType type;
+                //        ProtocolVersion legacy_record_version;
+                //        uint16 length;
+                //        opaque fragment[TLSPlaintext.length];
+                //    } TLSPlaintext;
+                //
+                //    struct {
+                //        ContentType opaque_type = application_data; /* 23 */
+                //        ProtocolVersion legacy_record_version = 0x0303; /* TLS v1.2 */
+                //        uint16 length;
+                //        opaque encrypted_record[TLSCiphertext.length];
+                //    } TLSCiphertext;
+                //
+
+                type = buf.readUint8(); // The spec says legacy_record_version "MUST be ignored for all purposes",
+                // but we know TLS1.3 implementations will only ever emit two possible values,
+                // so it seems useful to bail out early if we receive anything else.
+
+                version = buf.readUint16();
+
+                if (!(version !== VERSION_TLS_1_2)) {
+                  _context12.next = 8;
+                  break;
+                }
+
+                if (!(this._recvDecryptState !== null || version !== VERSION_TLS_1_0)) {
+                  _context12.next = 8;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+
+              case 8:
+                length = buf.readUint16();
+
+                if (!(this._recvDecryptState === null || type === RECORD_TYPE.CHANGE_CIPHER_SPEC)) {
+                  _context12.next = 18;
+                  break;
+                }
+
+                _context12.next = 12;
+                return this._readPlaintextRecord(type, length, buf);
+
+              case 12:
+                _ref = _context12.sent;
+                _ref2 = slicedToArray_default()(_ref, 2);
+                type = _ref2[0];
+                plaintext = _ref2[1];
+                _context12.next = 24;
+                break;
+
+              case 18:
+                _context12.next = 20;
+                return this._readEncryptedRecord(type, length, buf);
+
+              case 20:
+                _ref3 = _context12.sent;
+                _ref4 = slicedToArray_default()(_ref3, 2);
+                type = _ref4[0];
+                plaintext = _ref4[1];
+
+              case 24:
+                if (!buf.hasMoreBytes()) {
+                  _context12.next = 26;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+
+              case 26:
+                return _context12.abrupt("return", [type, plaintext]);
+
+              case 27:
+              case "end":
+                return _context12.stop();
+            }
+          }
+        }, _callee12, this);
+      }));
+
+      function recv(_x15) {
+        return _recv.apply(this, arguments);
+      }
+
+      return recv;
+    }() // Helper to read an unencrypted `TLSPlaintext` struct
+
+  }, {
+    key: "_readPlaintextRecord",
+    value: function () {
+      var _readPlaintextRecord2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee13(type, length, buf) {
+        return regenerator_default.a.wrap(function _callee13$(_context13) {
+          while (1) {
+            switch (_context13.prev = _context13.next) {
+              case 0:
+                if (!(length > MAX_RECORD_SIZE)) {
+                  _context13.next = 2;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.RECORD_OVERFLOW);
+
+              case 2:
+                return _context13.abrupt("return", [type, buf.readBytes(length)]);
+
+              case 3:
+              case "end":
+                return _context13.stop();
+            }
+          }
+        }, _callee13, this);
+      }));
+
+      function _readPlaintextRecord(_x16, _x17, _x18) {
+        return _readPlaintextRecord2.apply(this, arguments);
+      }
+
+      return _readPlaintextRecord;
+    }() // Helper to read an encrypted `TLSCiphertext` struct,
+    // decrypting it into plaintext.
+
+  }, {
+    key: "_readEncryptedRecord",
+    value: function () {
+      var _readEncryptedRecord2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee14(type, length, buf) {
+        var additionalData, ciphertext, paddedPlaintext, i;
+        return regenerator_default.a.wrap(function _callee14$(_context14) {
+          while (1) {
+            switch (_context14.prev = _context14.next) {
+              case 0:
+                if (!(length > MAX_ENCRYPTED_RECORD_SIZE)) {
+                  _context14.next = 2;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.RECORD_OVERFLOW);
+
+              case 2:
+                if (!(type !== RECORD_TYPE.APPLICATION_DATA)) {
+                  _context14.next = 4;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+
+              case 4:
+                // Decrypt and decode the contained `TLSInnerPlaintext` struct:
+                //
+                //    struct {
+                //        opaque content[TLSPlaintext.length];
+                //        ContentType type;
+                //        uint8 zeros[length_of_padding];
+                //    } TLSInnerPlaintext;
+                //
+                // The additional data for the decryption is the `TLSCiphertext` record
+                // header, which is a fixed size and immediately prior to current buffer position.
+                buf.incr(-RECORD_HEADER_SIZE);
+                additionalData = buf.readBytes(RECORD_HEADER_SIZE);
+                ciphertext = buf.readBytes(length);
+                _context14.next = 9;
+                return this._recvDecryptState.decrypt(ciphertext, additionalData);
+
+              case 9:
+                paddedPlaintext = _context14.sent;
+                i = paddedPlaintext.byteLength - 1;
+
+              case 11:
+                if (!(i >= 0)) {
+                  _context14.next = 17;
+                  break;
+                }
+
+                if (!(paddedPlaintext[i] !== 0)) {
+                  _context14.next = 14;
+                  break;
+                }
+
+                return _context14.abrupt("break", 17);
+
+              case 14:
+                i--;
+                _context14.next = 11;
+                break;
+
+              case 17:
+                if (!(i < 0)) {
+                  _context14.next = 19;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
+
+              case 19:
+                type = paddedPlaintext[i]; // `change_cipher_spec` records must always be plaintext.
+
+                if (!(type === RECORD_TYPE.CHANGE_CIPHER_SPEC)) {
+                  _context14.next = 22;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+
+              case 22:
+                return _context14.abrupt("return", [type, paddedPlaintext.slice(0, i)]);
+
+              case 23:
+              case "end":
+                return _context14.stop();
+            }
+          }
+        }, _callee14, this);
+      }));
+
+      function _readEncryptedRecord(_x19, _x20, _x21) {
+        return _readEncryptedRecord2.apply(this, arguments);
+      }
+
+      return _readEncryptedRecord;
+    }()
+  }]);
+
+  return RecordLayer;
+}();
+// CONCATENATED MODULE: ./src/tlsconnection.js
+
+
+
+
+
+
+
+
+
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// The top-level APIs offered by this module are `ClientConnection` and
+// `ServerConnection` classes, which provide authenticated and encrypted
+// communication via the "externally-provisioned PSK" mode of TLS1.3.
+// They each take a callback to be used for sending data to the remote peer,
+// and operate like this:
+//
+//    conn = await ClientConnection.create(psk, pskId, async function send_data_to_server(data) {
 //      // application-specific sending logic here.
 //    })
 //
@@ -1240,9 +6229,9 @@ function bytesAreEqual(v1, v2) {
 //
 //    // When data is received from the server, push it into
 //    // the connection and let it return any decrypted app-level data.
-//    // There might not be any app-level data if it was protocol control message,
-//    // and the receipt of the data might trigger additional calls to the
-//    // send callback for protocol control purposes.
+//    // There might not be any app-level data if it was a protocol control
+//    //  message, and the receipt of the data might trigger additional calls
+//    // to the send callback for protocol control purposes.
 //
 //    serverSocket.on('data', async encrypted_data => {
 //      const plaintext = await conn.recv(data)
@@ -1257,7 +6246,17 @@ function bytesAreEqual(v1, v2) {
 //
 //    await conn.close()
 //
-// The `InsecureServerConnection` API operates similarly; the distinction is mainly
+//    // When the peer sends a "closed" notification it will show up
+//    // as a `TLSCloseNotify` exception from recv:
+//
+//    try {
+//      await conn.recv(data);
+//    } catch (err) {
+//      if (! (err instanceof TLSCloseNotify) { throw err }
+//      do_something_to_cleanly_close_data_connection();
+//    }
+//
+// The `ServerConnection` API operates similarly; the distinction is mainly
 // in which side is expected to send vs receieve during the protocol handshake.
 
 
@@ -1266,59 +6265,75 @@ function bytesAreEqual(v1, v2) {
 
 
 
-
-
- // !!!!!!!
-// !!
-// !!   N.B. In case it wasn't obvious, this is insecure!
-// !!
-// !!!!!!!
-//
-// This will be replaced by an implementation of the TLS1.3 PSK mode.
-// We're using a simple insecure quote-unquote cipher for now in order
-// to simulate the same sort of interface that the real crypto engine
-// will provide.
-
-var rot128_InsecureConnection =
+var tlsconnection_Connection =
 /*#__PURE__*/
 function () {
-  function InsecureConnection(psk, pskId, sendCallback) {
-    classCallCheck_default()(this, InsecureConnection);
+  function Connection(psk, pskId, sendCallback) {
+    var _this = this;
+
+    classCallCheck_default()(this, Connection);
 
     this.psk = assertIsBytes(psk);
     this.pskId = assertIsBytes(pskId);
-    this.sendCallback = sendCallback;
+    this.connected = new Promise(function (resolve, reject) {
+      _this._onConnectionSuccess = resolve;
+      _this._onConnectionFailure = reject;
+    });
+    this._state = new states_UNINITIALIZED(this);
+    this._handshakeRecvBuffer = null;
+    this._hasSeenChangeCipherSpec = false;
+    this._recordlayer = new recordlayer_RecordLayer(sendCallback);
+    this._keyschedule = new keyschedule_KeySchedule();
+    this._lastPromise = Promise.resolve();
   } // Subclasses will override this with some async initialization logic.
 
 
-  createClass_default()(InsecureConnection, [{
+  createClass_default()(Connection, [{
     key: "send",
-    // These are the three public API methods that
-    // consumers can use to connunicate over TLS.
+    // These are the three public API methods that consumers can use
+    // to send and receive data encrypted with TLS1.3.
     value: function () {
       var _send = asyncToGenerator_default()(
       /*#__PURE__*/
-      regenerator_default.a.mark(function _callee(data) {
-        return regenerator_default.a.wrap(function _callee$(_context) {
+      regenerator_default.a.mark(function _callee2(data) {
+        var _this2 = this;
+
+        return regenerator_default.a.wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context.prev = _context.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
                 assertIsBytes(data);
-                _context.t0 = this;
-                _context.next = 4;
-                return this._rot128(data);
+                _context2.next = 3;
+                return this.connected;
 
-              case 4:
-                _context.t1 = _context.sent;
-                _context.next = 7;
-                return _context.t0.sendCallback.call(_context.t0, _context.t1);
+              case 3:
+                _context2.next = 5;
+                return this._synchronized(
+                /*#__PURE__*/
+                asyncToGenerator_default()(
+                /*#__PURE__*/
+                regenerator_default.a.mark(function _callee() {
+                  return regenerator_default.a.wrap(function _callee$(_context) {
+                    while (1) {
+                      switch (_context.prev = _context.next) {
+                        case 0:
+                          _context.next = 2;
+                          return _this2._state.sendApplicationData(data);
 
-              case 7:
+                        case 2:
+                        case "end":
+                          return _context.stop();
+                      }
+                    }
+                  }, _callee, this);
+                })));
+
+              case 5:
               case "end":
-                return _context.stop();
+                return _context2.stop();
             }
           }
-        }, _callee, this);
+        }, _callee2, this);
       }));
 
       function send(_x) {
@@ -1332,24 +6347,118 @@ function () {
     value: function () {
       var _recv = asyncToGenerator_default()(
       /*#__PURE__*/
-      regenerator_default.a.mark(function _callee2(data) {
-        return regenerator_default.a.wrap(function _callee2$(_context2) {
+      regenerator_default.a.mark(function _callee4(data) {
+        var _this3 = this;
+
+        return regenerator_default.a.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 assertIsBytes(data);
-                _context2.next = 3;
-                return this._rot128(data);
+                _context4.next = 3;
+                return this._synchronized(
+                /*#__PURE__*/
+                asyncToGenerator_default()(
+                /*#__PURE__*/
+                regenerator_default.a.mark(function _callee3() {
+                  var _ref3, _ref4, type, bytes, mlength, messageBytes;
+
+                  return regenerator_default.a.wrap(function _callee3$(_context3) {
+                    while (1) {
+                      switch (_context3.prev = _context3.next) {
+                        case 0:
+                          _context3.next = 2;
+                          return _this3._recordlayer.recv(data);
+
+                        case 2:
+                          _ref3 = _context3.sent;
+                          _ref4 = slicedToArray_default()(_ref3, 2);
+                          type = _ref4[0];
+                          bytes = _ref4[1];
+                          _context3.t0 = type;
+                          _context3.next = _context3.t0 === RECORD_TYPE.CHANGE_CIPHER_SPEC ? 9 : _context3.t0 === RECORD_TYPE.ALERT ? 12 : _context3.t0 === RECORD_TYPE.APPLICATION_DATA ? 15 : _context3.t0 === RECORD_TYPE.HANDSHAKE ? 18 : 31;
+                          break;
+
+                        case 9:
+                          _context3.next = 11;
+                          return _this3._state.recvChangeCipherSpec(bytes);
+
+                        case 11:
+                          return _context3.abrupt("return", null);
+
+                        case 12:
+                          _context3.next = 14;
+                          return _this3._state.recvAlertMessage(alerts_TLSAlert.fromBytes(bytes));
+
+                        case 14:
+                          return _context3.abrupt("return", null);
+
+                        case 15:
+                          _context3.next = 17;
+                          return _this3._state.recvApplicationData(bytes);
+
+                        case 17:
+                          return _context3.abrupt("return", _context3.sent);
+
+                        case 18:
+                          // Multiple handshake messages may be coalesced into a single record.
+                          // Store the in-progress record buffer on `this` so that we can guard
+                          // against handshake messages that span a change in keys.
+                          _this3._handshakeRecvBuffer = new utils_BufferReader(bytes);
+
+                          if (_this3._handshakeRecvBuffer.hasMoreBytes()) {
+                            _context3.next = 21;
+                            break;
+                          }
+
+                          throw new alerts_TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
+
+                        case 21:
+                          // Each handshake messages has a type and length prefix, per
+                          // https://tools.ietf.org/html/rfc8446#appendix-B.3
+                          _this3._handshakeRecvBuffer.incr(1);
+
+                          mlength = _this3._handshakeRecvBuffer.readUint24();
+
+                          _this3._handshakeRecvBuffer.incr(-4);
+
+                          messageBytes = _this3._handshakeRecvBuffer.readBytes(mlength + 4);
+
+                          _this3._keyschedule.addToTranscript(messageBytes);
+
+                          _context3.next = 28;
+                          return _this3._state.recvHandshakeMessage(messages_HandshakeMessage.fromBytes(messageBytes));
+
+                        case 28:
+                          if (_this3._handshakeRecvBuffer.hasMoreBytes()) {
+                            _context3.next = 21;
+                            break;
+                          }
+
+                        case 29:
+                          _this3._handshakeRecvBuffer = null;
+                          return _context3.abrupt("return", null);
+
+                        case 31:
+                          throw new alerts_TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
+
+                        case 32:
+                        case "end":
+                          return _context3.stop();
+                      }
+                    }
+                  }, _callee3, this);
+                })));
 
               case 3:
-                return _context2.abrupt("return", _context2.sent);
+                return _context4.abrupt("return", _context4.sent);
 
               case 4:
               case "end":
-                return _context2.stop();
+                return _context4.stop();
             }
           }
-        }, _callee2, this);
+        }, _callee4, this);
       }));
 
       function recv(_x2) {
@@ -1363,122 +6472,35 @@ function () {
     value: function () {
       var _close = asyncToGenerator_default()(
       /*#__PURE__*/
-      regenerator_default.a.mark(function _callee3() {
-        return regenerator_default.a.wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, _callee3, this);
-      }));
+      regenerator_default.a.mark(function _callee6() {
+        var _this4 = this;
 
-      function close() {
-        return _close.apply(this, arguments);
-      }
-
-      return close;
-    }()
-  }, {
-    key: "_rot128",
-    value: function () {
-      var _rot = asyncToGenerator_default()(
-      /*#__PURE__*/
-      regenerator_default.a.mark(function _callee4(input) {
-        var output, i;
-        return regenerator_default.a.wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                output = new Uint8Array(input.byteLength);
-
-                for (i = 0; i < input.byteLength; i++) {
-                  output[i] = input[i] + 128 & 0xFF;
-                }
-
-                return _context4.abrupt("return", output);
-
-              case 3:
-              case "end":
-                return _context4.stop();
-            }
-          }
-        }, _callee4, this);
-      }));
-
-      function _rot128(_x3) {
-        return _rot.apply(this, arguments);
-      }
-
-      return _rot128;
-    }()
-  }], [{
-    key: "create",
-    value: function () {
-      var _create = asyncToGenerator_default()(
-      /*#__PURE__*/
-      regenerator_default.a.mark(function _callee5(psk, pskId, sendCallback) {
-        return regenerator_default.a.wrap(function _callee5$(_context5) {
-          while (1) {
-            switch (_context5.prev = _context5.next) {
-              case 0:
-                return _context5.abrupt("return", new this(psk, pskId, sendCallback));
-
-              case 1:
-              case "end":
-                return _context5.stop();
-            }
-          }
-        }, _callee5, this);
-      }));
-
-      function create(_x4, _x5, _x6) {
-        return _create.apply(this, arguments);
-      }
-
-      return create;
-    }()
-  }]);
-
-  return InsecureConnection;
-}();
-
-var rot128_InsecureClientConnection =
-/*#__PURE__*/
-function (_InsecureConnection) {
-  inherits_default()(InsecureClientConnection, _InsecureConnection);
-
-  function InsecureClientConnection() {
-    classCallCheck_default()(this, InsecureClientConnection);
-
-    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(InsecureClientConnection).apply(this, arguments));
-  }
-
-  createClass_default()(InsecureClientConnection, null, [{
-    key: "create",
-    value: function () {
-      var _create2 = asyncToGenerator_default()(
-      /*#__PURE__*/
-      regenerator_default.a.mark(function _callee6(psk, pskId, sendCallback) {
-        var instance;
         return regenerator_default.a.wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
                 _context6.next = 2;
-                return get_default()(getPrototypeOf_default()(InsecureClientConnection), "create", this).call(this, psk, pskId, sendCallback);
+                return this._synchronized(
+                /*#__PURE__*/
+                asyncToGenerator_default()(
+                /*#__PURE__*/
+                regenerator_default.a.mark(function _callee5() {
+                  return regenerator_default.a.wrap(function _callee5$(_context5) {
+                    while (1) {
+                      switch (_context5.prev = _context5.next) {
+                        case 0:
+                          _context5.next = 2;
+                          return _this4._state.close();
+
+                        case 2:
+                        case "end":
+                          return _context5.stop();
+                      }
+                    }
+                  }, _callee5, this);
+                })));
 
               case 2:
-                instance = _context6.sent;
-                _context6.next = 5;
-                return instance.send(instance.psk);
-
-              case 5:
-                return _context6.abrupt("return", instance);
-
-              case 6:
               case "end":
                 return _context6.stop();
             }
@@ -1486,7 +6508,430 @@ function (_InsecureConnection) {
         }, _callee6, this);
       }));
 
-      function create(_x7, _x8, _x9) {
+      function close() {
+        return _close.apply(this, arguments);
+      }
+
+      return close;
+    }() // Ensure that async functions execute one at a time,
+    // by waiting for the previous call to `_synchronized()` to complete
+    // before starting a new one.  This helps ensure that we complete
+    // one state-machine transition before starting to do the next.
+    // It's also a convenient place to catch and alert on errors.
+
+  }, {
+    key: "_synchronized",
+    value: function _synchronized(cb) {
+      var _this5 = this;
+
+      var nextPromise = this._lastPromise.then(function () {
+        return cb();
+      }).catch(
+      /*#__PURE__*/
+      function () {
+        var _ref6 = asyncToGenerator_default()(
+        /*#__PURE__*/
+        regenerator_default.a.mark(function _callee7(err) {
+          return regenerator_default.a.wrap(function _callee7$(_context7) {
+            while (1) {
+              switch (_context7.prev = _context7.next) {
+                case 0:
+                  if (!(err instanceof alerts_TLSCloseNotify)) {
+                    _context7.next = 2;
+                    break;
+                  }
+
+                  throw err;
+
+                case 2:
+                  _context7.next = 4;
+                  return _this5._state.handleErrorAndRethrow(err);
+
+                case 4:
+                case "end":
+                  return _context7.stop();
+              }
+            }
+          }, _callee7, this);
+        }));
+
+        return function (_x3) {
+          return _ref6.apply(this, arguments);
+        };
+      }()); // We don't want to hold on to the return value or error,
+      // just synchronize on the fact that it completed.
+
+
+      this._lastPromise = nextPromise.then(noop, noop);
+      return nextPromise;
+    } // This drives internal transition of the state-machine,
+    // ensuring that the new state is properly initialized.
+
+  }, {
+    key: "_transition",
+    value: function () {
+      var _transition2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee8(State) {
+        var _this$_state;
+
+        var _len,
+            args,
+            _key,
+            _args8 = arguments;
+
+        return regenerator_default.a.wrap(function _callee8$(_context8) {
+          while (1) {
+            switch (_context8.prev = _context8.next) {
+              case 0:
+                this._state = new State(this);
+
+                for (_len = _args8.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+                  args[_key - 1] = _args8[_key];
+                }
+
+                _context8.next = 4;
+                return (_this$_state = this._state).initialize.apply(_this$_state, args);
+
+              case 4:
+                _context8.next = 6;
+                return this._recordlayer.flush();
+
+              case 6:
+              case "end":
+                return _context8.stop();
+            }
+          }
+        }, _callee8, this);
+      }));
+
+      function _transition(_x4) {
+        return _transition2.apply(this, arguments);
+      }
+
+      return _transition;
+    }() // These are helpers to allow the State to manipulate the recordlayer
+    // and send out various types of data.
+
+  }, {
+    key: "_sendApplicationData",
+    value: function () {
+      var _sendApplicationData2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee9(bytes) {
+        return regenerator_default.a.wrap(function _callee9$(_context9) {
+          while (1) {
+            switch (_context9.prev = _context9.next) {
+              case 0:
+                _context9.next = 2;
+                return this._recordlayer.send(RECORD_TYPE.APPLICATION_DATA, bytes);
+
+              case 2:
+                _context9.next = 4;
+                return this._recordlayer.flush();
+
+              case 4:
+              case "end":
+                return _context9.stop();
+            }
+          }
+        }, _callee9, this);
+      }));
+
+      function _sendApplicationData(_x5) {
+        return _sendApplicationData2.apply(this, arguments);
+      }
+
+      return _sendApplicationData;
+    }()
+  }, {
+    key: "_sendHandshakeMessage",
+    value: function () {
+      var _sendHandshakeMessage2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee10(msg) {
+        return regenerator_default.a.wrap(function _callee10$(_context10) {
+          while (1) {
+            switch (_context10.prev = _context10.next) {
+              case 0:
+                _context10.next = 2;
+                return this._sendHandshakeMessageBytes(msg.toBytes());
+
+              case 2:
+              case "end":
+                return _context10.stop();
+            }
+          }
+        }, _callee10, this);
+      }));
+
+      function _sendHandshakeMessage(_x6) {
+        return _sendHandshakeMessage2.apply(this, arguments);
+      }
+
+      return _sendHandshakeMessage;
+    }()
+  }, {
+    key: "_sendHandshakeMessageBytes",
+    value: function () {
+      var _sendHandshakeMessageBytes2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee11(bytes) {
+        return regenerator_default.a.wrap(function _callee11$(_context11) {
+          while (1) {
+            switch (_context11.prev = _context11.next) {
+              case 0:
+                this._keyschedule.addToTranscript(bytes);
+
+                _context11.next = 3;
+                return this._recordlayer.send(RECORD_TYPE.HANDSHAKE, bytes);
+
+              case 3:
+              case "end":
+                return _context11.stop();
+            }
+          }
+        }, _callee11, this);
+      }));
+
+      function _sendHandshakeMessageBytes(_x7) {
+        return _sendHandshakeMessageBytes2.apply(this, arguments);
+      }
+
+      return _sendHandshakeMessageBytes;
+    }()
+  }, {
+    key: "_sendAlertMessage",
+    value: function () {
+      var _sendAlertMessage2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee12(err) {
+        return regenerator_default.a.wrap(function _callee12$(_context12) {
+          while (1) {
+            switch (_context12.prev = _context12.next) {
+              case 0:
+                _context12.next = 2;
+                return this._recordlayer.send(RECORD_TYPE.ALERT, err.toBytes());
+
+              case 2:
+                _context12.next = 4;
+                return this._recordlayer.flush();
+
+              case 4:
+              case "end":
+                return _context12.stop();
+            }
+          }
+        }, _callee12, this);
+      }));
+
+      function _sendAlertMessage(_x8) {
+        return _sendAlertMessage2.apply(this, arguments);
+      }
+
+      return _sendAlertMessage;
+    }()
+  }, {
+    key: "_sendChangeCipherSpec",
+    value: function () {
+      var _sendChangeCipherSpec2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee13() {
+        return regenerator_default.a.wrap(function _callee13$(_context13) {
+          while (1) {
+            switch (_context13.prev = _context13.next) {
+              case 0:
+                _context13.next = 2;
+                return this._recordlayer.send(RECORD_TYPE.CHANGE_CIPHER_SPEC, new Uint8Array([0x01]));
+
+              case 2:
+                _context13.next = 4;
+                return this._recordlayer.flush();
+
+              case 4:
+              case "end":
+                return _context13.stop();
+            }
+          }
+        }, _callee13, this);
+      }));
+
+      function _sendChangeCipherSpec() {
+        return _sendChangeCipherSpec2.apply(this, arguments);
+      }
+
+      return _sendChangeCipherSpec;
+    }()
+  }, {
+    key: "_setSendKey",
+    value: function () {
+      var _setSendKey2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee14(key) {
+        return regenerator_default.a.wrap(function _callee14$(_context14) {
+          while (1) {
+            switch (_context14.prev = _context14.next) {
+              case 0:
+                _context14.next = 2;
+                return this._recordlayer.setSendKey(key);
+
+              case 2:
+                return _context14.abrupt("return", _context14.sent);
+
+              case 3:
+              case "end":
+                return _context14.stop();
+            }
+          }
+        }, _callee14, this);
+      }));
+
+      function _setSendKey(_x9) {
+        return _setSendKey2.apply(this, arguments);
+      }
+
+      return _setSendKey;
+    }()
+  }, {
+    key: "_setRecvKey",
+    value: function () {
+      var _setRecvKey2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee15(key) {
+        return regenerator_default.a.wrap(function _callee15$(_context15) {
+          while (1) {
+            switch (_context15.prev = _context15.next) {
+              case 0:
+                if (!(this._handshakeRecvBuffer && this._handshakeRecvBuffer.hasMoreBytes())) {
+                  _context15.next = 2;
+                  break;
+                }
+
+                throw new alerts_TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
+
+              case 2:
+                _context15.next = 4;
+                return this._recordlayer.setRecvKey(key);
+
+              case 4:
+                return _context15.abrupt("return", _context15.sent);
+
+              case 5:
+              case "end":
+                return _context15.stop();
+            }
+          }
+        }, _callee15, this);
+      }));
+
+      function _setRecvKey(_x10) {
+        return _setRecvKey2.apply(this, arguments);
+      }
+
+      return _setRecvKey;
+    }()
+  }, {
+    key: "_setConnectionSuccess",
+    value: function _setConnectionSuccess() {
+      if (this._onConnectionSuccess !== null) {
+        this._onConnectionSuccess();
+
+        this._onConnectionSuccess = null;
+        this._onConnectionFailure = null;
+      }
+    }
+  }, {
+    key: "_setConnectionFailure",
+    value: function _setConnectionFailure(err) {
+      if (this._onConnectionFailure !== null) {
+        this._onConnectionFailure(err);
+
+        this._onConnectionSuccess = null;
+        this._onConnectionFailure = null;
+      }
+    }
+  }, {
+    key: "_closeForSend",
+    value: function _closeForSend(alert) {
+      this._recordlayer.setSendError(alert);
+    }
+  }, {
+    key: "_closeForRecv",
+    value: function _closeForRecv(alert) {
+      this._recordlayer.setRecvError(alert);
+    }
+  }], [{
+    key: "create",
+    value: function () {
+      var _create = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee16(psk, pskId, sendCallback) {
+        return regenerator_default.a.wrap(function _callee16$(_context16) {
+          while (1) {
+            switch (_context16.prev = _context16.next) {
+              case 0:
+                return _context16.abrupt("return", new this(psk, pskId, sendCallback));
+
+              case 1:
+              case "end":
+                return _context16.stop();
+            }
+          }
+        }, _callee16, this);
+      }));
+
+      function create(_x11, _x12, _x13) {
+        return _create.apply(this, arguments);
+      }
+
+      return create;
+    }()
+  }]);
+
+  return Connection;
+}();
+var tlsconnection_ClientConnection =
+/*#__PURE__*/
+function (_Connection) {
+  inherits_default()(ClientConnection, _Connection);
+
+  function ClientConnection() {
+    classCallCheck_default()(this, ClientConnection);
+
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(ClientConnection).apply(this, arguments));
+  }
+
+  createClass_default()(ClientConnection, null, [{
+    key: "create",
+    value: function () {
+      var _create2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee17(psk, pskId, sendCallback) {
+        var instance;
+        return regenerator_default.a.wrap(function _callee17$(_context17) {
+          while (1) {
+            switch (_context17.prev = _context17.next) {
+              case 0:
+                _context17.next = 2;
+                return get_default()(getPrototypeOf_default()(ClientConnection), "create", this).call(this, psk, pskId, sendCallback);
+
+              case 2:
+                instance = _context17.sent;
+                _context17.next = 5;
+                return instance._transition(states_CLIENT_START);
+
+              case 5:
+                return _context17.abrupt("return", instance);
+
+              case 6:
+              case "end":
+                return _context17.stop();
+            }
+          }
+        }, _callee17, this);
+      }));
+
+      function create(_x14, _x15, _x16) {
         return _create2.apply(this, arguments);
       }
 
@@ -1494,66 +6939,59 @@ function (_InsecureConnection) {
     }()
   }]);
 
-  return InsecureClientConnection;
-}(rot128_InsecureConnection);
-var rot128_InsecureServerConnection =
+  return ClientConnection;
+}(tlsconnection_Connection);
+var tlsconnection_ServerConnection =
 /*#__PURE__*/
-function (_InsecureConnection2) {
-  inherits_default()(InsecureServerConnection, _InsecureConnection2);
+function (_Connection2) {
+  inherits_default()(ServerConnection, _Connection2);
 
-  function InsecureServerConnection(psk, pskId, sendCallback) {
-    var _this;
+  function ServerConnection() {
+    classCallCheck_default()(this, ServerConnection);
 
-    classCallCheck_default()(this, InsecureServerConnection);
-
-    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(InsecureServerConnection).call(this, psk, pskId, sendCallback));
-    _this.receivedHandshake = false;
-    return _this;
+    return possibleConstructorReturn_default()(this, getPrototypeOf_default()(ServerConnection).apply(this, arguments));
   }
 
-  createClass_default()(InsecureServerConnection, [{
-    key: "recv",
+  createClass_default()(ServerConnection, null, [{
+    key: "create",
     value: function () {
-      var _recv2 = asyncToGenerator_default()(
+      var _create3 = asyncToGenerator_default()(
       /*#__PURE__*/
-      regenerator_default.a.mark(function _callee7(data) {
-        var output;
-        return regenerator_default.a.wrap(function _callee7$(_context7) {
+      regenerator_default.a.mark(function _callee18(psk, pskId, sendCallback) {
+        var instance;
+        return regenerator_default.a.wrap(function _callee18$(_context18) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context18.prev = _context18.next) {
               case 0:
-                _context7.next = 2;
-                return get_default()(getPrototypeOf_default()(InsecureServerConnection.prototype), "recv", this).call(this, data);
+                _context18.next = 2;
+                return get_default()(getPrototypeOf_default()(ServerConnection), "create", this).call(this, psk, pskId, sendCallback);
 
               case 2:
-                output = _context7.sent;
-
-                if (!this.receivedHandshake) {
-                  assert(bytesAreEqual(output, this.psk), 'psk mismatch');
-                  this.receivedHandshake = true;
-                  output = null;
-                }
-
-                return _context7.abrupt("return", output);
+                instance = _context18.sent;
+                _context18.next = 5;
+                return instance._transition(states_SERVER_START);
 
               case 5:
+                return _context18.abrupt("return", instance);
+
+              case 6:
               case "end":
-                return _context7.stop();
+                return _context18.stop();
             }
           }
-        }, _callee7, this);
+        }, _callee18, this);
       }));
 
-      function recv(_x10) {
-        return _recv2.apply(this, arguments);
+      function create(_x17, _x18, _x19) {
+        return _create3.apply(this, arguments);
       }
 
-      return recv;
+      return create;
     }()
   }]);
 
-  return InsecureServerConnection;
-}(rot128_InsecureConnection);
+  return ServerConnection;
+}(tlsconnection_Connection);
 // CONCATENATED MODULE: ./node_modules/event-target-shim/dist/event-target-shim.mjs
 /**
  * @author Toru Nagashima <https://github.com/mysticatea>
@@ -2419,45 +7857,53 @@ if (
 //# sourceMappingURL=event-target-shim.mjs.map
 
 // CONCATENATED MODULE: ./src/index.js
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "InsecurePairingChannel", function() { return src_InsecurePairingChannel; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PairingChannel", function() { return src_PairingChannel; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_internals", function() { return _internals; });
+/* concated harmony reexport base64urlToBytes */__webpack_require__.d(__webpack_exports__, "base64urlToBytes", function() { return base64urlToBytes; });
+/* concated harmony reexport bytesToBase64url */__webpack_require__.d(__webpack_exports__, "bytesToBase64url", function() { return bytesToBase64url; });
 /* concated harmony reexport bytesToHex */__webpack_require__.d(__webpack_exports__, "bytesToHex", function() { return bytesToHex; });
-/* concated harmony reexport hexToBytes */__webpack_require__.d(__webpack_exports__, "hexToBytes", function() { return hexToBytes; });
 /* concated harmony reexport bytesToUtf8 */__webpack_require__.d(__webpack_exports__, "bytesToUtf8", function() { return bytesToUtf8; });
+/* concated harmony reexport hexToBytes */__webpack_require__.d(__webpack_exports__, "hexToBytes", function() { return hexToBytes; });
+/* concated harmony reexport TLSCloseNotify */__webpack_require__.d(__webpack_exports__, "TLSCloseNotify", function() { return alerts_TLSCloseNotify; });
+/* concated harmony reexport TLSError */__webpack_require__.d(__webpack_exports__, "TLSError", function() { return alerts_TLSError; });
 /* concated harmony reexport utf8ToBytes */__webpack_require__.d(__webpack_exports__, "utf8ToBytes", function() { return utf8ToBytes; });
+
+
+
+
+
+
+
+
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
- // A wrapper that combines a WebSocket to the channelserver
+// A wrapper that combines a WebSocket to the channelserver
 // with some client-side encryption for securing the channel.
 // We'll improve the encryption before initial release...
 
 
 
 
-
-
-
-
-
-
-
 var CLOSE_FLUSH_BUFFER_INTERVAL_MS = 200;
 var CLOSE_FLUSH_BUFFER_MAX_TRIES = 5;
-var src_InsecurePairingChannel =
+var src_PairingChannel =
 /*#__PURE__*/
 function (_EventTarget) {
-  inherits_default()(InsecurePairingChannel, _EventTarget);
+  inherits_default()(PairingChannel, _EventTarget);
 
-  function InsecurePairingChannel(channelId, channelKey, socket, connection) {
+  function PairingChannel(channelId, channelKey, socket, connection) {
     var _this;
 
-    classCallCheck_default()(this, InsecurePairingChannel);
+    classCallCheck_default()(this, PairingChannel);
 
-    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(InsecurePairingChannel).call(this));
+    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(PairingChannel).call(this));
     _this._channelId = channelId;
     _this._channelKey = channelKey;
     _this._socket = socket;
     _this._connection = connection;
+    _this._selfClosed = false;
+    _this._peerClosed = false;
 
     _this._setupListeners();
 
@@ -2466,11 +7912,11 @@ function (_EventTarget) {
   /**
    * Create a new pairing channel.
    *
-   * @returns Promise<InsecurePairingChannel>
+   * @returns Promise<PairingChannel>
    */
 
 
-  createClass_default()(InsecurePairingChannel, [{
+  createClass_default()(PairingChannel, [{
     key: "_setupListeners",
     value: function _setupListeners() {
       var _this2 = this;
@@ -2481,7 +7927,8 @@ function (_EventTarget) {
         var _ref = asyncToGenerator_default()(
         /*#__PURE__*/
         regenerator_default.a.mark(function _callee(event) {
-          var channelServerEnvelope, payload, data;
+          var channelServerEnvelope, payload, data, _event;
+
           return regenerator_default.a.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
@@ -2489,7 +7936,7 @@ function (_EventTarget) {
                   _context.prev = 0;
                   channelServerEnvelope = JSON.parse(event.data);
                   _context.next = 4;
-                  return _this2._connection.recv(hexToBytes(channelServerEnvelope.message));
+                  return _this2._connection.recv(base64urlToBytes(channelServerEnvelope.message));
 
                 case 4:
                   payload = _context.sent;
@@ -2505,20 +7952,32 @@ function (_EventTarget) {
                     }));
                   }
 
-                  _context.next = 11;
+                  _context.next = 12;
                   break;
 
                 case 8:
                   _context.prev = 8;
                   _context.t0 = _context["catch"](0);
 
-                  _this2.dispatchEvent(new CustomEvent('error', {
-                    detail: {
-                      error: _context.t0
-                    }
-                  }));
+                  if (_context.t0 instanceof alerts_TLSCloseNotify) {
+                    _this2._peerClosed = true;
 
-                case 11:
+                    if (_this2._selfClosed) {
+                      _this2._shutdown();
+                    }
+
+                    _event = new CustomEvent('close');
+                  } else {
+                    _event = new CustomEvent('error', {
+                      detail: {
+                        error: _context.t0
+                      }
+                    });
+                  }
+
+                  _this2.dispatchEvent(_event);
+
+                case 12:
                 case "end":
                   return _context.stop();
               }
@@ -2533,16 +7992,28 @@ function (_EventTarget) {
 
 
       this._socket.addEventListener('error', function () {
-        // The dispatched event that we receive has no useful information.
+        _this2._shutdown(); // The dispatched event that we receive has no useful information.
+
+
         _this2.dispatchEvent(new CustomEvent('error', {
           detail: {
             error: new Error('WebSocket error.')
           }
         }));
-      });
+      }); // In TLS, the peer has to explicitly send a close notification,
+      // which we dispatch above.  Unexpected socket close is an error.
 
-      this._socket.addEventListener('close', function (e) {
-        return _this2.dispatchEvent(e);
+
+      this._socket.addEventListener('close', function () {
+        _this2._shutdown();
+
+        if (!_this2._peerClosed) {
+          _this2.dispatchEvent(new CustomEvent('error', {
+            detail: {
+              error: new Error('WebSocket unexpectedly closed')
+            }
+          }));
+        }
       });
     }
     /**
@@ -2589,11 +8060,11 @@ function (_EventTarget) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _context3.next = 2;
+                this._selfClosed = true;
+                _context3.next = 3;
                 return this._connection.close();
 
-              case 2:
-                this._connection = null;
+              case 3:
                 _context3.prev = 3;
                 // Ensure all queued bytes have been sent before closing the connection.
                 tries = 0;
@@ -2624,17 +8095,19 @@ function (_EventTarget) {
               case 12:
                 _context3.prev = 12;
 
-                this._socket.close();
+                // If the peer hasn't closed, we might still receive some data.
+                if (this._peerClosed) {
+                  this._shutdown();
+                }
 
-                this._socket = null;
                 return _context3.finish(12);
 
-              case 16:
+              case 15:
               case "end":
                 return _context3.stop();
             }
           }
-        }, _callee3, this, [[3,, 12, 16]]);
+        }, _callee3, this, [[3,, 12, 15]]);
       }));
 
       function close() {
@@ -2644,9 +8117,19 @@ function (_EventTarget) {
       return close;
     }()
   }, {
+    key: "_shutdown",
+    value: function _shutdown() {
+      if (this._socket) {
+        this._socket.close();
+
+        this._socket = null;
+        this._connection = null;
+      }
+    }
+  }, {
     key: "closed",
     get: function get() {
-      return this._socket.readyState === 3;
+      return !this._socket || this._socket.readyState === 3;
     }
   }, {
     key: "channelId",
@@ -2663,19 +8146,19 @@ function (_EventTarget) {
     value: function create(channelServerURI) {
       var wsURI = new URL('/v1/ws/', channelServerURI).href;
       var channelKey = crypto.getRandomValues(new Uint8Array(32));
-      return this._makePairingChannel(wsURI, rot128_InsecureServerConnection, channelKey);
+      return this._makePairingChannel(wsURI, tlsconnection_ServerConnection, channelKey);
     }
     /**
      * Connect to an existing pairing channel.
      *
-     * @returns Promise<InsecurePairingChannel>
+     * @returns Promise<PairingChannel>
      */
 
   }, {
     key: "connect",
     value: function connect(channelServerURI, channelId, channelKey) {
       var wsURI = new URL("/v1/ws/".concat(channelId), channelServerURI).href;
-      return this._makePairingChannel(wsURI, rot128_InsecureClientConnection, channelKey);
+      return this._makePairingChannel(wsURI, tlsconnection_ClientConnection, channelKey);
     }
   }, {
     key: "_makePairingChannel",
@@ -2731,8 +8214,9 @@ function (_EventTarget) {
                     pskId = utf8ToBytes(channelId);
                     _context5.next = 6;
                     return ConnectionClass.create(psk, pskId, function (data) {
-                      // To send data over the websocket, it needs to be encoded as a safe string.
-                      socket.send(bytesToHex(data));
+                      // The channelserver websocket handler epxects b64urlsafe strings
+                      // rather than raw bytes, because it wraps them in a JSON object envelope.
+                      socket.send(bytesToBase64url(data));
                     });
 
                   case 6:
@@ -2771,10 +8255,41 @@ function (_EventTarget) {
     }
   }]);
 
-  return InsecurePairingChannel;
+  return PairingChannel;
 }(EventTarget); // Re-export helpful utilities for calling code to use.
 
+ // For running tests using the built bundle,
+// expose a bunch of implementation details.
 
+
+
+
+
+
+
+var _internals = {
+  arrayToBytes: arrayToBytes,
+  BufferReader: utils_BufferReader,
+  BufferWriter: utils_BufferWriter,
+  bytesAreEqual: bytesAreEqual,
+  bytesToHex: bytesToHex,
+  bytesToUtf8: bytesToUtf8,
+  ClientConnection: tlsconnection_ClientConnection,
+  Connection: tlsconnection_Connection,
+  DecryptionState: recordlayer_DecryptionState,
+  EncryptedExtensions: messages_EncryptedExtensions,
+  EncryptionState: recordlayer_EncryptionState,
+  Finished: messages_Finished,
+  HASH_LENGTH: HASH_LENGTH,
+  hexToBytes: hexToBytes,
+  hkdfExpand: hkdfExpand,
+  KeySchedule: keyschedule_KeySchedule,
+  NewSessionTicket: messages_NewSessionTicket,
+  RecordLayer: recordlayer_RecordLayer,
+  ServerConnection: tlsconnection_ServerConnection,
+  utf8ToBytes: utf8ToBytes,
+  zeros: zeros
+};
 
 /***/ })
 /******/ ]);
