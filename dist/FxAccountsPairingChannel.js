@@ -14,7 +14,7 @@
  * This uses the event-target-shim node library published under the MIT license:
  * https://github.com/mysticatea/event-target-shim/blob/master/LICENSE
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:9c65d4ae928ca50f73d5, Chunkhash:52a19cf7b9339982459a.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:348f3cf3e80cf7f54f9e, Chunkhash:d34c4d4ec81a46304a5d.
  * 
  */
 
@@ -1092,7 +1092,7 @@ class messages_HandshakeMessage {
           msg = messages_ServerHello._read(buf);
           break;
         case HANDSHAKE_TYPE.NEW_SESSION_TICKET:
-          msg = NewSessionTicket._read(buf);
+          msg = messages_NewSessionTicket._read(buf);
           break;
         case HANDSHAKE_TYPE.ENCRYPTED_EXTENSIONS:
           msg = EncryptedExtensions._read(buf);
@@ -1381,7 +1381,7 @@ class messages_Finished extends messages_HandshakeMessage {
 // We don't actually make use of these, but we need to be able
 // to accept them and do basic validation.
 
-class NewSessionTicket extends messages_HandshakeMessage {
+class messages_NewSessionTicket extends messages_HandshakeMessage {
   constructor(ticketLifetime, ticketAgeAdd, ticketNonce, ticket, extensions) {
     super();
     this.ticketLifetime = ticketLifetime;
@@ -1396,13 +1396,15 @@ class NewSessionTicket extends messages_HandshakeMessage {
   }
 
   static _read(buf) {
-    return new this(
-      buf.readUint32(), // ticket_lifetime
-      buf.readUint32(), // ticket_age_add
-      buf.readVectorBytes8(), // ticket_nonce
-      buf.readVectorBytes16(), // ticket
-      this._readExtensions(HANDSHAKE_TYPE.NEW_SESSION_TICKET, buf)
-    );
+    const ticketLifetime = buf.readUint32();
+    const ticketAgeAdd = buf.readUint32();
+    const ticketNonce = buf.readVectorBytes8();
+    const ticket = buf.readVectorBytes16();
+    if (ticket.byteLength < 1) {
+      throw new TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+    }
+    const extensions = this._readExtensions(HANDSHAKE_TYPE.NEW_SESSION_TICKET, buf);
+    return new this(ticketLifetime, ticketAgeAdd, ticketNonce, ticket, extensions);
   }
 
   _write(buf) {
@@ -1660,6 +1662,7 @@ class states_CLIENT_WAIT_SH extends states_State {
     if (! pskExt) {
       throw new TLSError(ALERT_DESCRIPTION.MISSING_EXTENSION);
     }
+    // We expect only the SUPPORTED_VERSIONS and PRE_SHARED_KEY extensions.
     if (msg.extensions.size !== 2) {
       throw new TLSError(ALERT_DESCRIPTION.UNSUPPORTED_EXTENSION);
     }
@@ -1690,7 +1693,7 @@ class states_CLIENT_WAIT_EE extends states_MidHandshakeState {
   }
 }
 
-class states_CLIENT_WAIT_FINISHED extends states_MidHandshakeState {
+class states_CLIENT_WAIT_FINISHED extends states_State {
   async initialize(serverFinishedTranscript) {
     this._serverFinishedTranscript = serverFinishedTranscript;
   }
@@ -1718,7 +1721,7 @@ class states_CLIENT_CONNECTED extends states_CONNECTED {
     // A connected client must be prepared to accept NewSessionTicket
     // messages.  We never use them, but other server implementations
     // might send them.
-    if (! (msg instanceof NewSessionTicket)) {
+    if (! (msg instanceof messages_NewSessionTicket)) {
       throw new TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
     }
   }
@@ -2341,7 +2344,7 @@ class recordlayer_RecordLayer {
 //    // as a `TLSCloseNotify` exception from recv:
 //
 //    try {
-//      await conn.recv(data);
+//      data = await conn.recv(data);
 //    } catch (err) {
 //      if (! (err instanceof TLSCloseNotify) { throw err }
 //      do_something_to_cleanly_close_data_connection();
@@ -3643,7 +3646,7 @@ const _internals = {
   hexToBytes: hexToBytes,
   hkdfExpand: hkdfExpand,
   KeySchedule: keyschedule_KeySchedule,
-  NewSessionTicket: NewSessionTicket,
+  NewSessionTicket: messages_NewSessionTicket,
   RecordLayer: recordlayer_RecordLayer,
   ServerConnection: tlsconnection_ServerConnection,
   utf8ToBytes: utf8ToBytes,

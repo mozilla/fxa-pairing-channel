@@ -249,6 +249,7 @@ class CLIENT_WAIT_SH extends State {
     if (! pskExt) {
       throw new TLSError(ALERT_DESCRIPTION.MISSING_EXTENSION);
     }
+    // We expect only the SUPPORTED_VERSIONS and PRE_SHARED_KEY extensions.
     if (msg.extensions.size !== 2) {
       throw new TLSError(ALERT_DESCRIPTION.UNSUPPORTED_EXTENSION);
     }
@@ -279,7 +280,7 @@ class CLIENT_WAIT_EE extends MidHandshakeState {
   }
 }
 
-class CLIENT_WAIT_FINISHED extends MidHandshakeState {
+class CLIENT_WAIT_FINISHED extends State {
   async initialize(serverFinishedTranscript) {
     this._serverFinishedTranscript = serverFinishedTranscript;
   }

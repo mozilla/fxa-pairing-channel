@@ -42,7 +42,7 @@
 //    // as a `TLSCloseNotify` exception from recv:
 //
 //    try {
-//      await conn.recv(data);
+//      data = await conn.recv(data);
 //    } catch (err) {
 //      if (! (err instanceof TLSCloseNotify) { throw err }
 //      do_something_to_cleanly_close_data_connection();

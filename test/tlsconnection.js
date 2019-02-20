@@ -893,12 +893,23 @@ describe('the ClientConnection class', () => {
 
       it('accepts and ignores a NewSessionTicket message', async () => {
         const encryptor = await testHelpers.makeEncryptionState(client._keyschedule.serverApplicationTrafficSecret, 0);
-        const newSessionTicket = new NewSessionTicket(0, 0, zeros(0), zeros(0), []);
+        const newSessionTicket = new NewSessionTicket(0, 0, zeros(32), zeros(32), []);
         const data = await client.recv(await testHelpers.makeEncryptedRecord(encryptor, {
           content: newSessionTicket.toBytes(),
           type: 22,
         }));
         assert.equal(data, null);
+      });
+
+      it('errors if it receives an invalid NewSessionTicket message', async () => {
+        const encryptor = await testHelpers.makeEncryptionState(client._keyschedule.serverApplicationTrafficSecret, 0);
+        const newSessionTicket = new NewSessionTicket(0, 0, zeros(0), zeros(0), []); // a zero-length ticket is invalid
+        await assert.throwsAsync(async () => {
+          await client.recv(await testHelpers.makeEncryptedRecord(encryptor, {
+            content: newSessionTicket.toBytes(),
+            type: 22,
+          }));
+        }, TLSError, 'DECODE_ERROR');
       });
 
       it('errors if it receives another handshake message', async () => {
@@ -1499,12 +1510,20 @@ describe('the handshake between ClientConnection and ServerConnection', () => {
     const CLIENT_SENT = [], SERVER_SENT = [];
     const server = await ServerConnection.create(TEST_VECTORS.PSK, TEST_VECTORS.PSK_ID, data => SERVER_SENT.push(data));
     const client = await ClientConnection.create(TEST_VECTORS.PSK, TEST_VECTORS.PSK_ID, data => CLIENT_SENT.push(data));
+    await assert.promiseIsPending(client.connected);
+    await assert.promiseIsPending(server.connected);
+
     await server.recv(CLIENT_SENT[0]); // CH
     await client.recv(SERVER_SENT[0]); // SH
     await client.recv(SERVER_SENT[1]); // CCS
+    await assert.promiseIsPending(client.connected);
+    await assert.promiseIsPending(server.connected);
+
     await client.recv(SERVER_SENT[2]); // EE+SF
-    await server.recv(CLIENT_SENT[1]); // CF
     await client.connected;
+    await assert.promiseIsPending(server.connected);
+
+    await server.recv(CLIENT_SENT[1]); // CF
     await server.connected;
   });
 
