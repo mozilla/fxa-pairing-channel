@@ -14,7 +14,7 @@
  * This uses the event-target-shim node library published under the MIT license:
  * https://github.com/mysticatea/event-target-shim/blob/master/LICENSE
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:0ad04506d795353753b8, Chunkhash:2c3de315a58fe5473e9b.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:3f2cbe918402baef9611, Chunkhash:4befe20cda6e4faa0272.
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -3252,11 +3252,18 @@ function (_HandshakeMessage5) {
   }], [{
     key: "_read",
     value: function _read(buf) {
-      return new this(buf.readUint32(), // ticket_lifetime
-      buf.readUint32(), // ticket_age_add
-      buf.readVectorBytes8(), // ticket_nonce
-      buf.readVectorBytes16(), // ticket
-      this._readExtensions(HANDSHAKE_TYPE.NEW_SESSION_TICKET, buf));
+      var ticketLifetime = buf.readUint32();
+      var ticketAgeAdd = buf.readUint32();
+      var ticketNonce = buf.readVectorBytes8();
+      var ticket = buf.readVectorBytes16();
+
+      if (ticket.byteLength < 1) {
+        throw new alerts_TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+      }
+
+      var extensions = this._readExtensions(HANDSHAKE_TYPE.NEW_SESSION_TICKET, buf);
+
+      return new this(ticketLifetime, ticketAgeAdd, ticketNonce, ticket, extensions);
     }
   }]);
 
@@ -4455,8 +4462,8 @@ function (_MidHandshakeState) {
 
 var states_CLIENT_WAIT_FINISHED =
 /*#__PURE__*/
-function (_MidHandshakeState2) {
-  inherits_default()(CLIENT_WAIT_FINISHED, _MidHandshakeState2);
+function (_State7) {
+  inherits_default()(CLIENT_WAIT_FINISHED, _State7);
 
   function CLIENT_WAIT_FINISHED() {
     classCallCheck_default()(this, CLIENT_WAIT_FINISHED);
@@ -4556,7 +4563,7 @@ function (_MidHandshakeState2) {
   }]);
 
   return CLIENT_WAIT_FINISHED;
-}(states_MidHandshakeState);
+}(states_State);
 
 var states_CLIENT_CONNECTED =
 /*#__PURE__*/
@@ -4620,8 +4627,8 @@ function (_CONNECTED) {
 
 var states_SERVER_START =
 /*#__PURE__*/
-function (_State7) {
-  inherits_default()(SERVER_START, _State7);
+function (_State8) {
+  inherits_default()(SERVER_START, _State8);
 
   function SERVER_START() {
     classCallCheck_default()(this, SERVER_START);
@@ -4768,8 +4775,8 @@ function (_State7) {
 
 var states_SERVER_NEGOTIATED =
 /*#__PURE__*/
-function (_MidHandshakeState3) {
-  inherits_default()(SERVER_NEGOTIATED, _MidHandshakeState3);
+function (_MidHandshakeState2) {
+  inherits_default()(SERVER_NEGOTIATED, _MidHandshakeState2);
 
   function SERVER_NEGOTIATED() {
     classCallCheck_default()(this, SERVER_NEGOTIATED);
@@ -4876,8 +4883,8 @@ function (_MidHandshakeState3) {
 
 var states_SERVER_WAIT_FINISHED =
 /*#__PURE__*/
-function (_MidHandshakeState4) {
-  inherits_default()(SERVER_WAIT_FINISHED, _MidHandshakeState4);
+function (_MidHandshakeState3) {
+  inherits_default()(SERVER_WAIT_FINISHED, _MidHandshakeState3);
 
   function SERVER_WAIT_FINISHED() {
     classCallCheck_default()(this, SERVER_WAIT_FINISHED);
@@ -6257,7 +6264,7 @@ function () {
 //    // as a `TLSCloseNotify` exception from recv:
 //
 //    try {
-//      await conn.recv(data);
+//      data = await conn.recv(data);
 //    } catch (err) {
 //      if (! (err instanceof TLSCloseNotify) { throw err }
 //      do_something_to_cleanly_close_data_connection();

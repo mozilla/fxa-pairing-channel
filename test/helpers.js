@@ -2,20 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-assert.throwsAsync = (fn, errorLike, errMsgMatcher, message) => {
-  let threw = null;
-  return fn().catch(err => {
-    threw = err;
-  }).then(() => {
-    // Use synchronous `assert.throws` to get all the nice matching logic.
-    assert.throws(() => {
-      if (threw) {
-        throw threw;
-      }
-    }, errorLike, errMsgMatcher, message);
-  });
-};
-
 // These are helper functions for generating a variety of byte structs
 // used by the protocol, optionally with a variety of errors or irregularities
 // for testing purposes.
@@ -261,5 +247,30 @@ const testHelpers = {
     const buf = new BufferWriter();
     buf.writeVectorBytes16(cookie);
     return { data: buf.flush(), type: 44 };
+  }
+};
+
+assert.throwsAsync = (fn, errorLike, errMsgMatcher, message) => {
+  let threw = null;
+  return fn().catch(err => {
+    threw = err;
+  }).then(() => {
+    // Use synchronous `assert.throws` to get all the nice matching logic.
+    assert.throws(() => {
+      if (threw) {
+        throw threw;
+      }
+    }, errorLike, errMsgMatcher, message);
+  });
+};
+
+assert.promiseIsPending = async (p) => {
+  const sentinel = {};
+  const which = await Promise.race([p, (async () => {
+    await testHelpers.nextTick();
+    return sentinel;
+  })()]);
+  if (which !== sentinel) {
+    assert.fail('promise was already fulfilled');
   }
 };

@@ -380,13 +380,15 @@ export class NewSessionTicket extends HandshakeMessage {
   }
 
   static _read(buf) {
-    return new this(
-      buf.readUint32(), // ticket_lifetime
-      buf.readUint32(), // ticket_age_add
-      buf.readVectorBytes8(), // ticket_nonce
-      buf.readVectorBytes16(), // ticket
-      this._readExtensions(HANDSHAKE_TYPE.NEW_SESSION_TICKET, buf)
-    );
+    const ticketLifetime = buf.readUint32();
+    const ticketAgeAdd = buf.readUint32();
+    const ticketNonce = buf.readVectorBytes8();
+    const ticket = buf.readVectorBytes16();
+    if (ticket.byteLength < 1) {
+      throw new TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+    }
+    const extensions = this._readExtensions(HANDSHAKE_TYPE.NEW_SESSION_TICKET, buf);
+    return new this(ticketLifetime, ticketAgeAdd, ticketNonce, ticket, extensions);
   }
 
   _write(buf) {
