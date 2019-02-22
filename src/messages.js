@@ -198,7 +198,7 @@ export class ClientHello extends HandshakeMessage {
     if (legacyCompressionMethods[0] !== 0x00) {
       throw new TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
     }
-    // Read and check the extensions.
+    // Read the extensions, and check any that we know must be present.
     const extensions = this._readExtensions(HANDSHAKE_TYPE.CLIENT_HELLO, buf);
     if (! extensions.has(EXTENSION_TYPE.SUPPORTED_VERSIONS)) {
       throw new TLSError(ALERT_DESCRIPTION.MISSING_EXTENSION);

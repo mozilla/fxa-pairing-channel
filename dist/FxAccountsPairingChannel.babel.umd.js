@@ -14,7 +14,7 @@
  * This uses the event-target-shim node library published under the MIT license:
  * https://github.com/mysticatea/event-target-shim/blob/master/LICENSE
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:3f2cbe918402baef9611, Chunkhash:4befe20cda6e4faa0272.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:215b07f16d9b797396fb, Chunkhash:58a5a668cbfa6147cc5d.
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -254,6 +254,22 @@ module.exports = _inherits;
 /* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
+var arrayWithHoles = __webpack_require__(16);
+
+var iterableToArrayLimit = __webpack_require__(17);
+
+var nonIterableRest = __webpack_require__(18);
+
+function _slicedToArray(arr, i) {
+  return arrayWithHoles(arr) || iterableToArrayLimit(arr, i) || nonIterableRest();
+}
+
+module.exports = _slicedToArray;
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
 var getPrototypeOf = __webpack_require__(3);
 
 var superPropBase = __webpack_require__(15);
@@ -279,22 +295,6 @@ function _get(target, property, receiver) {
 }
 
 module.exports = _get;
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var arrayWithHoles = __webpack_require__(16);
-
-var iterableToArrayLimit = __webpack_require__(17);
-
-var nonIterableRest = __webpack_require__(18);
-
-function _slicedToArray(arr, i) {
-  return arrayWithHoles(arr) || iterableToArrayLimit(arr, i) || nonIterableRest();
-}
-
-module.exports = _slicedToArray;
 
 /***/ }),
 /* 9 */
@@ -1318,11 +1318,11 @@ var inherits = __webpack_require__(6);
 var inherits_default = /*#__PURE__*/__webpack_require__.n(inherits);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/get.js
-var get = __webpack_require__(7);
+var get = __webpack_require__(8);
 var get_default = /*#__PURE__*/__webpack_require__.n(get);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/slicedToArray.js
-var slicedToArray = __webpack_require__(8);
+var slicedToArray = __webpack_require__(7);
 var slicedToArray_default = /*#__PURE__*/__webpack_require__.n(slicedToArray);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/wrapNativeSuper.js
@@ -2402,6 +2402,7 @@ function _getRandomBytes() {
 /* eslint-disable sorting/sort-object-props */
 
 var EXTENSION_TYPE = {
+  APPLICATION_LAYER_PROTOCOL_NEGOTIATION: 16,
   PRE_SHARED_KEY: 41,
   SUPPORTED_VERSIONS: 43,
   PSK_KEY_EXCHANGE_MODES: 45
@@ -2450,6 +2451,10 @@ function () {
       };
       buf.readVector16(function (buf) {
         switch (type) {
+          case EXTENSION_TYPE.APPLICATION_LAYER_PROTOCOL_NEGOTIATION:
+            ext = extensions_ALPNExtension._read(messageType, buf);
+            break;
+
           case EXTENSION_TYPE.PRE_SHARED_KEY:
             ext = extensions_PreSharedKeyExtension._read(messageType, buf);
             break;
@@ -2741,6 +2746,81 @@ function (_Extension3) {
   }]);
 
   return PskKeyExchangeModesExtension;
+}(extensions_Extension); // The APLN extension, defined in https://tools.ietf.org/html/rfc7301
+//
+// This is basically just a list of protocol names, in order of preference.
+
+var extensions_ALPNExtension =
+/*#__PURE__*/
+function (_Extension4) {
+  inherits_default()(ALPNExtension, _Extension4);
+
+  function ALPNExtension(protocolNames) {
+    var _this8;
+
+    classCallCheck_default()(this, ALPNExtension);
+
+    _this8 = possibleConstructorReturn_default()(this, getPrototypeOf_default()(ALPNExtension).call(this));
+    _this8.protocolNames = protocolNames;
+    return _this8;
+  }
+
+  createClass_default()(ALPNExtension, [{
+    key: "_write",
+    value: function _write(messageType, buf) {
+      var _this9 = this;
+
+      switch (messageType) {
+        case HANDSHAKE_TYPE.CLIENT_HELLO:
+        case HANDSHAKE_TYPE.ENCRYPTED_EXTENSIONS:
+          buf.writeVector16(function (buf) {
+            _this9.protocolNames.forEach(function (name) {
+              if (name.byteLength < 1) {
+                throw new alerts_TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+              }
+
+              buf.writeVectorBytes8(name);
+            });
+          });
+          break;
+
+        default:
+          throw new alerts_TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+      }
+    }
+  }, {
+    key: "TYPE_TAG",
+    get: function get() {
+      return EXTENSION_TYPE.APPLICATION_LAYER_PROTOCOL_NEGOTIATION;
+    }
+  }], [{
+    key: "_read",
+    value: function _read(messageType, buf) {
+      var protocolNames = [];
+
+      switch (messageType) {
+        case HANDSHAKE_TYPE.CLIENT_HELLO:
+        case HANDSHAKE_TYPE.ENCRYPTED_EXTENSIONS:
+          buf.readVector16(function (buf) {
+            protocolNames.push(buf.readVectorBytes8());
+          });
+          break;
+
+        default:
+          throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+      }
+
+      if (messageType === HANDSHAKE_TYPE.ENCRYPTED_EXTENSIONS) {
+        if (protocolNames.length !== 1) {
+          throw new alerts_TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+        }
+      }
+
+      return new this(protocolNames);
+    }
+  }]);
+
+  return ALPNExtension;
 }(extensions_Extension);
 // CONCATENATED MODULE: ./src/constants.js
 /* This Source Code Form is subject to the terms of the Mozilla Public
@@ -3010,7 +3090,7 @@ function (_HandshakeMessage) {
 
       if (legacyCompressionMethods[0] !== 0x00) {
         throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
-      } // Read and check the extensions.
+      } // Read the extensions, and check any that we know must be present.
 
 
       var extensions = this._readExtensions(HANDSHAKE_TYPE.CLIENT_HELLO, buf);
@@ -3270,6 +3350,7 @@ function (_HandshakeMessage5) {
   return NewSessionTicket;
 }(messages_HandshakeMessage);
 // CONCATENATED MODULE: ./src/states.js
+
 
 
 
@@ -4209,7 +4290,7 @@ function (_State5) {
       var _initialize5 = asyncToGenerator_default()(
       /*#__PURE__*/
       regenerator_default.a.mark(function _callee29() {
-        var keyschedule, clientHello, buf, PSK_BINDERS_SIZE, truncatedTranscript, pskBinder;
+        var keyschedule, extensions, clientHello, buf, PSK_BINDERS_SIZE, truncatedTranscript, pskBinder;
         return regenerator_default.a.wrap(function _callee29$(_context29) {
           while (1) {
             switch (_context29.prev = _context29.next) {
@@ -4219,18 +4300,31 @@ function (_State5) {
                 return keyschedule.addPSK(this.conn.psk);
 
               case 3:
+                // Construct a ClientHello message with our single PSK and appropriate extensions.
+                // To make comparative testing easier, we add extensions in the same order they're added
+                // by the tlslite-ng library.
+                extensions = [];
+
+                if (this.conn.opts.supportedApplicationLayerProtocols) {
+                  extensions.push(new extensions_ALPNExtension(this.conn.opts.supportedApplicationLayerProtocols));
+                }
+
+                extensions.push(new extensions_SupportedVersionsExtension([VERSION_TLS_1_3]));
+                extensions.push(new extensions_PskKeyExchangeModesExtension([PSK_MODE_KE])); // We can't know the PSK binder value yet, so we initially write zeros.
+
+                extensions.push(new extensions_PreSharedKeyExtension([this.conn.pskId], [zeros(HASH_LENGTH)]));
                 _context29.t0 = messages_ClientHello;
-                _context29.next = 6;
+                _context29.next = 11;
                 return getRandomBytes(32);
 
-              case 6:
+              case 11:
                 _context29.t1 = _context29.sent;
-                _context29.next = 9;
+                _context29.next = 14;
                 return getRandomBytes(32);
 
-              case 9:
+              case 14:
                 _context29.t2 = _context29.sent;
-                _context29.t3 = [new extensions_SupportedVersionsExtension([VERSION_TLS_1_3]), new extensions_PskKeyExchangeModesExtension([PSK_MODE_KE]), new extensions_PreSharedKeyExtension([this.conn.pskId], [zeros(HASH_LENGTH)])];
+                _context29.t3 = extensions;
                 clientHello = new _context29.t0(_context29.t1, _context29.t2, _context29.t3);
                 buf = new utils_BufferWriter();
                 clientHello.write(buf); // Now that we know what the ClientHello looks like,
@@ -4241,21 +4335,21 @@ function (_State5) {
 
                 PSK_BINDERS_SIZE = HASH_LENGTH + 1 + 2;
                 truncatedTranscript = buf.slice(0, buf.tell() - PSK_BINDERS_SIZE);
-                _context29.next = 18;
+                _context29.next = 23;
                 return keyschedule.calculateFinishedMAC(keyschedule.extBinderKey, truncatedTranscript);
 
-              case 18:
+              case 23:
                 pskBinder = _context29.sent;
                 buf.incr(-HASH_LENGTH);
                 buf.writeBytes(pskBinder);
-                _context29.next = 23;
+                _context29.next = 28;
                 return this.conn._sendHandshakeMessageBytes(buf.flush());
 
-              case 23:
-                _context29.next = 25;
+              case 28:
+                _context29.next = 30;
                 return this.conn._transition(states_CLIENT_WAIT_SH, clientHello.sessionId);
 
-              case 25:
+              case 30:
               case "end":
                 return _context29.stop();
             }
@@ -4338,6 +4432,7 @@ function (_State6) {
                 throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
 
               case 4:
+                // Validate that our PSK was selected.
                 pskExt = msg.extensions.get(EXTENSION_TYPE.PRE_SHARED_KEY);
 
                 if (pskExt) {
@@ -4348,20 +4443,20 @@ function (_State6) {
                 throw new alerts_TLSError(ALERT_DESCRIPTION.MISSING_EXTENSION);
 
               case 7:
-                if (!(msg.extensions.size !== 2)) {
+                if (!(pskExt.selectedIdentity !== 0)) {
                   _context31.next = 9;
                   break;
                 }
 
-                throw new alerts_TLSError(ALERT_DESCRIPTION.UNSUPPORTED_EXTENSION);
+                throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
 
               case 9:
-                if (!(pskExt.selectedIdentity !== 0)) {
+                if (!(msg.extensions.size !== 2)) {
                   _context31.next = 11;
                   break;
                 }
 
-                throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+                throw new alerts_TLSError(ALERT_DESCRIPTION.UNSUPPORTED_EXTENSION);
 
               case 11:
                 _context31.next = 13;
@@ -4415,7 +4510,10 @@ function (_MidHandshakeState) {
       var _recvHandshakeMessage5 = asyncToGenerator_default()(
       /*#__PURE__*/
       regenerator_default.a.mark(function _callee32(msg) {
-        var keyschedule, serverFinishedTranscript;
+        var _this = this;
+
+        var _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, _step$value, type, ext, _ret, keyschedule, serverFinishedTranscript;
+
         return regenerator_default.a.wrap(function _callee32$(_context32) {
           while (1) {
             switch (_context32.prev = _context32.next) {
@@ -4428,25 +4526,105 @@ function (_MidHandshakeState) {
                 throw new alerts_TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
 
               case 2:
-                if (!(msg.extensions.size !== 0)) {
-                  _context32.next = 4;
+                _iteratorNormalCompletion = true;
+                _didIteratorError = false;
+                _iteratorError = undefined;
+                _context32.prev = 5;
+                _iterator = msg.extensions[Symbol.iterator]();
+
+              case 7:
+                if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                  _context32.next = 19;
                   break;
                 }
 
+                _step$value = slicedToArray_default()(_step.value, 2), type = _step$value[0], ext = _step$value[1];
+                _context32.t0 = type;
+                _context32.next = _context32.t0 === EXTENSION_TYPE.APPLICATION_LAYER_PROTOCOL_NEGOTIATION ? 12 : 15;
+                break;
+
+              case 12:
+                _ret = function () {
+                  // We optionally support the ALPN extension, but only if we offered it.
+                  var supportedApplicationLayerProtocols = _this.conn.opts.supportedApplicationLayerProtocols;
+
+                  if (!supportedApplicationLayerProtocols) {
+                    throw new alerts_TLSError(ALERT_DESCRIPTION.UNSUPPORTED_EXTENSION);
+                  }
+
+                  var selectedProtocol = ext.protocolNames[0];
+
+                  if (!supportedApplicationLayerProtocols.find(function (name) {
+                    return bytesAreEqual(name, selectedProtocol);
+                  })) {
+                    throw new alerts_TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+                  }
+
+                  _this.conn.applicationLayerProtocol = selectedProtocol;
+                  return "break";
+                }();
+
+                if (!(_ret === "break")) {
+                  _context32.next = 15;
+                  break;
+                }
+
+                return _context32.abrupt("break", 16);
+
+              case 15:
                 throw new alerts_TLSError(ALERT_DESCRIPTION.UNSUPPORTED_EXTENSION);
 
-              case 4:
+              case 16:
+                _iteratorNormalCompletion = true;
+                _context32.next = 7;
+                break;
+
+              case 19:
+                _context32.next = 25;
+                break;
+
+              case 21:
+                _context32.prev = 21;
+                _context32.t1 = _context32["catch"](5);
+                _didIteratorError = true;
+                _iteratorError = _context32.t1;
+
+              case 25:
+                _context32.prev = 25;
+                _context32.prev = 26;
+
+                if (!_iteratorNormalCompletion && _iterator.return != null) {
+                  _iterator.return();
+                }
+
+              case 28:
+                _context32.prev = 28;
+
+                if (!_didIteratorError) {
+                  _context32.next = 31;
+                  break;
+                }
+
+                throw _iteratorError;
+
+              case 31:
+                return _context32.finish(28);
+
+              case 32:
+                return _context32.finish(25);
+
+              case 33:
                 keyschedule = this.conn._keyschedule;
                 serverFinishedTranscript = keyschedule.getTranscript();
-                _context32.next = 8;
+                _context32.next = 37;
                 return this.conn._transition(states_CLIENT_WAIT_FINISHED, serverFinishedTranscript);
 
-              case 8:
+              case 37:
               case "end":
                 return _context32.stop();
             }
           }
-        }, _callee32, this);
+        }, _callee32, this, [[5, 21, 25, 33], [26,, 28, 32]]);
       }));
 
       function recvHandshakeMessage(_x25) {
@@ -4642,9 +4820,9 @@ function (_State8) {
       var _recvHandshakeMessage8 = asyncToGenerator_default()(
       /*#__PURE__*/
       regenerator_default.a.mark(function _callee36(msg) {
-        var _this = this;
+        var _this2 = this;
 
-        var pskExt, pskModesExt, pskIndex, keyschedule, transcript, pskBindersSize, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, binder;
+        var pskExt, pskModesExt, pskIndex, keyschedule, transcript, pskBindersSize, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, binder, alpnExt, supportedApplicationLayerProtocols;
 
         return regenerator_default.a.wrap(function _callee36$(_context36) {
           while (1) {
@@ -4682,7 +4860,7 @@ function (_State8) {
 
               case 8:
                 pskIndex = pskExt.identities.findIndex(function (pskId) {
-                  return bytesAreEqual(pskId, _this.conn.pskId);
+                  return bytesAreEqual(pskId, _this2.conn.pskId);
                 });
 
                 if (!(pskIndex === -1)) {
@@ -4703,13 +4881,13 @@ function (_State8) {
 
                 pskBindersSize = 2; // Vector16 representation overhead.
 
-                _iteratorNormalCompletion = true;
-                _didIteratorError = false;
-                _iteratorError = undefined;
+                _iteratorNormalCompletion2 = true;
+                _didIteratorError2 = false;
+                _iteratorError2 = undefined;
                 _context36.prev = 19;
 
-                for (_iterator = pskExt.binders[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                  binder = _step.value;
+                for (_iterator2 = pskExt.binders[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                  binder = _step2.value;
                   pskBindersSize += binder.byteLength + 1; // Vector8 representation overhead.
                 }
 
@@ -4719,26 +4897,26 @@ function (_State8) {
               case 23:
                 _context36.prev = 23;
                 _context36.t0 = _context36["catch"](19);
-                _didIteratorError = true;
-                _iteratorError = _context36.t0;
+                _didIteratorError2 = true;
+                _iteratorError2 = _context36.t0;
 
               case 27:
                 _context36.prev = 27;
                 _context36.prev = 28;
 
-                if (!_iteratorNormalCompletion && _iterator.return != null) {
-                  _iterator.return();
+                if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                  _iterator2.return();
                 }
 
               case 30:
                 _context36.prev = 30;
 
-                if (!_didIteratorError) {
+                if (!_didIteratorError2) {
                   _context36.next = 33;
                   break;
                 }
 
-                throw _iteratorError;
+                throw _iteratorError2;
 
               case 33:
                 return _context36.finish(30);
@@ -4751,10 +4929,40 @@ function (_State8) {
                 return keyschedule.verifyFinishedMAC(keyschedule.extBinderKey, pskExt.binders[pskIndex], transcript.slice(0, -pskBindersSize));
 
               case 37:
-                _context36.next = 39;
+                // Negotiate application-layer protocol, if requested.
+                alpnExt = msg.extensions.get(EXTENSION_TYPE.APPLICATION_LAYER_PROTOCOL_NEGOTIATION);
+
+                if (!alpnExt) {
+                  _context36.next = 44;
+                  break;
+                }
+
+                supportedApplicationLayerProtocols = this.conn.opts.supportedApplicationLayerProtocols;
+
+                if (!supportedApplicationLayerProtocols) {
+                  _context36.next = 44;
+                  break;
+                }
+
+                // Select the first protocol name in my list that appears in the client's list.
+                this.conn.applicationLayerProtocol = supportedApplicationLayerProtocols.find(function (myName) {
+                  return alpnExt.protocolNames.find(function (theirName) {
+                    return bytesAreEqual(myName, theirName);
+                  });
+                }); // Error out if we have no protocols in common.
+
+                if (this.conn.applicationLayerProtocol) {
+                  _context36.next = 44;
+                  break;
+                }
+
+                throw new alerts_TLSAlert(ALERT_DESCRIPTION.NO_APPLICATION_PROTOCOL);
+
+              case 44:
+                _context36.next = 46;
                 return this.conn._transition(states_SERVER_NEGOTIATED, msg.sessionId, pskIndex);
 
-              case 39:
+              case 46:
               case "end":
                 return _context36.stop();
             }
@@ -4790,79 +4998,91 @@ function (_MidHandshakeState2) {
       var _initialize8 = asyncToGenerator_default()(
       /*#__PURE__*/
       regenerator_default.a.mark(function _callee37(sessionId, pskIndex) {
-        var keyschedule, serverFinishedMAC, clientFinishedTranscript, clientHandshakeTrafficSecret;
+        var extensions, keyschedule, serverFinishedMAC, clientFinishedTranscript, clientHandshakeTrafficSecret;
         return regenerator_default.a.wrap(function _callee37$(_context37) {
           while (1) {
             switch (_context37.prev = _context37.next) {
               case 0:
+                // Send ServerHello, with minimal set of unencrypted extensions.
+                extensions = [];
+                extensions.push(new extensions_SupportedVersionsExtension(null, VERSION_TLS_1_3));
+                extensions.push(new extensions_PreSharedKeyExtension(null, null, pskIndex));
                 _context37.t0 = this.conn;
                 _context37.t1 = messages_ServerHello;
-                _context37.next = 4;
+                _context37.next = 7;
                 return getRandomBytes(32);
 
-              case 4:
+              case 7:
                 _context37.t2 = _context37.sent;
-                _context37.t3 = sessionId;
-                _context37.t4 = [new extensions_SupportedVersionsExtension(null, VERSION_TLS_1_3), new extensions_PreSharedKeyExtension(null, null, pskIndex)];
+                _context37.t3 = // Server random
+                sessionId;
+                _context37.t4 = extensions;
                 _context37.t5 = new _context37.t1(_context37.t2, _context37.t3, _context37.t4);
-                _context37.next = 10;
+                _context37.next = 13;
                 return _context37.t0._sendHandshakeMessage.call(_context37.t0, _context37.t5);
 
-              case 10:
+              case 13:
                 if (!(sessionId.byteLength > 0)) {
-                  _context37.next = 13;
+                  _context37.next = 16;
                   break;
                 }
 
-                _context37.next = 13;
+                _context37.next = 16;
                 return this.conn._sendChangeCipherSpec();
 
-              case 13:
+              case 16:
                 // We can now transition to the encrypted part of the handshake.
                 keyschedule = this.conn._keyschedule;
-                _context37.next = 16;
+                _context37.next = 19;
                 return keyschedule.addECDHE(null);
 
-              case 16:
-                _context37.next = 18;
+              case 19:
+                _context37.next = 21;
                 return this.conn._setSendKey(keyschedule.serverHandshakeTrafficSecret);
 
-              case 18:
-                _context37.next = 20;
+              case 21:
+                _context37.next = 23;
                 return this.conn._setRecvKey(keyschedule.clientHandshakeTrafficSecret);
 
-              case 20:
-                _context37.next = 22;
-                return this.conn._sendHandshakeMessage(new messages_EncryptedExtensions([]));
+              case 23:
+                // Send EncryptedExtensions, containing any remaining extensions.
+                extensions = [];
 
-              case 22:
-                _context37.next = 24;
-                return keyschedule.calculateFinishedMAC(keyschedule.serverHandshakeTrafficSecret);
+                if (this.conn.applicationLayerProtocol) {
+                  extensions.push(new extensions_ALPNExtension([this.conn.applicationLayerProtocol]));
+                }
 
-              case 24:
-                serverFinishedMAC = _context37.sent;
                 _context37.next = 27;
-                return this.conn._sendHandshakeMessage(new messages_Finished(serverFinishedMAC));
+                return this.conn._sendHandshakeMessage(new messages_EncryptedExtensions(extensions));
 
               case 27:
                 _context37.next = 29;
-                return keyschedule.getTranscript();
+                return keyschedule.calculateFinishedMAC(keyschedule.serverHandshakeTrafficSecret);
 
               case 29:
+                serverFinishedMAC = _context37.sent;
+                _context37.next = 32;
+                return this.conn._sendHandshakeMessage(new messages_Finished(serverFinishedMAC));
+
+              case 32:
+                _context37.next = 34;
+                return keyschedule.getTranscript();
+
+              case 34:
                 clientFinishedTranscript = _context37.sent;
                 clientHandshakeTrafficSecret = keyschedule.clientHandshakeTrafficSecret;
-                _context37.next = 33;
+                _context37.next = 38;
                 return keyschedule.finalize();
 
-              case 33:
-                _context37.next = 35;
+              case 38:
+                _context37.next = 40;
                 return this.conn._setSendKey(keyschedule.serverApplicationTrafficSecret);
 
-              case 35:
-                _context37.next = 37;
+              case 40:
+                _context37.next = 42;
                 return this.conn._transition(states_SERVER_WAIT_FINISHED, clientHandshakeTrafficSecret, clientFinishedTranscript);
 
-              case 37:
+              case 42:
               case "end":
                 return _context37.stop();
             }
@@ -6282,17 +6502,24 @@ function () {
 var tlsconnection_Connection =
 /*#__PURE__*/
 function () {
-  function Connection(psk, pskId, sendCallback) {
+  function Connection(psk, pskId, opts, sendCallback) {
     var _this = this;
 
     classCallCheck_default()(this, Connection);
 
+    if (typeof sendCallback === 'undefined') {
+      sendCallback = opts;
+      opts = {};
+    }
+
     this.psk = assertIsBytes(psk);
     this.pskId = assertIsBytes(pskId);
+    this.opts = this._validateOptions(opts);
     this.connected = new Promise(function (resolve, reject) {
       _this._onConnectionSuccess = resolve;
       _this._onConnectionFailure = reject;
     });
+    this.applicationLayerProtocol = null;
     this._state = new states_UNINITIALIZED(this);
     this._handshakeRecvBuffer = null;
     this._hasSeenChangeCipherSpec = false;
@@ -6527,7 +6754,18 @@ function () {
       }
 
       return close;
-    }() // Ensure that async functions execute one at a time,
+    }()
+  }, {
+    key: "_validateOptions",
+    value: function _validateOptions(opts) {
+      if (typeof opts.supportedApplicationLayerProtocols !== 'undefined') {
+        opts.supportedApplicationLayerProtocols.forEach(function (name) {
+          assertIsBytes(name);
+        });
+      }
+
+      return opts;
+    } // Ensure that async functions execute one at a time,
     // by waiting for the previous call to `_synchronized()` to complete
     // before starting a new one.  This helps ensure that we complete
     // one state-machine transition before starting to do the next.
@@ -6879,12 +7117,12 @@ function () {
     value: function () {
       var _create = asyncToGenerator_default()(
       /*#__PURE__*/
-      regenerator_default.a.mark(function _callee16(psk, pskId, sendCallback) {
+      regenerator_default.a.mark(function _callee16(psk, pskId, opts, sendCallback) {
         return regenerator_default.a.wrap(function _callee16$(_context16) {
           while (1) {
             switch (_context16.prev = _context16.next) {
               case 0:
-                return _context16.abrupt("return", new this(psk, pskId, sendCallback));
+                return _context16.abrupt("return", new this(psk, pskId, opts, sendCallback));
 
               case 1:
               case "end":
@@ -6894,7 +7132,7 @@ function () {
         }, _callee16, this);
       }));
 
-      function create(_x11, _x12, _x13) {
+      function create(_x11, _x12, _x13, _x14) {
         return _create.apply(this, arguments);
       }
 
@@ -6920,14 +7158,14 @@ function (_Connection) {
     value: function () {
       var _create2 = asyncToGenerator_default()(
       /*#__PURE__*/
-      regenerator_default.a.mark(function _callee17(psk, pskId, sendCallback) {
+      regenerator_default.a.mark(function _callee17(psk, pskId, opts, sendCallback) {
         var instance;
         return regenerator_default.a.wrap(function _callee17$(_context17) {
           while (1) {
             switch (_context17.prev = _context17.next) {
               case 0:
                 _context17.next = 2;
-                return get_default()(getPrototypeOf_default()(ClientConnection), "create", this).call(this, psk, pskId, sendCallback);
+                return get_default()(getPrototypeOf_default()(ClientConnection), "create", this).call(this, psk, pskId, opts, sendCallback);
 
               case 2:
                 instance = _context17.sent;
@@ -6945,7 +7183,7 @@ function (_Connection) {
         }, _callee17, this);
       }));
 
-      function create(_x14, _x15, _x16) {
+      function create(_x15, _x16, _x17, _x18) {
         return _create2.apply(this, arguments);
       }
 
@@ -6971,14 +7209,14 @@ function (_Connection2) {
     value: function () {
       var _create3 = asyncToGenerator_default()(
       /*#__PURE__*/
-      regenerator_default.a.mark(function _callee18(psk, pskId, sendCallback) {
+      regenerator_default.a.mark(function _callee18(psk, pskId, opts, sendCallback) {
         var instance;
         return regenerator_default.a.wrap(function _callee18$(_context18) {
           while (1) {
             switch (_context18.prev = _context18.next) {
               case 0:
                 _context18.next = 2;
-                return get_default()(getPrototypeOf_default()(ServerConnection), "create", this).call(this, psk, pskId, sendCallback);
+                return get_default()(getPrototypeOf_default()(ServerConnection), "create", this).call(this, psk, pskId, opts, sendCallback);
 
               case 2:
                 instance = _context18.sent;
@@ -6996,7 +7234,7 @@ function (_Connection2) {
         }, _callee18, this);
       }));
 
-      function create(_x17, _x18, _x19) {
+      function create(_x19, _x20, _x21, _x22) {
         return _create3.apply(this, arguments);
       }
 
@@ -8158,9 +8396,10 @@ function (_EventTarget) {
   }], [{
     key: "create",
     value: function create(channelServerURI) {
+      var tlsOpts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       var wsURI = new URL('/v1/ws/', channelServerURI).href;
       var channelKey = crypto.getRandomValues(new Uint8Array(32));
-      return this._makePairingChannel(wsURI, tlsconnection_ServerConnection, channelKey);
+      return this._makePairingChannel(wsURI, tlsconnection_ServerConnection, channelKey, tlsOpts);
     }
     /**
      * Connect to an existing pairing channel.
@@ -8171,12 +8410,13 @@ function (_EventTarget) {
   }, {
     key: "connect",
     value: function connect(channelServerURI, channelId, channelKey) {
+      var tlsOpts = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
       var wsURI = new URL("/v1/ws/".concat(channelId), channelServerURI).href;
-      return this._makePairingChannel(wsURI, tlsconnection_ClientConnection, channelKey);
+      return this._makePairingChannel(wsURI, tlsconnection_ClientConnection, channelKey, tlsOpts);
     }
   }, {
     key: "_makePairingChannel",
-    value: function _makePairingChannel(wsUri, ConnectionClass, psk) {
+    value: function _makePairingChannel(wsUri, ConnectionClass, psk, tlsOpts) {
       var _this3 = this;
 
       var socket = new WebSocket(wsUri);
@@ -8227,7 +8467,7 @@ function (_EventTarget) {
                     _JSON$parse = JSON.parse(event.data), channelId = _JSON$parse.channelid;
                     pskId = utf8ToBytes(channelId);
                     _context5.next = 6;
-                    return ConnectionClass.create(psk, pskId, function (data) {
+                    return ConnectionClass.create(psk, pskId, tlsOpts, function (data) {
                       // The channelserver websocket handler epxects b64urlsafe strings
                       // rather than raw bytes, because it wraps them in a JSON object envelope.
                       socket.send(bytesToBase64url(data));

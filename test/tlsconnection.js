@@ -71,7 +71,10 @@ describe('the ServerConnection class', () => {
     sinon.stub(crypto, 'getRandomValues').callsFake(arr => {
       arr.set(TEST_VECTORS.SERVER_RANDOM);
     });
-    server = await ServerConnection.create(TEST_VECTORS.PSK, TEST_VECTORS.PSK_ID, data => SERVER_SENT.push(data));
+    const opts = {
+      supportedApplicationLayerProtocols: [utf8ToBytes('firefox accounts pairing v1')]
+    };
+    server = await ServerConnection.create(TEST_VECTORS.PSK, TEST_VECTORS.PSK_ID, opts, data => SERVER_SENT.push(data));
   });
 
   afterEach(() => {
@@ -718,7 +721,10 @@ describe('the ClientConnection class', () => {
     sinon.stub(crypto, 'getRandomValues').callsFake(arr => {
       arr.set(RANDOM_VALUES.shift());
     });
-    client = await ClientConnection.create(TEST_VECTORS.PSK, TEST_VECTORS.PSK_ID, data => CLIENT_SENT.push(data));
+    const opts = {
+      supportedApplicationLayerProtocols: [utf8ToBytes('firefox accounts pairing v1')]
+    };
+    client = await ClientConnection.create(TEST_VECTORS.PSK, TEST_VECTORS.PSK_ID, opts, data => CLIENT_SENT.push(data));
   });
 
   afterEach(() => {

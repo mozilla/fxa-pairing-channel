@@ -15,6 +15,7 @@ import { HASH_LENGTH } from './crypto.js';
 
 /* eslint-disable sorting/sort-object-props */
 export const EXTENSION_TYPE = {
+  APPLICATION_LAYER_PROTOCOL_NEGOTIATION: 16,
   PRE_SHARED_KEY: 41,
   SUPPORTED_VERSIONS: 43,
   PSK_KEY_EXCHANGE_MODES: 45,
@@ -46,6 +47,9 @@ export class Extension {
     };
     buf.readVector16(buf => {
       switch (type) {
+        case EXTENSION_TYPE.APPLICATION_LAYER_PROTOCOL_NEGOTIATION:
+          ext = ALPNExtension._read(messageType, buf);
+          break;
         case EXTENSION_TYPE.PRE_SHARED_KEY:
           ext = PreSharedKeyExtension._read(messageType, buf);
           break;
@@ -256,6 +260,60 @@ export class PskKeyExchangeModesExtension extends Extension {
         buf.writeVector8(buf => {
           this.modes.forEach(mode => {
             buf.writeUint8(mode);
+          });
+        });
+        break;
+      default:
+        throw new TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+    }
+  }
+}
+
+
+// The APLN extension, defined in https://tools.ietf.org/html/rfc7301
+//
+// This is basically just a list of protocol names, in order of preference.
+
+export class ALPNExtension extends Extension {
+  constructor(protocolNames) {
+    super();
+    this.protocolNames = protocolNames;
+  }
+
+  get TYPE_TAG() {
+    return EXTENSION_TYPE.APPLICATION_LAYER_PROTOCOL_NEGOTIATION;
+  }
+
+  static _read(messageType, buf) {
+    const protocolNames = [];
+    switch (messageType) {
+      case HANDSHAKE_TYPE.CLIENT_HELLO:
+      case HANDSHAKE_TYPE.ENCRYPTED_EXTENSIONS:
+        buf.readVector16(buf => {
+          protocolNames.push(buf.readVectorBytes8());
+        });
+        break;
+      default:
+        throw new TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+    }
+    if (messageType === HANDSHAKE_TYPE.ENCRYPTED_EXTENSIONS) {
+      if (protocolNames.length !== 1) {
+        throw new TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+      }
+    }
+    return new this(protocolNames);
+  }
+
+  _write(messageType, buf) {
+    switch (messageType) {
+      case HANDSHAKE_TYPE.CLIENT_HELLO:
+      case HANDSHAKE_TYPE.ENCRYPTED_EXTENSIONS:
+        buf.writeVector16(buf => {
+          this.protocolNames.forEach(name => {
+            if (name.byteLength < 1) {
+              throw new TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+            }
+            buf.writeVectorBytes8(name);
           });
         });
         break;

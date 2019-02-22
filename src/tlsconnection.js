@@ -52,7 +52,7 @@
 // in which side is expected to send vs receieve during the protocol handshake.
 
 import * as STATE from './states.js';
-import { assertIsBytes, noop, BufferReader } from './utils.js';
+import { assertIsBytes, noop, BufferReader, assert } from './utils.js';
 import { HandshakeMessage } from './messages.js';
 import { KeySchedule } from './keyschedule.js';
 import { RecordLayer, RECORD_TYPE } from './recordlayer.js';
@@ -61,13 +61,19 @@ import { TLSCloseNotify } from './index.js';
 
 
 export class Connection {
-  constructor(psk, pskId, sendCallback) {
+  constructor(psk, pskId, opts, sendCallback) {
+    if (typeof sendCallback === 'undefined') {
+      sendCallback = opts;
+      opts = {};
+    }
     this.psk = assertIsBytes(psk);
     this.pskId = assertIsBytes(pskId);
+    this.opts = this._validateOptions(opts);
     this.connected = new Promise((resolve, reject) => {
       this._onConnectionSuccess = resolve;
       this._onConnectionFailure = reject;
     });
+    this.applicationLayerProtocol = null;
     this._state = new STATE.UNINITIALIZED(this);
     this._handshakeRecvBuffer = null;
     this._hasSeenChangeCipherSpec = false;
@@ -77,8 +83,8 @@ export class Connection {
   }
 
   // Subclasses will override this with some async initialization logic.
-  static async create(psk, pskId, sendCallback) {
-    return new this(psk, pskId, sendCallback);
+  static async create(psk, pskId, opts, sendCallback) {
+    return new this(psk, pskId, opts, sendCallback);
   }
 
   // These are the three public API methods that consumers can use
@@ -138,6 +144,16 @@ export class Connection {
     await this._synchronized(async () => {
       await this._state.close();
     });
+  }
+
+  _validateOptions(opts) {
+    if (typeof opts.supportedApplicationLayerProtocols !== 'undefined') {
+      opts.supportedApplicationLayerProtocols.forEach(name => {
+        assertIsBytes(name);
+        assert(name.byteLength > 0, 'ALPN protocol name must not be empty');
+      });
+    }
+    return opts;
   }
 
   // Ensure that async functions execute one at a time,
@@ -237,16 +253,16 @@ export class Connection {
 }
 
 export class ClientConnection extends Connection {
-  static async create(psk, pskId, sendCallback) {
-    const instance = await super.create(psk, pskId, sendCallback);
+  static async create(psk, pskId, opts, sendCallback) {
+    const instance = await super.create(psk, pskId, opts, sendCallback);
     await instance._transition(STATE.CLIENT_START);
     return instance;
   }
 }
 
 export class ServerConnection extends Connection {
-  static async create(psk, pskId, sendCallback) {
-    const instance = await super.create(psk, pskId, sendCallback);
+  static async create(psk, pskId, opts, sendCallback) {
+    const instance = await super.create(psk, pskId, opts, sendCallback);
     await instance._transition(STATE.SERVER_START);
     return instance;
   }

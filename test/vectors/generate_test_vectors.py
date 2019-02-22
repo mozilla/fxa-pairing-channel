@@ -220,7 +220,7 @@ MOCKED_URANDOM_CALLS.extend((
 ))
 
 def run_client_minimal(client):
-    client.handshakeClientCert(settings=minimalSettings)
+    client.handshakeClientCert(settings=minimalSettings, alpn=[b"firefox accounts pairing v1"])
     client.send(CLIENT_RAW_APP_DATA)
     assert client.recv(1024) == SERVER_RAW_APP_DATA
     client.send(CLIENT_RAW_APP_DATA_2)
@@ -228,7 +228,7 @@ def run_client_minimal(client):
     client.close()
 
 def run_server_minimal(server):
-    server.handshakeServer(settings=minimalSettings)
+    server.handshakeServer(settings=minimalSettings, alpn=[b"firefox accounts pairing v1"])
     assert server.recv(1024) == CLIENT_RAW_APP_DATA
     server.send(SERVER_RAW_APP_DATA)
     assert server.recv(1024) == CLIENT_RAW_APP_DATA_2

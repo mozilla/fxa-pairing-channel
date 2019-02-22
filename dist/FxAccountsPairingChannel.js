@@ -14,7 +14,7 @@
  * This uses the event-target-shim node library published under the MIT license:
  * https://github.com/mysticatea/event-target-shim/blob/master/LICENSE
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:348f3cf3e80cf7f54f9e, Chunkhash:d34c4d4ec81a46304a5d.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:4e51016242546e6a8d5c, Chunkhash:3f7d9814b29975947aca.
  * 
  */
 
@@ -757,6 +757,7 @@ async function getRandomBytes(size) {
 
 /* eslint-disable sorting/sort-object-props */
 const EXTENSION_TYPE = {
+  APPLICATION_LAYER_PROTOCOL_NEGOTIATION: 16,
   PRE_SHARED_KEY: 41,
   SUPPORTED_VERSIONS: 43,
   PSK_KEY_EXCHANGE_MODES: 45,
@@ -788,6 +789,9 @@ class extensions_Extension {
     };
     buf.readVector16(buf => {
       switch (type) {
+        case EXTENSION_TYPE.APPLICATION_LAYER_PROTOCOL_NEGOTIATION:
+          ext = extensions_ALPNExtension._read(messageType, buf);
+          break;
         case EXTENSION_TYPE.PRE_SHARED_KEY:
           ext = extensions_PreSharedKeyExtension._read(messageType, buf);
           break;
@@ -1007,6 +1011,60 @@ class extensions_PskKeyExchangeModesExtension extends extensions_Extension {
   }
 }
 
+
+// The APLN extension, defined in https://tools.ietf.org/html/rfc7301
+//
+// This is basically just a list of protocol names, in order of preference.
+
+class extensions_ALPNExtension extends extensions_Extension {
+  constructor(protocolNames) {
+    super();
+    this.protocolNames = protocolNames;
+  }
+
+  get TYPE_TAG() {
+    return EXTENSION_TYPE.APPLICATION_LAYER_PROTOCOL_NEGOTIATION;
+  }
+
+  static _read(messageType, buf) {
+    const protocolNames = [];
+    switch (messageType) {
+      case HANDSHAKE_TYPE.CLIENT_HELLO:
+      case HANDSHAKE_TYPE.ENCRYPTED_EXTENSIONS:
+        buf.readVector16(buf => {
+          protocolNames.push(buf.readVectorBytes8());
+        });
+        break;
+      default:
+        throw new TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+    }
+    if (messageType === HANDSHAKE_TYPE.ENCRYPTED_EXTENSIONS) {
+      if (protocolNames.length !== 1) {
+        throw new TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+      }
+    }
+    return new this(protocolNames);
+  }
+
+  _write(messageType, buf) {
+    switch (messageType) {
+      case HANDSHAKE_TYPE.CLIENT_HELLO:
+      case HANDSHAKE_TYPE.ENCRYPTED_EXTENSIONS:
+        buf.writeVector16(buf => {
+          this.protocolNames.forEach(name => {
+            if (name.byteLength < 1) {
+              throw new TLSError(ALERT_DESCRIPTION.DECODE_ERROR);
+            }
+            buf.writeVectorBytes8(name);
+          });
+        });
+        break;
+      default:
+        throw new TLSError(ALERT_DESCRIPTION.INTERNAL_ERROR);
+    }
+  }
+}
+
 // CONCATENATED MODULE: ./src/constants.js
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -1214,7 +1272,7 @@ class messages_ClientHello extends messages_HandshakeMessage {
     if (legacyCompressionMethods[0] !== 0x00) {
       throw new TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
     }
-    // Read and check the extensions.
+    // Read the extensions, and check any that we know must be present.
     const extensions = this._readExtensions(HANDSHAKE_TYPE.CLIENT_HELLO, buf);
     if (! extensions.has(EXTENSION_TYPE.SUPPORTED_VERSIONS)) {
       throw new TLSError(ALERT_DESCRIPTION.MISSING_EXTENSION);
@@ -1615,8 +1673,17 @@ class states_CLIENT_START extends states_State {
   async initialize() {
     const keyschedule = this.conn._keyschedule;
     await keyschedule.addPSK(this.conn.psk);
-    // Construct a ClientHello message with our single PSK.
+    // Construct a ClientHello message with our single PSK and appropriate extensions.
+    // To make comparative testing easier, we add extensions in the same order they're added
+    // by the tlslite-ng library.
+    const extensions = [];
+    if (this.conn.opts.supportedApplicationLayerProtocols) {
+      extensions.push(new extensions_ALPNExtension(this.conn.opts.supportedApplicationLayerProtocols));
+    }
+    extensions.push(new extensions_SupportedVersionsExtension([VERSION_TLS_1_3]));
+    extensions.push(new extensions_PskKeyExchangeModesExtension([PSK_MODE_KE]));
     // We can't know the PSK binder value yet, so we initially write zeros.
+    extensions.push(new extensions_PreSharedKeyExtension([this.conn.pskId], [zeros(HASH_LENGTH)]));
     const clientHello = new messages_ClientHello(
       // Client random salt.
       await getRandomBytes(32),
@@ -1624,11 +1691,7 @@ class states_CLIENT_START extends states_State {
       // but sending a random one makes it easier to be compatible with
       // the data emitted by tlslite-ng for test-case generation.
       await getRandomBytes(32),
-      [
-        new extensions_SupportedVersionsExtension([VERSION_TLS_1_3]),
-        new extensions_PskKeyExchangeModesExtension([PSK_MODE_KE]),
-        new extensions_PreSharedKeyExtension([this.conn.pskId], [zeros(HASH_LENGTH)]),
-      ],
+      extensions
     );
     const buf = new utils_BufferWriter();
     clientHello.write(buf);
@@ -1658,16 +1721,17 @@ class states_CLIENT_WAIT_SH extends states_State {
     if (! bytesAreEqual(msg.sessionId, this._sessionId)) {
       throw new TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
     }
+    // Validate that our PSK was selected.
     const pskExt = msg.extensions.get(EXTENSION_TYPE.PRE_SHARED_KEY);
     if (! pskExt) {
       throw new TLSError(ALERT_DESCRIPTION.MISSING_EXTENSION);
     }
-    // We expect only the SUPPORTED_VERSIONS and PRE_SHARED_KEY extensions.
-    if (msg.extensions.size !== 2) {
-      throw new TLSError(ALERT_DESCRIPTION.UNSUPPORTED_EXTENSION);
-    }
     if (pskExt.selectedIdentity !== 0) {
       throw new TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+    }
+    // We expect only SUPPORTED_VERSIONS and PRE_SHARED_KEY extensions in the ServerHello.
+    if (msg.extensions.size !== 2) {
+      throw new TLSError(ALERT_DESCRIPTION.UNSUPPORTED_EXTENSION);
     }
     await this.conn._keyschedule.addECDHE(null);
     await this.conn._setSendKey(this.conn._keyschedule.clientHandshakeTrafficSecret);
@@ -1678,14 +1742,27 @@ class states_CLIENT_WAIT_SH extends states_State {
 
 class states_CLIENT_WAIT_EE extends states_MidHandshakeState {
   async recvHandshakeMessage(msg) {
-    // We don't make use of any encrypted extensions, but we still
-    // have to wait for the server to send the (empty) list of them.
     if (! (msg instanceof EncryptedExtensions)) {
       throw new TLSError(ALERT_DESCRIPTION.UNEXPECTED_MESSAGE);
     }
-    // We do not support any EncryptedExtensions.
-    if (msg.extensions.size !== 0) {
-      throw new TLSError(ALERT_DESCRIPTION.UNSUPPORTED_EXTENSION);
+    for (const [type, ext] of msg.extensions) {
+      switch (type) {
+        case EXTENSION_TYPE.APPLICATION_LAYER_PROTOCOL_NEGOTIATION: {
+          // We optionally support the ALPN extension, but only if we offered it.
+          const supportedApplicationLayerProtocols = this.conn.opts.supportedApplicationLayerProtocols;
+          if (! supportedApplicationLayerProtocols) {
+            throw new TLSError(ALERT_DESCRIPTION.UNSUPPORTED_EXTENSION);
+          }
+          const selectedProtocol = ext.protocolNames[0];
+          if (! supportedApplicationLayerProtocols.find(name => bytesAreEqual(name, selectedProtocol))) {
+            throw new TLSError(ALERT_DESCRIPTION.ILLEGAL_PARAMETER);
+          }
+          this.conn.applicationLayerProtocol = selectedProtocol;
+          break;
+        }
+        default:
+          throw new TLSError(ALERT_DESCRIPTION.UNSUPPORTED_EXTENSION);
+      }
     }
     const keyschedule = this.conn._keyschedule;
     const serverFinishedTranscript = keyschedule.getTranscript();
@@ -1773,20 +1850,35 @@ class states_SERVER_START extends states_State {
       pskBindersSize += binder.byteLength + 1; // Vector8 representation overhead.
     }
     await keyschedule.verifyFinishedMAC(keyschedule.extBinderKey, pskExt.binders[pskIndex], transcript.slice(0, -pskBindersSize));
+    // Negotiate application-layer protocol, if requested.
+    const alpnExt = msg.extensions.get(EXTENSION_TYPE.APPLICATION_LAYER_PROTOCOL_NEGOTIATION);
+    if (alpnExt) {
+      const supportedApplicationLayerProtocols = this.conn.opts.supportedApplicationLayerProtocols;
+      if (supportedApplicationLayerProtocols) {
+        // Select the first protocol name in my list that appears in the client's list.
+        this.conn.applicationLayerProtocol = supportedApplicationLayerProtocols.find(myName => {
+          return alpnExt.protocolNames.find(theirName => bytesAreEqual(myName, theirName));
+        });
+        // Error out if we have no protocols in common.
+        if (! this.conn.applicationLayerProtocol) {
+          throw new TLSAlert(ALERT_DESCRIPTION.NO_APPLICATION_PROTOCOL);
+        }
+      }
+    }
     await this.conn._transition(states_SERVER_NEGOTIATED, msg.sessionId, pskIndex);
   }
 }
 
 class states_SERVER_NEGOTIATED extends states_MidHandshakeState {
   async initialize(sessionId, pskIndex) {
+    // Send ServerHello, with minimal set of unencrypted extensions.
+    let extensions = [];
+    extensions.push(new extensions_SupportedVersionsExtension(null, VERSION_TLS_1_3));
+    extensions.push(new extensions_PreSharedKeyExtension(null, null, pskIndex));
     await this.conn._sendHandshakeMessage(new messages_ServerHello(
-      // Server random
-      await getRandomBytes(32),
+      await getRandomBytes(32), // Server random
       sessionId,
-      [
-        new extensions_SupportedVersionsExtension(null, VERSION_TLS_1_3),
-        new extensions_PreSharedKeyExtension(null, null, pskIndex),
-      ]
+      extensions
     ));
     // If the client sent a non-empty sessionId, the server *must* send a change-cipher-spec for b/w compat.
     if (sessionId.byteLength > 0) {
@@ -1797,8 +1889,12 @@ class states_SERVER_NEGOTIATED extends states_MidHandshakeState {
     await keyschedule.addECDHE(null);
     await this.conn._setSendKey(keyschedule.serverHandshakeTrafficSecret);
     await this.conn._setRecvKey(keyschedule.clientHandshakeTrafficSecret);
-    // Send an empty EncryptedExtensions message.
-    await this.conn._sendHandshakeMessage(new EncryptedExtensions([]));
+    // Send EncryptedExtensions, containing any remaining extensions.
+    extensions = [];
+    if (this.conn.applicationLayerProtocol) {
+      extensions.push(new extensions_ALPNExtension([this.conn.applicationLayerProtocol]));
+    }
+    await this.conn._sendHandshakeMessage(new EncryptedExtensions(extensions));
     // Send the Finished message.
     const serverFinishedMAC = await keyschedule.calculateFinishedMAC(keyschedule.serverHandshakeTrafficSecret);
     await this.conn._sendHandshakeMessage(new messages_Finished(serverFinishedMAC));
@@ -2363,13 +2459,19 @@ class recordlayer_RecordLayer {
 
 
 class tlsconnection_Connection {
-  constructor(psk, pskId, sendCallback) {
+  constructor(psk, pskId, opts, sendCallback) {
+    if (typeof sendCallback === 'undefined') {
+      sendCallback = opts;
+      opts = {};
+    }
     this.psk = assertIsBytes(psk);
     this.pskId = assertIsBytes(pskId);
+    this.opts = this._validateOptions(opts);
     this.connected = new Promise((resolve, reject) => {
       this._onConnectionSuccess = resolve;
       this._onConnectionFailure = reject;
     });
+    this.applicationLayerProtocol = null;
     this._state = new UNINITIALIZED(this);
     this._handshakeRecvBuffer = null;
     this._hasSeenChangeCipherSpec = false;
@@ -2379,8 +2481,8 @@ class tlsconnection_Connection {
   }
 
   // Subclasses will override this with some async initialization logic.
-  static async create(psk, pskId, sendCallback) {
-    return new this(psk, pskId, sendCallback);
+  static async create(psk, pskId, opts, sendCallback) {
+    return new this(psk, pskId, opts, sendCallback);
   }
 
   // These are the three public API methods that consumers can use
@@ -2440,6 +2542,15 @@ class tlsconnection_Connection {
     await this._synchronized(async () => {
       await this._state.close();
     });
+  }
+
+  _validateOptions(opts) {
+    if (typeof opts.supportedApplicationLayerProtocols !== 'undefined') {
+      opts.supportedApplicationLayerProtocols.forEach(name => {
+        assertIsBytes(name);
+      });
+    }
+    return opts;
   }
 
   // Ensure that async functions execute one at a time,
@@ -2539,16 +2650,16 @@ class tlsconnection_Connection {
 }
 
 class tlsconnection_ClientConnection extends tlsconnection_Connection {
-  static async create(psk, pskId, sendCallback) {
-    const instance = await super.create(psk, pskId, sendCallback);
+  static async create(psk, pskId, opts, sendCallback) {
+    const instance = await super.create(psk, pskId, opts, sendCallback);
     await instance._transition(states_CLIENT_START);
     return instance;
   }
 }
 
 class tlsconnection_ServerConnection extends tlsconnection_Connection {
-  static async create(psk, pskId, sendCallback) {
-    const instance = await super.create(psk, pskId, sendCallback);
+  static async create(psk, pskId, opts, sendCallback) {
+    const instance = await super.create(psk, pskId, opts, sendCallback);
     await instance._transition(states_SERVER_START);
     return instance;
   }
@@ -3462,10 +3573,10 @@ class src_PairingChannel extends EventTarget {
    *
    * @returns Promise<PairingChannel>
    */
-  static create(channelServerURI) {
+  static create(channelServerURI, tlsOpts = {}) {
     const wsURI = new URL('/v1/ws/', channelServerURI).href;
     const channelKey = crypto.getRandomValues(new Uint8Array(32));
-    return this._makePairingChannel(wsURI, tlsconnection_ServerConnection, channelKey);
+    return this._makePairingChannel(wsURI, tlsconnection_ServerConnection, channelKey, tlsOpts);
   }
 
   /**
@@ -3473,12 +3584,12 @@ class src_PairingChannel extends EventTarget {
    *
    * @returns Promise<PairingChannel>
    */
-  static connect(channelServerURI, channelId, channelKey) {
+  static connect(channelServerURI, channelId, channelKey, tlsOpts = {}) {
     const wsURI = new URL(`/v1/ws/${channelId}`, channelServerURI).href;
-    return this._makePairingChannel(wsURI, tlsconnection_ClientConnection, channelKey);
+    return this._makePairingChannel(wsURI, tlsconnection_ClientConnection, channelKey, tlsOpts);
   }
 
-  static _makePairingChannel(wsUri, ConnectionClass, psk) {
+  static _makePairingChannel(wsUri, ConnectionClass, psk, tlsOpts) {
     const socket = new WebSocket(wsUri);
     return new Promise((resolve, reject) => {
       // eslint-disable-next-line prefer-const
@@ -3492,7 +3603,7 @@ class src_PairingChannel extends EventTarget {
         try {
           const {channelid: channelId} = JSON.parse(event.data);
           const pskId = utf8ToBytes(channelId);
-          const connection = await ConnectionClass.create(psk, pskId, data => {
+          const connection = await ConnectionClass.create(psk, pskId, tlsOpts, data => {
             // The channelserver websocket handler epxects b64urlsafe strings
             // rather than raw bytes, because it wraps them in a JSON object envelope.
             socket.send(bytesToBase64url(data));

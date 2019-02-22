@@ -39,10 +39,10 @@ export class PairingChannel extends EventTarget {
    *
    * @returns Promise<PairingChannel>
    */
-  static create(channelServerURI) {
+  static create(channelServerURI, tlsOpts = {}) {
     const wsURI = new URL('/v1/ws/', channelServerURI).href;
     const channelKey = crypto.getRandomValues(new Uint8Array(32));
-    return this._makePairingChannel(wsURI, ServerConnection, channelKey);
+    return this._makePairingChannel(wsURI, ServerConnection, channelKey, tlsOpts);
   }
 
   /**
@@ -50,12 +50,12 @@ export class PairingChannel extends EventTarget {
    *
    * @returns Promise<PairingChannel>
    */
-  static connect(channelServerURI, channelId, channelKey) {
+  static connect(channelServerURI, channelId, channelKey, tlsOpts = {}) {
     const wsURI = new URL(`/v1/ws/${channelId}`, channelServerURI).href;
-    return this._makePairingChannel(wsURI, ClientConnection, channelKey);
+    return this._makePairingChannel(wsURI, ClientConnection, channelKey, tlsOpts);
   }
 
-  static _makePairingChannel(wsUri, ConnectionClass, psk) {
+  static _makePairingChannel(wsUri, ConnectionClass, psk, tlsOpts) {
     const socket = new WebSocket(wsUri);
     return new Promise((resolve, reject) => {
       // eslint-disable-next-line prefer-const
@@ -69,7 +69,7 @@ export class PairingChannel extends EventTarget {
         try {
           const {channelid: channelId} = JSON.parse(event.data);
           const pskId = utf8ToBytes(channelId);
-          const connection = await ConnectionClass.create(psk, pskId, data => {
+          const connection = await ConnectionClass.create(psk, pskId, tlsOpts, data => {
             // The channelserver websocket handler epxects b64urlsafe strings
             // rather than raw bytes, because it wraps them in a JSON object envelope.
             socket.send(bytesToBase64url(data));
