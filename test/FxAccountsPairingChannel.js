@@ -40,7 +40,7 @@ describe('FxAccountsPairingChannel', () => {
 
   it('throws when network connection fails', async () => {
     await assert.throwsAsync(async () => {
-      await PairingChannel.create('wss://this.should.not.work');
+      await PairingChannel.create('wss://nonexistent.example.com');
     }, Error, 'Error while creating the pairing channel');
   });
 
