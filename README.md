@@ -50,6 +50,6 @@ Crypto
 
 Under the hood, the `PairingChannel` implements the "externally-provisioned
 pre-shared key" mode of [TLS1.3](https://tools.ietf.org/html/rfc8446).
-Each side of the channel can thus be assured that its peer is in posession
+Each side of the channel can thus be assured that its peer is in possession
 of the `channelKey`, and that their traffic is protected from anyone who
 does not possess this key.
