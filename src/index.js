@@ -81,9 +81,11 @@ export class PairingChannel extends EventTarget {
         }
       };
       stopListening = () => {
+        socket.removeEventListener('close', onConnectionError);
         socket.removeEventListener('error', onConnectionError);
         socket.removeEventListener('message', onFirstMessage);
       };
+      socket.addEventListener('close', onConnectionError);
       socket.addEventListener('error', onConnectionError);
       socket.addEventListener('message', onFirstMessage);
     });
