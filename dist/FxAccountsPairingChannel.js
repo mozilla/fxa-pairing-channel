@@ -14,7 +14,7 @@
  * This uses the event-target-shim node library published under the MIT license:
  * https://github.com/mysticatea/event-target-shim/blob/master/LICENSE
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:348f3cf3e80cf7f54f9e, Chunkhash:d34c4d4ec81a46304a5d.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:b723ebbf7c71d866d60b, Chunkhash:5bb015078a7c08e8cdc5.
  * 
  */
 
@@ -3416,6 +3416,7 @@ if (
 
 /* harmony default export */ var event_target_shim = (EventTarget);
 
+//# sourceMappingURL=event-target-shim.mjs.map
 
 // CONCATENATED MODULE: ./src/index.js
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PairingChannel", function() { return src_PairingChannel; });
@@ -3504,9 +3505,11 @@ class src_PairingChannel extends EventTarget {
         }
       };
       stopListening = () => {
+        socket.removeEventListener('close', onConnectionError);
         socket.removeEventListener('error', onConnectionError);
         socket.removeEventListener('message', onFirstMessage);
       };
+      socket.addEventListener('close', onConnectionError);
       socket.addEventListener('error', onConnectionError);
       socket.addEventListener('message', onFirstMessage);
     });

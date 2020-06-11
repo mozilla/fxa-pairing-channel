@@ -14,7 +14,7 @@
  * This uses the event-target-shim node library published under the MIT license:
  * https://github.com/mysticatea/event-target-shim/blob/master/LICENSE
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:3f2cbe918402baef9611, Chunkhash:4befe20cda6e4faa0272.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:d6cd81de19f68c6e469c, Chunkhash:3cf39a098c4805094778.
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -8259,10 +8259,12 @@ function (_EventTarget) {
         }();
 
         stopListening = function stopListening() {
+          socket.removeEventListener('close', onConnectionError);
           socket.removeEventListener('error', onConnectionError);
           socket.removeEventListener('message', onFirstMessage);
         };
 
+        socket.addEventListener('close', onConnectionError);
         socket.addEventListener('error', onConnectionError);
         socket.addEventListener('message', onFirstMessage);
       });
