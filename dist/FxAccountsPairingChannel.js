@@ -3416,7 +3416,6 @@ if (
 
 /* harmony default export */ var event_target_shim = (EventTarget);
 
-//# sourceMappingURL=event-target-shim.mjs.map
 
 // CONCATENATED MODULE: ./src/index.js
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PairingChannel", function() { return src_PairingChannel; });

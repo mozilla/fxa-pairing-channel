@@ -1,18 +1,18 @@
 version: 2
 jobs:
-  build:
+  build-and-test:
     docker:
-      - image: circleci/node:8.14.1-stretch-browsers
+      - image: cimg/node:lts-browsers
         env:
           - DISPLAY=:99
     steps:
       - checkout
       - run:
           command: |
-            sudo apt-get install -y python-setuptools python2.7-dev build-essential xvfb
-            sudo easy_install pip
-            sudo pip install mozdownload mozinstall
-            mozdownload --version 64.0 --destination firefox.tar.bz2
+            sudo apt-get update
+            sudo apt-get install -y python3-pip build-essential xvfb
+            sudo pip3 install mozdownload mozinstall
+            mozdownload --version latest --destination firefox.tar.bz2
             mozinstall firefox.tar.bz2
       - run:
           shell: /bin/bash --login
@@ -20,14 +20,33 @@ jobs:
             sudo npm install -g npm@6
             npm ci
             DISPLAY=:99 FIREFOX_BIN=./firefox/firefox-bin npm test
-
       - store_artifacts:
           path: ./coverage/
-
       - run: npm run lint
+      # We checkin built artifacts, so this helps make sure that we don't forget
+      # to do so, by erroring out in CI if a rebuild makes uncommited changes.
+      - run: npm run build
+      - run: git diff && git diff-index --exit-code HEAD
+
 workflows:
   version: 2
 
-  build-test-push:
+  build-test:
     jobs:
-      - build
+      - build-and-test
+
+  # Since we don't have many PRs to this repo, periodically run
+  # the tests to see if they're still working with the latest
+  # versions of nodejs and Firefox.
+  periodic-test:
+    jobs:
+      - build-and-test
+    triggers:
+      - schedule:
+          cron: "5 8 13 * *"
+          filters:
+            branches:
+              only:
+                - master
+
+
