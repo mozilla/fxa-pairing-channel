@@ -14,7 +14,7 @@
  * This uses the event-target-shim node library published under the MIT license:
  * https://github.com/mysticatea/event-target-shim/blob/master/LICENSE
  * 
- * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:d6cd81de19f68c6e469c, Chunkhash:3cf39a098c4805094778.
+ * Bundle generated from https://github.com/mozilla/fxa-pairing-channel.git. Hash:78cb6944395e5a8ce1e1, Chunkhash:8c9e24877c95d0520946.
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -2004,7 +2004,9 @@ function (_BufferWithPointer2) {
 // Low-level crypto primitives.
 //
 // This file implements the AEAD encrypt/decrypt and hashing routines
-// for the TLS_AES_128_GCM_SHA256 ciphersuite.
+// for the TLS_AES_128_GCM_SHA256 ciphersuite. They are (thankfully)
+// fairly light-weight wrappers around what's available via the WebCrypto
+// API.
 //
 
 
@@ -2409,6 +2411,11 @@ function _getRandomBytes() {
 // This file contains some helpers for reading/writing the various kinds
 // of Extension that might appear in a HandshakeMessage.
 //
+// "Extensions" are how TLS signals the presence of particular bits of optional
+// functionality in the protocol. Lots of parts of TLS1.3 that don't seem like
+// they're optional are implemented in terms of an extension, IIUC because that's
+// what was needed for a clean deployment in amongst earlier versions of the protocol.
+//
 
 
 
@@ -2777,8 +2784,8 @@ var PSK_MODE_KE = 0;
 //
 // Message parsing.
 //
-// Herein we need code for reading and writing the various Handshake
-// messages involved in the protocol.
+// Herein we have code for reading and writing the various Handshake
+// messages involved in the TLS protocol.
 //
 
 
@@ -7897,7 +7904,9 @@ if (
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 // A wrapper that combines a WebSocket to the channelserver
 // with some client-side encryption for securing the channel.
-// We'll improve the encryption before initial release...
+//
+// This code is responsible for the event handling and the consumer API.
+// All the details of encrypting the messages are delegated to`./tlsconnection.js`.
 
 
 
@@ -7929,6 +7938,10 @@ function (_EventTarget) {
   /**
    * Create a new pairing channel.
    *
+   * This will open a channel on the channelserver, and generate a random client-side
+   * encryption key. When the promise resolves, `this.channelId` and `this.channelKey`
+   * can be transferred to another client to allow it to securely connect to the channel.
+   *
    * @returns Promise<PairingChannel>
    */
 
@@ -7951,6 +7964,8 @@ function (_EventTarget) {
               switch (_context.prev = _context.next) {
                 case 0:
                   _context.prev = 0;
+                  // When we receive data from the channelserver, pump it through the TLS connection
+                  // to decrypt it, then echo it back out to consumers as an event.
                   channelServerEnvelope = JSON.parse(event.data);
                   _context.next = 4;
                   return _this2._connection.recv(base64urlToBytes(channelServerEnvelope.message));
@@ -7976,6 +7991,9 @@ function (_EventTarget) {
                   _context.prev = 8;
                   _context.t0 = _context["catch"](0);
 
+                  // The underlying TLS connection will signal a clean shutdown of the channel
+                  // by throwing a special error, because it doesn't really have a better
+                  // signally mechanism available.
                   if (_context.t0 instanceof alerts_TLSCloseNotify) {
                     _this2._peerClosed = true;
 
@@ -8162,11 +8180,16 @@ function (_EventTarget) {
     key: "create",
     value: function create(channelServerURI) {
       var wsURI = new URL('/v1/ws/', channelServerURI).href;
-      var channelKey = crypto.getRandomValues(new Uint8Array(32));
+      var channelKey = crypto.getRandomValues(new Uint8Array(32)); // The one who creates the channel plays the role of 'server' in the underlying TLS exchange.
+
       return this._makePairingChannel(wsURI, tlsconnection_ServerConnection, channelKey);
     }
     /**
      * Connect to an existing pairing channel.
+     *
+     * This will connect to a channel on the channelserver previously established by
+     * another client calling `create`. The `channelId` and `channelKey` must have been
+     * obtained via some out-of-band mechanism (such as by scanning from a QR code).
      *
      * @returns Promise<PairingChannel>
      */
@@ -8174,7 +8197,9 @@ function (_EventTarget) {
   }, {
     key: "connect",
     value: function connect(channelServerURI, channelId, channelKey) {
-      var wsURI = new URL("/v1/ws/".concat(channelId), channelServerURI).href;
+      var wsURI = new URL("/v1/ws/".concat(channelId), channelServerURI).href; // The one who connects to an existing channel plays the role of 'client'
+      // in the underlying TLS exchange.
+
       return this._makePairingChannel(wsURI, tlsconnection_ClientConnection, channelKey);
     }
   }, {
@@ -8227,12 +8252,15 @@ function (_EventTarget) {
                   case 0:
                     stopListening();
                     _context5.prev = 1;
+                    // The channelserver echos back the channel id, and we use it as an
+                    // additional input to the TLS handshake via the "psk id" field.
                     _JSON$parse = JSON.parse(event.data), channelId = _JSON$parse.channelid;
                     pskId = utf8ToBytes(channelId);
                     _context5.next = 6;
                     return ConnectionClass.create(psk, pskId, function (data) {
-                      // The channelserver websocket handler epxects b64urlsafe strings
-                      // rather than raw bytes, because it wraps them in a JSON object envelope.
+                      // Send data by forwarding it via the channelserver websocket.
+                      // The TLS connection gives us `data` as raw bytes, but channelserver
+                      // expects b64urlsafe strings, because it wraps them in a JSON object envelope.
                       socket.send(bytesToBase64url(data));
                     });
 

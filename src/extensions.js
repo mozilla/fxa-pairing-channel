@@ -8,6 +8,11 @@
 // This file contains some helpers for reading/writing the various kinds
 // of Extension that might appear in a HandshakeMessage.
 //
+// "Extensions" are how TLS signals the presence of particular bits of optional
+// functionality in the protocol. Lots of parts of TLS1.3 that don't seem like
+// they're optional are implemented in terms of an extension, IIUC because that's
+// what was needed for a clean deployment in amongst earlier versions of the protocol.
+//
 
 import { ALERT_DESCRIPTION, TLSError } from './alerts.js';
 import { HANDSHAKE_TYPE } from './messages.js';

@@ -6,7 +6,9 @@
 // Low-level crypto primitives.
 //
 // This file implements the AEAD encrypt/decrypt and hashing routines
-// for the TLS_AES_128_GCM_SHA256 ciphersuite.
+// for the TLS_AES_128_GCM_SHA256 ciphersuite. They are (thankfully)
+// fairly light-weight wrappers around what's available via the WebCrypto
+// API.
 //
 
 import { utf8ToBytes, BufferWriter } from './utils.js';

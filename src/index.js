@@ -4,7 +4,9 @@
 
 // A wrapper that combines a WebSocket to the channelserver
 // with some client-side encryption for securing the channel.
-// We'll improve the encryption before initial release...
+//
+// This code is responsible for the event handling and the consumer API.
+// All the details of encrypting the messages are delegated to`./tlsconnection.js`.
 
 import { ClientConnection, ServerConnection } from './tlsconnection.js';
 import { TLSCloseNotify, TLSError } from './alerts.js';
@@ -37,21 +39,32 @@ export class PairingChannel extends EventTarget {
   /**
    * Create a new pairing channel.
    *
+   * This will open a channel on the channelserver, and generate a random client-side
+   * encryption key. When the promise resolves, `this.channelId` and `this.channelKey`
+   * can be transferred to another client to allow it to securely connect to the channel.
+   *
    * @returns Promise<PairingChannel>
    */
   static create(channelServerURI) {
     const wsURI = new URL('/v1/ws/', channelServerURI).href;
     const channelKey = crypto.getRandomValues(new Uint8Array(32));
+    // The one who creates the channel plays the role of 'server' in the underlying TLS exchange.
     return this._makePairingChannel(wsURI, ServerConnection, channelKey);
   }
 
   /**
    * Connect to an existing pairing channel.
    *
+   * This will connect to a channel on the channelserver previously established by
+   * another client calling `create`. The `channelId` and `channelKey` must have been
+   * obtained via some out-of-band mechanism (such as by scanning from a QR code).
+   *
    * @returns Promise<PairingChannel>
    */
   static connect(channelServerURI, channelId, channelKey) {
     const wsURI = new URL(`/v1/ws/${channelId}`, channelServerURI).href;
+    // The one who connects to an existing channel plays the role of 'client'
+    // in the underlying TLS exchange.
     return this._makePairingChannel(wsURI, ClientConnection, channelKey);
   }
 
@@ -67,11 +80,14 @@ export class PairingChannel extends EventTarget {
       const onFirstMessage = async event => {
         stopListening();
         try {
+          // The channelserver echos back the channel id, and we use it as an
+          // additional input to the TLS handshake via the "psk id" field.
           const {channelid: channelId} = JSON.parse(event.data);
           const pskId = utf8ToBytes(channelId);
           const connection = await ConnectionClass.create(psk, pskId, data => {
-            // The channelserver websocket handler epxects b64urlsafe strings
-            // rather than raw bytes, because it wraps them in a JSON object envelope.
+            // Send data by forwarding it via the channelserver websocket.
+            // The TLS connection gives us `data` as raw bytes, but channelserver
+            // expects b64urlsafe strings, because it wraps them in a JSON object envelope.
             socket.send(bytesToBase64url(data));
           });
           const instance = new this(channelId, psk, socket, connection);
@@ -94,6 +110,8 @@ export class PairingChannel extends EventTarget {
   _setupListeners() {
     this._socket.addEventListener('message', async event => {
       try {
+        // When we receive data from the channelserver, pump it through the TLS connection
+        // to decrypt it, then echo it back out to consumers as an event.
         const channelServerEnvelope = JSON.parse(event.data);
         const payload = await this._connection.recv(base64urlToBytes(channelServerEnvelope.message));
         if (payload !== null) {
@@ -107,6 +125,9 @@ export class PairingChannel extends EventTarget {
         }
       } catch (error) {
         let event;
+        // The underlying TLS connection will signal a clean shutdown of the channel
+        // by throwing a special error, because it doesn't really have a better
+        // signally mechanism available.
         if (error instanceof TLSCloseNotify) {
           this._peerClosed = true;
           if (this._selfClosed) {
