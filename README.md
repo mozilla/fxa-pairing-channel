@@ -127,14 +127,15 @@ For ease of consumption, we check the resulting built artifacts in to the Git re
 
 ### Release Process
 
-Use `npm publish` to cut a new release, after ensuring that the tests pass and the
-correct artifacts have been built:
+Use `npm version` and `npm publish` to cut a new release, after ensuring that the tests pass
+and the correct artifacts have been built:
 
 ```
 npm run build
 npm test
+npm version [major | minor | patch] -m "Prepare version %s"
 npm publish
-git tag vX.Y.Z & git push origin vX.Y.Z
+git push origin vX.Y.Z
 ```
 
 Then, open a [Bugzilla Bug](https://bugzilla.mozilla.org/enter_bug.cgi?product=Firefox&component=Firefox%20Accounts) to update the vendored copy of the library in mozilla-central.
