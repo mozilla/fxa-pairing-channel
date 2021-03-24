@@ -1287,7 +1287,20 @@ module.exports = _construct;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "PairingChannel", function() { return /* binding */ src_PairingChannel; });
+__webpack_require__.d(__webpack_exports__, "base64urlToBytes", function() { return /* reexport */ base64urlToBytes; });
+__webpack_require__.d(__webpack_exports__, "bytesToBase64url", function() { return /* reexport */ bytesToBase64url; });
+__webpack_require__.d(__webpack_exports__, "bytesToHex", function() { return /* reexport */ bytesToHex; });
+__webpack_require__.d(__webpack_exports__, "bytesToUtf8", function() { return /* reexport */ bytesToUtf8; });
+__webpack_require__.d(__webpack_exports__, "hexToBytes", function() { return /* reexport */ hexToBytes; });
+__webpack_require__.d(__webpack_exports__, "TLSCloseNotify", function() { return /* reexport */ alerts_TLSCloseNotify; });
+__webpack_require__.d(__webpack_exports__, "TLSError", function() { return /* reexport */ alerts_TLSError; });
+__webpack_require__.d(__webpack_exports__, "utf8ToBytes", function() { return /* reexport */ utf8ToBytes; });
+__webpack_require__.d(__webpack_exports__, "_internals", function() { return /* binding */ _internals; });
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/regenerator/index.js
 var regenerator = __webpack_require__(0);
@@ -7871,16 +7884,6 @@ if (
 //# sourceMappingURL=event-target-shim.mjs.map
 
 // CONCATENATED MODULE: ./src/index.js
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PairingChannel", function() { return src_PairingChannel; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_internals", function() { return _internals; });
-/* concated harmony reexport base64urlToBytes */__webpack_require__.d(__webpack_exports__, "base64urlToBytes", function() { return base64urlToBytes; });
-/* concated harmony reexport bytesToBase64url */__webpack_require__.d(__webpack_exports__, "bytesToBase64url", function() { return bytesToBase64url; });
-/* concated harmony reexport bytesToHex */__webpack_require__.d(__webpack_exports__, "bytesToHex", function() { return bytesToHex; });
-/* concated harmony reexport bytesToUtf8 */__webpack_require__.d(__webpack_exports__, "bytesToUtf8", function() { return bytesToUtf8; });
-/* concated harmony reexport hexToBytes */__webpack_require__.d(__webpack_exports__, "hexToBytes", function() { return hexToBytes; });
-/* concated harmony reexport TLSCloseNotify */__webpack_require__.d(__webpack_exports__, "TLSCloseNotify", function() { return alerts_TLSCloseNotify; });
-/* concated harmony reexport TLSError */__webpack_require__.d(__webpack_exports__, "TLSError", function() { return alerts_TLSError; });
-/* concated harmony reexport utf8ToBytes */__webpack_require__.d(__webpack_exports__, "utf8ToBytes", function() { return utf8ToBytes; });
 
 
 
