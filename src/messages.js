@@ -5,8 +5,8 @@
 //
 // Message parsing.
 //
-// Herein we need code for reading and writing the various Handshake
-// messages involved in the protocol.
+// Herein we have code for reading and writing the various Handshake
+// messages involved in the TLS protocol.
 //
 
 import { BufferWriter, BufferReader } from './utils.js';

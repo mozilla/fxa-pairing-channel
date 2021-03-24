@@ -1,4 +1,8 @@
 
+// This header provides a little bit of plumbing to use `FxAccountsPairingChannel`
+// from Firefox browser code, hence the presence of these privileged browser APIs.
+// If you're trying to use this from ordinary web content you're in for a bad time.
+
 const {Services} = ChromeUtils.import("resource://gre/modules/Services.jsm");
 const {setTimeout} = ChromeUtils.import("resource://gre/modules/Timer.jsm");
 // We cannot use WebSocket from chrome code without a window,
