@@ -111,10 +111,10 @@ web content and one for vendoring into the Firefox source tree:
   using [Babel](https://babeljs.io/), and is suitable for use in web content that must
   run in any (within reason!) browser. This is the artifact that gets used on the FxA
   website for the client side of the pairing flow.
-* `./dist/FxAccountsPairingChannel.js` is Firefox browser code, suitable only for use
+* `./dist/FxAccountsPairingChannel.sys.mjs` is Firefox browser code, suitable only for use
   within the Firefox browser application itself. This gets manually copied over into
-  [`mozilla-central/services/fxaccounts/FxAccountsPairingChannel.js`](
-  https://searchfox.org/mozilla-central/source/services/fxaccounts/FxAccountsPairingChannel.js)
+  [`mozilla-central/services/fxaccounts/FxAccountsPairingChannel.sys.mjs`](
+  https://searchfox.org/mozilla-central/source/services/fxaccounts/FxAccountsPairingChannel.sys.mjs)
   when making a new release.
 
 To generate these files from the current `./src` tree, run:
@@ -139,7 +139,7 @@ git push origin vX.Y.Z
 ```
 
 Then, open a [Bugzilla Bug](https://bugzilla.mozilla.org/enter_bug.cgi?product=Firefox&component=Firefox%20Accounts) to update the vendored copy of the library in mozilla-central.
-Copy `./dist/FxAccountsPairingChannel.js` to [`services/fxaccounts/FxAccountsPairingChannel.js`](
-https://searchfox.org/mozilla-central/source/services/fxaccounts/FxAccountsPairingChannel.js) in
+Copy `./dist/FxAccountsPairingChannel.sys.mjs` to [`services/fxaccounts/FxAccountsPairingChannel.sys.mjs`](
+https://searchfox.org/mozilla-central/source/services/fxaccounts/FxAccountsPairingChannel.sys.mjs) in
 the mozilla-central source tree. The details of how to submit the resulting patch to mozilla-central
 are outside the scope of this document.

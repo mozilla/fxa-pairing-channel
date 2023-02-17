@@ -2,7 +2,7 @@
 dist/FxAccountsPairingChannel.babel.umd.coverage.js 
 
 # Some leftover from editing build artifacts with `sed`
-dist/FxAccountsPairingChannel.js-e
+dist/FxAccountsPairingChannel.sys.mjs-e
 
 # Logs
 logs
