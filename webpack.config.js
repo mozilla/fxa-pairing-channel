@@ -28,22 +28,15 @@ const WrapperPlugin = require('wrapper-webpack-plugin');
 const bannerPlugin = new webpack.BannerPlugin({
   banner: BANNER
 });
-
-function plugins(isJsm) {
-  // Adds a banner to the generated source
-  const PLUGINS = [];
-  if (isJsm) {
-    const headerDoc = fs.readFileSync('./src/jsm_header.js.inc', 'utf8');
-    PLUGINS.push(new WrapperPlugin({
-      header: headerDoc,
-    }));
-  }
-  PLUGINS.push(bannerPlugin);
-  return PLUGINS;
-}
+const headerPlugin = new WrapperPlugin({
+  header(filename, args) {
+    const headerDoc = fs.readFileSync('./src/mjs_header.js.inc', 'utf8');
+    return headerDoc.replace("[hash]", args.hash).replace("[chunkhash]", args.chunkhash);
+  },
+});
 
 const outputConfig = {
-  library: LIBRARY_NAME,
+  // library: LIBRARY_NAME,
   path: EXPORT_PATH,
 };
 
@@ -56,21 +49,25 @@ const libraryConfig = {
   },
 };
 
-const firefoxJsmConfig = {
+const firefoxMjsConfig = {
   ...libraryConfig,
   output: {
     ...outputConfig,
-    filename: `${LIBRARY_NAME}.js`,
-    libraryTarget: 'var',
+    filename: `${LIBRARY_NAME}.sys.mjs`,
+    libraryTarget: 'module',
     libraryExport: 'PairingChannel',
   },
-  plugins: plugins(true),
+  experiments: {
+    outputModule: true,
+  },
+  plugins: [headerPlugin],
 };
 
 const babelLibraryConfig = {
   ...libraryConfig,
   output: {
     ...outputConfig,
+    library: LIBRARY_NAME,
     filename: `${LIBRARY_NAME}.babel.umd.js`,
     libraryTarget: 'umd',
     umdNamedDefine: true,
@@ -90,13 +87,14 @@ const babelLibraryConfig = {
       }
     ]
   },
-  plugins: plugins(false),
+  plugins: [bannerPlugin],
 };
 
 const coverageLibraryConfig = {
   ...libraryConfig,
   output: {
     ...outputConfig,
+    library: LIBRARY_NAME,
     filename: `${LIBRARY_NAME}.babel.umd.coverage.js`,
     libraryTarget: 'umd',
     umdNamedDefine: true,
@@ -119,11 +117,11 @@ const coverageLibraryConfig = {
   performance: {
     hints: false
   },
-  plugins: plugins(false),
+  plugins: [bannerPlugin],
 };
 
 const config = [
-  firefoxJsmConfig,
+  firefoxMjsConfig,
   babelLibraryConfig,
   coverageLibraryConfig,
 ];
