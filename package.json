@@ -22,7 +22,7 @@
   "dependencies": {
     "@babel/runtime": "^7.2.0",
     "event-target-shim": "^4.0.3",
-    "wrapper-webpack-plugin": "^2.1.0"
+    "wrapper-webpack-plugin": "^2.2.2"
   },
   "devDependencies": {
     "@babel/core": "^7.2.0",
@@ -42,7 +42,7 @@
     "karma-sinon": "^1.0.5",
     "mocha": "^8.3.1",
     "sinon": "^9.2.4",
-    "webpack": "^4.46.0",
-    "webpack-cli": "^3.3.12"
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
   }
 }
