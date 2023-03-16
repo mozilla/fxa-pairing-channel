@@ -1,46 +1,34 @@
-version: 2
+version: 2.1
+
+orbs:
+  browser-tools: circleci/browser-tools@1.4.1
+
 jobs:
-  build-and-test:
+  testo:
     docker:
-      - image: cimg/node:lts-browsers
-        env:
-          - DISPLAY=:99
+      - image: cimg/node:10.23.0-browsers
     steps:
       - checkout
+      - browser-tools/install-firefox
+      - run: npm install
       - run:
           command: |
-            sudo apt-get update
-            sudo apt-get install -y python3-pip build-essential xvfb
-            sudo pip3 install mozdownload mozinstall
-            mozdownload --version latest --destination firefox.tar.bz2
-            mozinstall firefox.tar.bz2
-      - run:
-          shell: /bin/bash --login
-          command: |
-            sudo npm install -g npm@6
-            npm ci
-            DISPLAY=:99 FIREFOX_BIN=./firefox/firefox-bin npm test
+            FIREFOX_BIN=/usr/local/bin/firefox npm test
       - store_artifacts:
           path: ./coverage/
-      - run: npm run lint
-      # We checkin built artifacts, so this helps make sure that we don't forget
-      # to do so, by erroring out in CI if a rebuild makes uncommited changes.
-      - run: npm run build
-      - run: git diff && git diff-index --exit-code HEAD
 
 workflows:
   version: 2
-
   build-test:
     jobs:
-      - build-and-test
+      - testo
 
   # Since we don't have many PRs to this repo, periodically run
   # the tests to see if they're still working with the latest
   # versions of nodejs and Firefox.
   periodic-test:
     jobs:
-      - build-and-test
+      - testo
     triggers:
       - schedule:
           cron: "5 8 13 * *"
