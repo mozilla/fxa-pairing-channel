@@ -9,9 +9,7 @@ globals:
   module: true
 
 plugins:
-  - fxa
   - sorting
-extends: plugin:fxa/client
 
 rules:
   brace-style: 2
