@@ -41,7 +41,7 @@
     "karma-sinon": "^1.0.5",
     "mocha": "^10.4.0",
     "sinon": "^9.2.4",
-    "webpack": "^4.46.0",
+    "webpack": "^5.91.0",
     "webpack-cli": "^3.3.12"
   }
 }
