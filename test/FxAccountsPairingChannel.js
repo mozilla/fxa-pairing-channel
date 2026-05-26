@@ -36,7 +36,7 @@ const {
 /* eslint-enable no-unused-vars */
 
 describe('FxAccountsPairingChannel', () => {
-  const CHANNEL_SERVER = 'wss://dev.channelserver.nonprod.cloudops.mozgcp.net';
+  const CHANNEL_SERVER = 'wss://stage.channelserver.nonprod.cloudops.mozgcp.net';
 
   it('throws when network connection fails', async () => {
     await assert.throwsAsync(async () => {
